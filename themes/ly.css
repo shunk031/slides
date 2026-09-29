@@ -7,7 +7,7 @@
   --slide-padding: 48px;
   padding: var(--slide-padding);
   font-family: "LINE Seed JP", sans-serif;
-  color: #00003e;
+  color: #595959;
   background-color: white;
   background-image: url("../../themes/assets/ly/background.svg");
   background-size: cover;
@@ -90,6 +90,7 @@ section.classification-public::before {
 }
 
 section :is(h1, h2, h3, h4, h5, h6) {
+  color: #00003e;
   font-kerning: normal;
 
   text-align: left;
@@ -99,6 +100,11 @@ section :is(h1, h2, h3, h4, h5, h6) {
 section[lang="ja"] :is(h1, h2, h3, h4, h5, h6) {
   font-feature-settings: "palt";
   word-break: auto-phrase;
+}
+
+section code {
+  color: inherit;
+  background-color: #f2f2f2;
 }
 
 section[lang="ja"] p {
