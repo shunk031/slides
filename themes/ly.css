@@ -4,7 +4,7 @@
 @import url("https://fonts.googleapis.com/css2?family=LINE+Seed+JP:wght@400;700&display=swap");
 
 :root {
-  --slide-padding: 24px;
+  --slide-padding: 16px;
   --slide-top: var(--slide-padding);
   --top-row-height: 24px;
   --content-gap: 16px;
