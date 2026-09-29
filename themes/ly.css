@@ -52,7 +52,7 @@ section::before {
 
 section.first-slide::before {
   left: auto;
-  right: 31px;
+  right: var(--slide-padding);
 }
 
 section[class*="classification-"]:not(.first-slide, .lead, .takahashi) {
