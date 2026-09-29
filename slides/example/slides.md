@@ -5,7 +5,7 @@ class: classification-public
 size: 16:9
 lang: ja
 footer: © LY Corporation
-_class: lead first-slide classification-public
+_class: paper-title title-slide-big first-slide classification-public
 paginate: true
 _paginate: false
 style: |
@@ -38,9 +38,36 @@ style: |
   section code::after {
     content: "コード用";
   }
+  section.paper-title > h1::after { content: "論文タイトル用"; }
+  section.paper-title > p:nth-of-type(1)::after { content: "著者用"; }
+  section.paper-title > p:nth-of-type(2)::after { content: "著者所属用"; }
+  section.paper-title > p:nth-of-type(3)::after { content: "論文リンク用"; }
+  section.paper-title > blockquote:nth-of-type(1) p:nth-of-type(1)::after { content: "発表者所属用"; }
+  section.paper-title > blockquote:nth-of-type(1) p:nth-of-type(2)::after { content: "発表者名用"; }
+  section.paper-title > blockquote:nth-of-type(1) p:nth-of-type(3)::after { content: "発表者リンク用"; }
+  section.paper-title > blockquote:nth-of-type(2) p::after { content: "注記用"; }
+  section.paper-title > p:nth-of-type(4)::after { content: "ロゴ用"; }
 ---
 
-# 非公式 LINE ヤフー Marp テンプレートを作ってみた / DIY: Unofficial LY Marp Template
+# Beyond Atomic Layouts: Compositional Design Understanding with Vision‑Language Models
+
+Yiyang Huang¹˒²\*, Zhaowen Wang²†, Simon Jenni², Jing Shi²,
+Yitian Zhang¹, Yizhou Wang¹, and Yun Fu¹
+
+¹Northeastern University, Boston, USA / ²Adobe Research, San Jose, USA
+
+Project page: [hukcc.github.io/Beyond-Atomic-Layouts/](https://hukcc.github.io/Beyond-Atomic-Layouts/), arXiv: [arxiv.org/abs/2608.26716](https://arxiv.org/abs/2608.26716)
+
+> **AI CBU / Visual Generation Dept.**
+>
+> **Shunsuke Kitada, Ph.D.**
+>
+> HP: [shunk031.me](https://shunk031.me) / X: [@shunk031](https://x.com/shunk031)
+
+> ※本発表で紹介する図や数式は
+> 対象の論文から引用しております
+
+![LINEヤフー](../../themes/assets/ly/logo.svg)
 
 ---
 

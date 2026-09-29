@@ -70,6 +70,16 @@ _paginate: false
 
 サンプルの `style:` はレイアウト確認用です。要素を赤い実線、情報分類ラベルとページ番号を青い破線で囲みます。見出し・段落・コードの枠には用途を表示します。枠と用途の表示を消すには、この `style:` ブロックを削除してください。
 
+### 論文紹介の表紙を作る
+
+サンプルの表紙は `_class: paper-title title-slide-big first-slide classification-public` を指定しています。`paper-title` が各ボックスを配置し、`title-slide-big` が背景を選びます。
+
+表紙の Markdown は、見出し `# 論文タイトル`、著者の段落、著者所属の段落、論文リンクの段落、発表者情報の引用ブロック、注記の引用ブロック、ロゴ画像の順に書きます。段落の順序で配置を決めるため、サンプルの構成を保って内容を差し替えてください。発表者情報の引用ブロック内は、所属・氏名・リンクの 3 段落です。
+
+CSS の `grid-template-areas` では、それぞれを `paper-title`・`authors`・`affiliations`・`links`・`presenter`・`note`・`logo` と名付けています。確認用の枠にも用途を表示します。
+
+ロゴは利用者指定の [Wikimedia Commons の SVG](https://upload.wikimedia.org/wikipedia/commons/6/68/LY_Corp_logo.svg) を `themes/assets/ly/logo.svg` に保存しています。
+
 ### 本文見出しに説明を添える
 
 `## X | _Y_` と書くと、主題 X は通常の 48px、説明 Y は約 25.7px で表示します。Y は斜体にせず、長い場合は残りの幅で折り返します。自動縮小はしません。
