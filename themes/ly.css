@@ -6,7 +6,7 @@
 :root {
   --slide-padding: 24px;
   --slide-top: 10px;
-  --content-gap: 24px;
+  --content-gap: 16px;
   padding: 48px var(--slide-padding);
   font-family: "LINE Seed JP", sans-serif;
   color: #595959;
