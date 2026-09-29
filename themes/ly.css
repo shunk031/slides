@@ -347,3 +347,52 @@ section.paper-title > p:nth-of-type(4) img {
   width: var(--paper-logo-width);
   height: auto;
 }
+
+/* Opt-in layout diagnostics */
+section.debug-layout {
+  --debug-color: #e53935;
+  --debug-pseudo-color: #1976d2;
+  --debug-outline-width: 1px;
+  --debug-label-padding: 2px 4px;
+  --debug-label-font-size: 14px;
+  --debug-label-line-height: 1.2;
+}
+
+section.debug-layout * {
+  outline: var(--debug-outline-width) solid var(--debug-color);
+}
+section.debug-layout::before, section.debug-layout::after {
+  outline: var(--debug-outline-width) dashed var(--debug-pseudo-color);
+}
+section.debug-layout :is(h1, h2, h3, h4, h5, h6, p, code) {
+  position: relative;
+}
+section.debug-layout :is(h1, h2, h3, h4, h5, h6, p, code)::after {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  padding: var(--debug-label-padding);
+  background: var(--debug-color);
+  color: var(--color-label-text);
+  font: var(--debug-label-font-size)/var(--debug-label-line-height) var(--slide-font-family);
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+section.debug-layout :is(h1, h2, h3, h4, h5, h6)::after {
+  content: "タイトル用";
+}
+section.debug-layout p::after {
+  content: "本文用";
+}
+section.debug-layout code::after {
+  content: "コード用";
+}
+section.debug-layout.paper-title > h1::after { content: "論文タイトル用"; }
+section.debug-layout.paper-title > p:nth-of-type(1)::after { content: "著者用"; }
+section.debug-layout.paper-title > p:nth-of-type(2)::after { content: "著者所属用"; }
+section.debug-layout.paper-title > p:nth-of-type(3)::after { content: "論文リンク用"; }
+section.debug-layout.paper-title > blockquote:nth-of-type(1) p:nth-of-type(1)::after { content: "発表者所属用"; }
+section.debug-layout.paper-title > blockquote:nth-of-type(1) p:nth-of-type(2)::after { content: "発表者名用"; }
+section.debug-layout.paper-title > blockquote:nth-of-type(1) p:nth-of-type(3)::after { content: "発表者リンク用"; }
+section.debug-layout.paper-title > blockquote:nth-of-type(2) p::after { content: "注記用"; }
+section.debug-layout.paper-title > p:nth-of-type(4)::after { content: "ロゴ用"; }

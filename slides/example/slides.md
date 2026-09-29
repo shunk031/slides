@@ -1,52 +1,13 @@
 ---
 marp: true
 theme: ly
-class: classification-public
+class: classification-public debug-layout
 size: 16:9
 lang: ja
 footer: © LY Corporation
-_class: paper-title title-slide-big first-slide classification-public
+_class: paper-title title-slide-big first-slide classification-public debug-layout
 paginate: true
 _paginate: false
-style: |
-  section * {
-    outline: 1px solid #e53935;
-  }
-  section::before, section::after {
-    outline: 1px dashed #1976d2;
-  }
-  section :is(h1, h2, h3, h4, h5, h6, p, code) {
-    position: relative;
-  }
-  section :is(h1, h2, h3, h4, h5, h6, p, code)::after {
-    position: absolute;
-    top: 100%;
-    right: 0;
-    padding: 2px 4px;
-    background: #e53935;
-    color: white;
-    font: 14px/1.2 "LINE Seed JP", sans-serif;
-    letter-spacing: 0;
-    white-space: nowrap;
-  }
-  section :is(h1, h2, h3, h4, h5, h6)::after {
-    content: "タイトル用";
-  }
-  section p::after {
-    content: "本文用";
-  }
-  section code::after {
-    content: "コード用";
-  }
-  section.paper-title > h1::after { content: "論文タイトル用"; }
-  section.paper-title > p:nth-of-type(1)::after { content: "著者用"; }
-  section.paper-title > p:nth-of-type(2)::after { content: "著者所属用"; }
-  section.paper-title > p:nth-of-type(3)::after { content: "論文リンク用"; }
-  section.paper-title > blockquote:nth-of-type(1) p:nth-of-type(1)::after { content: "発表者所属用"; }
-  section.paper-title > blockquote:nth-of-type(1) p:nth-of-type(2)::after { content: "発表者名用"; }
-  section.paper-title > blockquote:nth-of-type(1) p:nth-of-type(3)::after { content: "発表者リンク用"; }
-  section.paper-title > blockquote:nth-of-type(2) p::after { content: "注記用"; }
-  section.paper-title > p:nth-of-type(4)::after { content: "ロゴ用"; }
 ---
 
 # _Beyond Atomic Layouts: Compositional Design Understanding with Vision‑Language Models_
@@ -71,7 +32,7 @@ _Project page: [hukcc.github.io/Beyond-Atomic-Layouts/](https://hukcc.github.io/
 
 ---
 
-<!-- _class: content-slide-gray classification-public -->
+<!-- _class: content-slide-gray classification-public debug-layout -->
 
 ## 本論文の選定理由 | _初稿生成だけでなく「狙って直せる」デザイン生成まで扱う_
 
@@ -92,7 +53,7 @@ _Project page: [hukcc.github.io/Beyond-Atomic-Layouts/](https://hukcc.github.io/
 
 ---
 
-<!-- _class: title-slide-big classification-public -->
+<!-- _class: title-slide-big classification-public debug-layout -->
 
 # 表紙用の背景
 
@@ -100,7 +61,7 @@ _Project page: [hukcc.github.io/Beyond-Atomic-Layouts/](https://hukcc.github.io/
 
 ---
 
-<!-- _class: content-slide-gray classification-public -->
+<!-- _class: content-slide-gray classification-public debug-layout -->
 
 ## 図や説明を置くページ
 
@@ -108,6 +69,6 @@ _Project page: [hukcc.github.io/Beyond-Atomic-Layouts/](https://hukcc.github.io/
 
 ---
 
-<!-- _class: takahashi classification-public -->
+<!-- _class: takahashi classification-public debug-layout -->
 
 # 伝えたいことを一つ
