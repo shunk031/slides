@@ -4,6 +4,7 @@
 @import url("https://fonts.googleapis.com/css2?family=LINE+Seed+JP:wght@400;700&display=swap");
 
 :root {
+  padding: 48px;
   font-family: "LINE Seed JP", sans-serif;
   color: #00003e;
   background-color: white;
