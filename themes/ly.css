@@ -1,0 +1,64 @@
+/* @theme ly */
+
+@import "gaia";
+@import url("https://fonts.googleapis.com/css2?family=LINE+Seed+JP:wght@400;700&display=swap");
+
+:root {
+  font-family: "LINE Seed JP", sans-serif;
+  color: #00003e;
+  background-color: white;
+  background-image: url("../../themes/assets/ly/background.svg");
+  background-size: cover;
+}
+:root::after {
+  font-size: 50%;
+  color: white;
+  content: attr(data-marpit-pagination) " / " attr(data-marpit-pagination-total);
+}
+
+:root.title-slide-big {
+  background-color: white;
+  background-image: url("../../themes/assets/ly/title.svg");
+  background-size: cover;
+}
+:root.title-slide-big::after {
+  display: none;
+}
+
+:root.content-slide-gray {
+  background-color: white;
+  background-image: url("../../themes/assets/ly/gray.svg");
+  background-size: cover;
+}
+:root.content-slide-gray::after {
+  font-size: 50%;
+  color: #aaaaaa !important;
+  content: attr(data-marpit-pagination) " / " attr(data-marpit-pagination-total);
+}
+
+section :is(h1, h2, h3, h4, h5, h6) {
+  font-kerning: normal;
+
+  text-align: left;
+  text-wrap: pretty;
+}
+
+section[lang="ja"] :is(h1, h2, h3, h4, h5, h6) {
+  font-feature-settings: "palt";
+  word-break: auto-phrase;
+}
+
+section[lang="ja"] :not(h1, h2, h3, h4, h5, h6) {
+  font-kerning: none;
+}
+
+section[lang="en"] :not(h1, h2, h3, h4, h5, h6) {
+  font-kerning: normal;
+  text-wrap: pretty;
+}
+
+section.takahashi {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}

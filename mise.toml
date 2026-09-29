@@ -1,0 +1,11 @@
+[tools]
+node = "24.18.0"
+"npm:@marp-team/marp-cli" = "4.5.1"
+
+[tasks.pdf]
+description = "すべての資料を dist/ に PDF 出力"
+run = "marp --pdf --allow-local-files --input-dir slides --output dist"
+
+[tasks.preview]
+description = "ブラウザでスライドをプレビュー"
+run = "marp --server ."
