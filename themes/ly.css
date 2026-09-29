@@ -5,6 +5,7 @@
 
 :root {
   --slide-padding: 24px;
+  --content-gap: 24px;
   padding: 48px var(--slide-padding);
   font-family: "LINE Seed JP", sans-serif;
   color: #595959;
@@ -51,6 +52,21 @@ section::before {
 section.first-slide::before {
   left: auto;
   right: 31px;
+}
+
+section[class*="classification-"]:not(.first-slide, .lead, .takahashi) {
+  padding-top: 19px;
+}
+
+section:not(.first-slide, .lead, .takahashi)::before {
+  position: static;
+  display: block;
+  width: max-content;
+  margin-bottom: var(--content-gap);
+}
+
+section:not(.first-slide, .lead, .takahashi) > :is(h1, h2) + :not(header, footer) {
+  margin-top: var(--content-gap);
 }
 
 section.classification-top-secret::before {
