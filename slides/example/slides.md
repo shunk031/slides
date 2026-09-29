@@ -4,6 +4,7 @@ theme: ly
 class: classification-public
 size: 16:9
 lang: ja
+footer: © LY Corporation
 _class: lead first-slide classification-public
 paginate: true
 _paginate: false
@@ -19,9 +20,8 @@ style: |
   }
   section :is(h1, h2, h3, h4, h5, h6, p, code)::after {
     position: absolute;
-    top: 0;
+    top: 100%;
     right: 0;
-    transform: translateY(-100%);
     padding: 2px 4px;
     background: #e53935;
     color: white;

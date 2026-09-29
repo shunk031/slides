@@ -4,7 +4,8 @@
 @import url("https://fonts.googleapis.com/css2?family=LINE+Seed+JP:wght@400;700&display=swap");
 
 :root {
-  padding: 48px;
+  --slide-padding: 48px;
+  padding: var(--slide-padding);
   font-family: "LINE Seed JP", sans-serif;
   color: #00003e;
   background-color: white;
@@ -12,15 +13,32 @@
   background-size: cover;
 }
 :root::after {
+  top: 19px;
+  right: 31px;
+  bottom: auto;
+  height: auto;
+  padding: 0;
+  line-height: 1.3;
   font-size: 50%;
-  color: white;
+  color: #00003e;
   content: attr(data-marpit-pagination) " / " attr(data-marpit-pagination-total);
+}
+
+section > footer {
+  left: var(--slide-padding);
+  right: auto;
+  bottom: 24px;
+  height: auto;
+  padding: 0;
+  font-size: 10px;
+  line-height: 1.3;
+  color: #aaaaaa;
 }
 
 section::before {
   position: absolute;
   top: 19px;
-  left: 48px;
+  left: var(--slide-padding);
   padding: 5px 11px;
   border-radius: 4px;
   background: #aaaaaa;

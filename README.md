@@ -45,6 +45,7 @@ theme: ly
 class: classification-public
 size: 16:9
 lang: ja
+footer: © LY Corporation
 _class: lead first-slide classification-public
 paginate: true
 _paginate: false
@@ -62,6 +63,8 @@ _paginate: false
 サンプルには通常ページのほか、`title-slide-big`、`content-slide-gray`、`takahashi` の使用例があります。`_class` はそのページだけに適用します。
 
 `paginate: true` でページ番号を有効にし、`_paginate: false` で表紙だけ非表示にしています。表紙もページ数に含み、本文の番号は 2 から始まります。
+
+`footer:` で著作権表示を指定します。本文・情報分類ラベル・footer の左余白は、`themes/ly.css` の `--slide-padding` でまとめて調整できます。表紙の情報分類ラベルは右上に置きます。
 
 サンプルの `style:` はレイアウト確認用です。要素を赤い実線、情報分類ラベルとページ番号を青い破線で囲みます。見出し・段落・コードの枠には用途を表示します。枠と用途の表示を消すには、この `style:` ブロックを削除してください。
 
