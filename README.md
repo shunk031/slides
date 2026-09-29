@@ -45,7 +45,7 @@ theme: ly
 class: classification-public
 size: 16:9
 lang: ja
-_class: lead classification-public
+_class: lead first-slide classification-public
 paginate: true
 _paginate: false
 ---
@@ -65,7 +65,7 @@ _paginate: false
 
 ### 情報分類を表示する
 
-`ly` テーマでは、`class` に指定した情報分類を右上のラベルに表示します。
+`ly` テーマでは、`class` に指定した情報分類を左上のラベルに表示します。Markdown 冒頭の `_class` に `first-slide` を加えると、1 ページ目だけ右上に表示します。
 
 | 表示              | クラス                      |
 | ----------------- | --------------------------- |

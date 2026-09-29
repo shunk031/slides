@@ -4,7 +4,7 @@ theme: ly
 class: classification-public
 size: 16:9
 lang: ja
-_class: lead classification-public
+_class: lead first-slide classification-public
 paginate: true
 _paginate: false
 ---
