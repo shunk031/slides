@@ -99,7 +99,7 @@ section :is(h1, h2, h3, h4, h5, h6) {
 
 section:not(.first-slide) h2:has(> em:last-child) {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 0.35em;
   white-space: nowrap;
 }
