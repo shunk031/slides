@@ -4,7 +4,7 @@
 @import url("https://fonts.googleapis.com/css2?family=LINE+Seed+JP:wght@400;700&display=swap");
 
 :root {
-  --slide-padding: 36px;
+  --slide-padding: 24px;
   padding: 48px var(--slide-padding);
   font-family: "LINE Seed JP", sans-serif;
   color: #595959;
@@ -14,7 +14,7 @@
 }
 :root::after {
   top: 19px;
-  right: 31px;
+  right: var(--slide-padding);
   bottom: auto;
   height: auto;
   padding: 0;
