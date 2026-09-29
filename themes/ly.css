@@ -77,6 +77,10 @@ section[lang="ja"] :is(h1, h2, h3, h4, h5, h6) {
   word-break: auto-phrase;
 }
 
+section[lang="ja"] p {
+  word-break: auto-phrase;
+}
+
 section[lang="ja"] :not(h1, h2, h3, h4, h5, h6) {
   font-kerning: none;
 }
