@@ -5,7 +5,7 @@
 
 :root {
   --slide-padding: 24px;
-  --slide-top: 10px;
+  --slide-top: var(--slide-padding);
   --top-row-height: 24px;
   --content-gap: 16px;
   padding: 48px var(--slide-padding);
