@@ -1,6 +1,7 @@
 ---
 marp: true
 theme: ly
+header: Public
 size: 16:9
 lang: ja
 _class: lead

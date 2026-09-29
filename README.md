@@ -42,6 +42,7 @@ mise run pdf
 ---
 marp: true
 theme: ly
+header: Public
 size: 16:9
 lang: ja
 _class: lead
@@ -58,6 +59,18 @@ paginate: true
 ```
 
 サンプルには通常ページのほか、`title-slide-big`、`content-slide-gray`、`takahashi` の使用例があります。`_class` はそのページだけに適用します。
+
+### 公開区分を表示する
+
+`ly` テーマでは、Markdown 冒頭の `header` が全ページ右上のラベルになります。
+
+| 表示     | 指定                        |
+| -------- | --------------------------- |
+| 公開用   | `header: Public`            |
+| 社内向け | `header: Internal Use Only` |
+| 表示なし | `header` の行を省略         |
+
+背景 SVG の編集は不要です。
 
 ## テーマを追加する
 
