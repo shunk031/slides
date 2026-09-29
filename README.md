@@ -16,6 +16,10 @@ Node.js と Marp CLI のバージョンは `mise.toml` で管理します。
 
 ## サンプルを表示する
 
+VS Code では推奨拡張の [Marp for VS Code](https://marketplace.visualstudio.com/items?itemName=marp-team.marp-vscode) をインストールし、`slides/example/slides.md` の Markdown プレビューを開きます。`.vscode/settings.json` にローカルの `ly` テーマを登録しています。
+
+ブラウザで確認する場合は、次を実行します。
+
 ```sh
 mise run preview
 ```
@@ -58,6 +62,8 @@ paginate: true
 ## テーマを追加する
 
 `themes/<テーマ名>.css` を作り、先頭に `/* @theme <テーマ名> */` を記載します。`.marprc.yml` が `themes/` を読み込むので、資料の `theme` を変えるだけで選択できます。
+
+VS Code でも使うテーマは、`.vscode/settings.json` の `markdown.marp.themes` に `./themes/<テーマ名>.css` を追加します。
 
 テーマの背景画像は `themes/assets/<テーマ名>/` に置きます。CSS の画像パスは Markdown の位置を基準に解決されるため、`../../themes/assets/<テーマ名>/background.svg` のように指定します。資料は `slides/<発表名>/slides.md` の階層に揃えてください。
 
