@@ -6,6 +6,7 @@ size: 16:9
 lang: ja
 _class: lead classification-public
 paginate: true
+_paginate: false
 ---
 
 # 非公式 LINE ヤフー Marp テンプレートを作ってみた / DIY: Unofficial LY Marp Template

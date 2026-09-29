@@ -47,6 +47,7 @@ size: 16:9
 lang: ja
 _class: lead classification-public
 paginate: true
+_paginate: false
 ---
 
 # 発表タイトル
@@ -59,6 +60,8 @@ paginate: true
 ```
 
 サンプルには通常ページのほか、`title-slide-big`、`content-slide-gray`、`takahashi` の使用例があります。`_class` はそのページだけに適用します。
+
+`paginate: true` でページ番号を有効にし、`_paginate: false` で表紙だけ非表示にしています。表紙もページ数に含み、本文の番号は 2 から始まります。
 
 ### 情報分類を表示する
 
