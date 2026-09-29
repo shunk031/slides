@@ -5,6 +5,7 @@
 
 :root {
   --slide-padding: 24px;
+  --slide-top: 10px;
   --content-gap: 24px;
   padding: 48px var(--slide-padding);
   font-family: "LINE Seed JP", sans-serif;
@@ -14,7 +15,7 @@
   background-size: cover;
 }
 :root::after {
-  top: 19px;
+  top: var(--slide-top);
   right: var(--slide-padding);
   bottom: auto;
   height: auto;
@@ -38,7 +39,7 @@ section > footer {
 
 section::before {
   position: absolute;
-  top: 19px;
+  top: var(--slide-top);
   left: var(--slide-padding);
   padding: 5px 11px;
   border-radius: 4px;
@@ -55,7 +56,7 @@ section.first-slide::before {
 }
 
 section[class*="classification-"]:not(.first-slide, .lead, .takahashi) {
-  padding-top: 19px;
+  padding-top: var(--slide-top);
 }
 
 section:not(.first-slide, .lead, .takahashi)::before {
