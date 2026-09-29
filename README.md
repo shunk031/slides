@@ -113,6 +113,21 @@ CSS の `grid-template-areas` では、それぞれを `paper-title`・`authors`
 
 VS Code 内蔵プレビューではこの検証を実行しないため、仕上げに `mise run pdf` を実行してください。検証スクリプトを変更した場合は `mise run test` で正常・不正な指定のテストを実行します。
 
+## テーマの見た目を調整する
+
+`themes/ly.css` の `:root` に共通設定、`section.paper-title` の先頭に論文表紙の設定をまとめています。
+
+| 調整するもの                     | 主な変数                                                                                |
+| -------------------------------- | --------------------------------------------------------------------------------------- |
+| 外側の余白・要素間隔             | `--slide-padding`、`--slide-top`、`--content-gap`                                       |
+| 文字色・背景色                   | `--color-heading`、`--color-text`、`--color-background`                                 |
+| 本文・見出し                     | `--body-font-size`、`--heading-font-size`、`--heading-description-ratio`                |
+| 情報分類・ページ番号・著作権表示 | `--classification-*`、`--pagination-font-size`、`--footer-*`                            |
+| 論文表紙の余白・列幅             | `--paper-padding-*`、`--paper-row-gap`、`--paper-column-gap`、`--paper-presenter-width` |
+| 論文表紙の文字・ハイライト・ロゴ | `--paper-title-*`、`--paper-authors-*`、`--paper-highlight-color`、`--paper-logo-width` |
+
+行高・箇条書きの字下げ・注記の幅なども変数で調整できます。表紙タイトルの行高を縮める場合は、`g` などの下端が次行のハイライトに隠れないことを確認してください。
+
 ## テーマを追加する
 
 `themes/<テーマ名>.css` を作り、先頭に `/* @theme <テーマ名> */` を記載します。`.marprc.cjs` が `themes/` を読み込むので、資料の `theme` を変えるだけで選択できます。
