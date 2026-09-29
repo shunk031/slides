@@ -49,23 +49,23 @@ style: |
   section.paper-title > p:nth-of-type(4)::after { content: "ロゴ用"; }
 ---
 
-# Beyond Atomic Layouts: Compositional Design Understanding with Vision‑Language Models
+# _Beyond Atomic Layouts: Compositional Design Understanding with Vision‑Language Models_
 
-Yiyang Huang¹˒²\*, Zhaowen Wang²†, Simon Jenni², Jing Shi²,
-Yitian Zhang¹, Yizhou Wang¹, and Yun Fu¹
+_Yiyang Huang¹˒²\*, Zhaowen Wang²†, Simon Jenni², Jing Shi²,
+Yitian Zhang¹, Yizhou Wang¹, and Yun Fu¹_
 
-¹Northeastern University, Boston, USA / ²Adobe Research, San Jose, USA
+_¹Northeastern University, Boston, USA / ²Adobe Research, San Jose, USA_
 
-Project page: [hukcc.github.io/Beyond-Atomic-Layouts/](https://hukcc.github.io/Beyond-Atomic-Layouts/), arXiv: [arxiv.org/abs/2608.26716](https://arxiv.org/abs/2608.26716)
+_Project page: [hukcc.github.io/Beyond-Atomic-Layouts/](https://hukcc.github.io/Beyond-Atomic-Layouts/), arXiv: [arxiv.org/abs/2608.26716](https://arxiv.org/abs/2608.26716)_
 
-> **AI CBU / Visual Generation Dept.**
+> _**AI CBU / Visual Generation Dept.**_
 >
-> **Shunsuke Kitada, Ph.D.**
+> _**Shunsuke Kitada, Ph.D.**_
 >
-> HP: [shunk031.me](https://shunk031.me) / X: [@shunk031](https://x.com/shunk031)
+> _HP: [shunk031.me](https://shunk031.me) / X: [@shunk031](https://x.com/shunk031)_
 
-> ※本発表で紹介する図や数式は
-> 対象の論文から引用しております
+> _※本発表で紹介する図や数式は
+> 対象の論文から引用しております_
 
 ![LINEヤフー](../../themes/assets/ly/logo.svg)
 

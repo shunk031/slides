@@ -78,6 +78,8 @@ _paginate: false
 
 CSS の `grid-template-areas` では、それぞれを `paper-title`・`authors`・`affiliations`・`links`・`presenter`・`note`・`logo` と名付けています。確認用の枠にも用途を表示します。
 
+表紙では各テキストを `_テキスト_` で囲むと、斜体ではなく白いハイライトを付けます。折り返した行ごとに文字の背景を白くし、ボックスの残りの部分には背景の装飾を残します。
+
 ロゴは利用者指定の [Wikimedia Commons の SVG](https://upload.wikimedia.org/wikipedia/commons/6/68/LY_Corp_logo.svg) を `themes/assets/ly/logo.svg` に保存しています。
 
 ### 本文見出しに説明を添える
