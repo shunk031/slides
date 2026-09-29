@@ -42,10 +42,10 @@ mise run pdf
 ---
 marp: true
 theme: ly
-header: Public
+class: classification-public
 size: 16:9
 lang: ja
-_class: lead
+_class: lead classification-public
 paginate: true
 ---
 
@@ -60,21 +60,32 @@ paginate: true
 
 サンプルには通常ページのほか、`title-slide-big`、`content-slide-gray`、`takahashi` の使用例があります。`_class` はそのページだけに適用します。
 
-### 公開区分を表示する
+### 情報分類を表示する
 
-`ly` テーマでは、Markdown 冒頭の `header` が全ページ右上のラベルになります。
+`ly` テーマでは、`class` に指定した情報分類を右上のラベルに表示します。
 
-| 表示     | 指定                        |
-| -------- | --------------------------- |
-| 公開用   | `header: Public`            |
-| 社内向け | `header: Internal Use Only` |
-| 表示なし | `header` の行を省略         |
+| 表示              | クラス                      |
+| ----------------- | --------------------------- |
+| Top Secret        | `classification-top-secret` |
+| Secret            | `classification-secret`     |
+| Restricted        | `classification-restricted` |
+| Internal Use Only | `classification-internal`   |
+| Public            | `classification-public`     |
+| 表示なし          | 情報分類クラスを指定しない  |
 
-背景 SVG の編集は不要です。
+全ページで同じ情報分類を指定します。`_class` は `class` 全体を上書きするため、レイアウトを変えるページにも情報分類を含めます。
+
+```markdown
+<!-- _class: title-slide-big classification-public -->
+```
+
+`.marprc.cjs` が検証スクリプトを読み込み、Marp CLI での変換時に `classification-` で始まる未知のクラス、複数区分、ページ間の分類変更・指定漏れをエラーにします。全ページで指定しなければ表示なしです。`header` は通常のヘッダーとして使えます。
+
+VS Code 内蔵プレビューではこの検証を実行しないため、仕上げに `mise run pdf` を実行してください。検証スクリプトを変更した場合は `mise run test` で正常・不正な指定のテストを実行します。
 
 ## テーマを追加する
 
-`themes/<テーマ名>.css` を作り、先頭に `/* @theme <テーマ名> */` を記載します。`.marprc.yml` が `themes/` を読み込むので、資料の `theme` を変えるだけで選択できます。
+`themes/<テーマ名>.css` を作り、先頭に `/* @theme <テーマ名> */` を記載します。`.marprc.cjs` が `themes/` を読み込むので、資料の `theme` を変えるだけで選択できます。
 
 VS Code でも使うテーマは、`.vscode/settings.json` の `markdown.marp.themes` に `./themes/<テーマ名>.css` を追加します。
 

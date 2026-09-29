@@ -1,10 +1,10 @@
 ---
 marp: true
 theme: ly
-header: Public
+class: classification-public
 size: 16:9
 lang: ja
-_class: lead
+_class: lead classification-public
 paginate: true
 ---
 
@@ -18,22 +18,22 @@ paginate: true
 
 ---
 
-<!-- _class: title-slide-big -->
+<!-- _class: title-slide-big classification-public -->
 
 # 表紙用の背景
 
-`_class: title-slide-big`
+`_class: title-slide-big classification-public`
 
 ---
 
-<!-- _class: content-slide-gray -->
+<!-- _class: content-slide-gray classification-public -->
 
 ## 図や説明を置くページ
 
-`_class: content-slide-gray`
+`_class: content-slide-gray classification-public`
 
 ---
 
-<!-- _class: takahashi -->
+<!-- _class: takahashi classification-public -->
 
 # 伝えたいことを一つ
