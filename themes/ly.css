@@ -222,7 +222,8 @@ section.paper-title > h1 {
   grid-area: paper-title;
   max-width: 1080px;
   font-size: 50px;
-  line-height: 1.16;
+  /* Keep the next line's highlight clear of LINE Seed JP descenders. */
+  line-height: 1.25;
   text-wrap: wrap;
   word-break: normal;
 }
