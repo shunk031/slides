@@ -41,6 +41,7 @@
   --heading-description-line-height: 1.4;
   --list-indent: 1.6em;
   --nested-list-font-size: 0.9em;
+  --citation-font-size: 0.75em;
 
   padding: var(--slide-padding-block) var(--slide-padding);
   font-family: var(--slide-font-family);
@@ -346,6 +347,123 @@ section.paper-title > p:nth-of-type(4) {
 section.paper-title > p:nth-of-type(4) img {
   width: var(--paper-logo-width);
   height: auto;
+}
+
+/* Markdown: _[Author+ ConfName'YY](url)_ */
+section :is(p, li) > em:has(> a:only-child) {
+  font-size: var(--citation-font-size);
+  font-style: normal;
+}
+
+/* Self-introduction: biography on the left, portraits and links on the right. */
+section.profile-slide {
+  --profile-sidebar-width: 320px;
+  --profile-column-gap: 28px;
+  --profile-section-gap: 22px;
+  --profile-font-size: 27px;
+  --profile-detail-font-size: 22px;
+  --profile-heading-font-size: 44px;
+  --profile-name-ratio: 0.68;
+  --profile-line-height: 1.35;
+  --profile-link-font-size: 17px;
+  --profile-photo-gap: 20px;
+  --profile-photo-size: calc((var(--profile-sidebar-width) - var(--profile-photo-gap)) / 2);
+  --profile-accent-color: #ff0000;
+  --footer-font-size: 16px;
+  --profile-letter-spacing: 0;
+
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--profile-sidebar-width);
+  grid-template-rows: auto auto 1fr;
+  grid-template-areas:
+    "classification classification"
+    "heading sidebar"
+    "biography sidebar";
+  column-gap: var(--profile-column-gap);
+  row-gap: var(--content-gap);
+  letter-spacing: var(--profile-letter-spacing);
+}
+
+section.profile-slide::before {
+  grid-area: classification;
+  margin: 0;
+}
+
+section.profile-slide > h2 {
+  grid-area: heading;
+  margin: 0;
+  font-size: var(--profile-heading-font-size);
+  --heading-description-ratio: var(--profile-name-ratio);
+}
+
+section.profile-slide > blockquote {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: var(--color-text);
+  font-size: var(--profile-font-size);
+  line-height: var(--profile-line-height);
+}
+
+section.profile-slide > blockquote::before,
+section.profile-slide > blockquote::after {
+  content: none;
+}
+
+section.profile-slide > h2 + blockquote {
+  grid-area: biography;
+  margin-top: 0;
+}
+
+section.profile-slide > blockquote > p {
+  margin: 0;
+}
+
+section.profile-slide > blockquote > ul + p,
+section.profile-slide > blockquote > ul > li + li {
+  margin-top: var(--profile-section-gap);
+}
+
+section.profile-slide > blockquote > ul:first-of-type > li + li {
+  margin-top: 0;
+}
+
+section.profile-slide blockquote ul ul {
+  font-size: var(--profile-detail-font-size);
+}
+
+section.profile-slide blockquote li:has(> strong) {
+  color: var(--profile-accent-color);
+}
+
+section.profile-slide blockquote li > ul {
+  color: var(--color-text);
+}
+
+section.profile-slide > blockquote:nth-of-type(2) {
+  grid-area: sidebar;
+  font-size: var(--profile-detail-font-size);
+}
+
+section.profile-slide > blockquote:nth-of-type(2) > p:first-child {
+  display: flex;
+  gap: var(--profile-photo-gap);
+}
+
+section.profile-slide > blockquote:nth-of-type(2) img {
+  width: var(--profile-photo-size);
+  height: var(--profile-photo-size);
+  object-fit: cover;
+}
+
+section.profile-slide > blockquote:nth-of-type(2) > p:nth-child(2) {
+  font-size: var(--profile-link-font-size);
+  text-align: center;
+}
+
+section.profile-slide > blockquote:nth-of-type(2) > p:nth-child(n + 3) {
+  margin-top: var(--profile-section-gap);
 }
 
 /* Opt-in layout diagnostics */

@@ -88,6 +88,14 @@ CSS の `grid-template-areas` では、それぞれを `paper-title`・`authors`
 
 ロゴは利用者指定の [Wikimedia Commons の SVG](https://upload.wikimedia.org/wikipedia/commons/6/68/LY_Corp_logo.svg) を `themes/assets/ly/logo.svg` に保存しています。
 
+### 自己紹介スライドを作る
+
+`profile-slide content-slide-gray classification-public` を指定し、`##` の見出し、経歴・研究分野の引用ブロック、写真・関連リンクの引用ブロックの順に書きます。右列の先頭段落に写真を2枚、次の段落にプロフィールへのリンクを置きます。`debug-layout` も併用できます。
+
+列幅・文字サイズ・写真の間隔は `themes/ly.css` の `--profile-*` 変数で調整します。研究分野の親項目を `**太字**` にすると赤く強調します。
+
+サンプルの写真は利用者指定の [kitada-ly.jpg](https://shunk031.me/icons/kitada-ly.jpg) と [kitada-kita.jpg](https://shunk031.me/icons/kitada-kita.jpg) を `slides/example/assets/` に保存しています。本文は提供された自己紹介スライドを元にしています。
+
 ### 本文見出しに説明を添える
 
 `## X | _Y_` と書くと、主題 X は通常の 48px、説明 Y は約 25.7px で表示します。Y は斜体にせず、長い場合は残りの幅で折り返します。自動縮小はしません。
@@ -95,6 +103,10 @@ CSS の `grid-template-areas` では、それぞれを `paper-title`・`authors`
 ```markdown
 ## 本論文の選定理由 | _初稿生成だけでなく「狙って直せる」デザイン生成まで扱う_
 ```
+
+### 引用を小さく表示する
+
+段落や箇条書きでは、`_[Author+ ConfName'YY](URL)_` のようにリンクを `_` で囲むと、斜体にせず周囲の文字サイズの 75% で表示します。比率は `--citation-font-size` で調整できます。通常のリンクは元のサイズのままです。
 
 ### 情報分類を表示する
 
