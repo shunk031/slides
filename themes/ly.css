@@ -367,7 +367,9 @@ section.profile-slide {
   --profile-line-height: 1.35;
   --profile-link-font-size: 17px;
   --profile-photo-gap: 20px;
-  --profile-thumbnail-height: 150px;
+  --profile-thumbnail-height: 200px;
+  --profile-caption-background: rgb(255 255 255 / 92%);
+  --profile-caption-padding: 4px 6px;
   --profile-photo-size: calc((var(--profile-sidebar-width) - var(--profile-photo-gap)) / 2);
   --profile-accent-color: #ff0000;
   --footer-font-size: 16px;
@@ -465,9 +467,21 @@ section.profile-slide > blockquote:nth-of-type(2) > p:nth-child(2) {
 }
 
 section.profile-slide > blockquote:nth-of-type(2) > p:nth-child(n + 3) {
+  display: grid;
   margin-top: var(--profile-section-gap);
   font-size: var(--profile-link-font-size);
   text-align: center;
+}
+
+section.profile-slide > blockquote:nth-of-type(2) > p:nth-child(n + 3) > a {
+  grid-area: 1 / 1;
+}
+
+section.profile-slide > blockquote:nth-of-type(2) > p:nth-child(n + 3) > a:not(:has(img)) {
+  align-self: end;
+  z-index: 1;
+  padding: var(--profile-caption-padding);
+  background: var(--profile-caption-background);
 }
 
 section.profile-slide > blockquote:nth-of-type(2) > p:nth-child(n + 3) img {
