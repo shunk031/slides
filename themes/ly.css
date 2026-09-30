@@ -368,7 +368,7 @@ section.profile-slide {
   --profile-link-font-size: 17px;
   --profile-photo-gap: 20px;
   --profile-thumbnail-height: 200px;
-  --profile-caption-background: transparent;
+  --profile-caption-background: rgb(255 255 255 / 70%);
   --profile-caption-padding: 4px 6px;
   --profile-photo-size: calc((var(--profile-sidebar-width) - var(--profile-photo-gap)) / 2);
   --profile-accent-color: #ff0000;
