@@ -10,6 +10,7 @@
   --color-text: #595959;
   --color-muted: #aaaaaa;
   --color-background: white;
+  --white-background-opacity: 85%;
   --color-label-text: white;
   --color-code-background: #f2f2f2;
 
@@ -368,7 +369,7 @@ section.profile-slide {
   --profile-link-font-size: 17px;
   --profile-photo-gap: 20px;
   --profile-thumbnail-height: 200px;
-  --profile-caption-background: rgb(255 255 255 / 70%);
+  --profile-caption-background: rgb(255 255 255 / var(--white-background-opacity));
   --profile-caption-padding: 4px 6px;
   --profile-photo-size: calc((var(--profile-sidebar-width) - var(--profile-photo-gap)) / 2);
   --profile-accent-color: #ff0000;
