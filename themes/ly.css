@@ -27,6 +27,7 @@
   --classification-padding-inline: 11px;
   --classification-radius: 4px;
   --classification-font-size: 11px;
+  --classification-letter-spacing: 0;
   --classification-font-weight: 400;
   --pagination-font-size: 50%;
   --footer-bottom: 24px;
@@ -83,6 +84,7 @@ section::before {
   background: var(--color-muted);
   color: var(--color-label-text);
   font-size: var(--classification-font-size);
+  letter-spacing: var(--classification-letter-spacing);
   font-weight: var(--classification-font-weight);
   line-height: var(--top-row-height);
 }
@@ -363,7 +365,6 @@ section.profile-slide {
   --profile-section-gap: 22px;
   --profile-font-size: 27px;
   --profile-detail-font-size: 22px;
-  --profile-heading-font-size: 44px;
   --profile-name-ratio: 0.68;
   --profile-line-height: 1.35;
   --profile-link-font-size: 17px;
@@ -396,7 +397,6 @@ section.profile-slide::before {
 section.profile-slide > h2 {
   grid-area: heading;
   margin: 0;
-  font-size: var(--profile-heading-font-size);
   --heading-description-ratio: var(--profile-name-ratio);
 }
 
