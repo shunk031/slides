@@ -452,7 +452,7 @@ section.profile-slide > blockquote:nth-of-type(2) > p:nth-child(-n + 2) {
   gap: var(--profile-photo-gap);
 }
 
-section.profile-slide > blockquote:nth-of-type(2) img {
+section.profile-slide > blockquote:nth-of-type(2) > p:first-child img {
   width: var(--profile-photo-size);
   height: var(--profile-photo-size);
   object-fit: cover;
@@ -465,6 +465,12 @@ section.profile-slide > blockquote:nth-of-type(2) > p:nth-child(2) {
 
 section.profile-slide > blockquote:nth-of-type(2) > p:nth-child(n + 3) {
   margin-top: var(--profile-section-gap);
+}
+
+section.profile-slide > blockquote:nth-of-type(2) > p:nth-child(n + 3) img {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 
 /* Opt-in layout diagnostics */

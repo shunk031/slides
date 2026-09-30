@@ -90,11 +90,11 @@ CSS の `grid-template-areas` では、それぞれを `paper-title`・`authors`
 
 ### 自己紹介スライドを作る
 
-`profile-slide content-slide-gray classification-public` を指定し、`##` の見出し、経歴・研究分野の引用ブロック、写真・関連リンクの引用ブロックの順に書きます。右列の先頭段落に写真を2枚、次の段落にプロフィールへのリンクを置きます。`debug-layout` も併用できます。
+`profile-slide content-slide-gray classification-public` を指定し、`##` の見出し、経歴・研究分野の引用ブロック、写真・関連リンクの引用ブロックの順に書きます。右列の先頭段落に写真を2枚、次の段落にプロフィールへのリンクを置きます。その後に `[![説明](assets/画像.png)](URL)` と書くと、右列の幅に合わせたリンク付きサムネイルを配置できます。`debug-layout` も併用できます。
 
 列幅・文字サイズ・写真の間隔は `themes/ly.css` の `--profile-*` 変数で調整します。研究分野の親項目を `**太字**` にすると赤く強調します。
 
-サンプルの写真は利用者指定の [kitada-ly.jpg](https://shunk031.me/icons/kitada-ly.jpg) と [kitada-kita.jpg](https://shunk031.me/icons/kitada-kita.jpg) を `slides/example/assets/` に保存しています。本文は提供された自己紹介スライドを元にしています。
+サンプルの写真は利用者指定の [kitada-ly.jpg](https://shunk031.me/icons/kitada-ly.jpg) と [kitada-kita.jpg](https://shunk031.me/icons/kitada-kita.jpg) を `slides/example/assets/` に保存しています。講座・書籍のサムネイルも利用者提供の画像を同じディレクトリに保存しています。本文は提供された自己紹介スライドを元にしています。
 
 ### 本文見出しに説明を添える
 
