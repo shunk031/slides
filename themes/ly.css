@@ -446,8 +446,9 @@ section.profile-slide > blockquote:nth-of-type(2) {
   font-size: var(--profile-detail-font-size);
 }
 
-section.profile-slide > blockquote:nth-of-type(2) > p:first-child {
-  display: flex;
+section.profile-slide > blockquote:nth-of-type(2) > p:nth-child(-n + 2) {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--profile-photo-gap);
 }
 

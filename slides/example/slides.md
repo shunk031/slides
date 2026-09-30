@@ -56,7 +56,7 @@ _Project page: [hukcc.github.io/Beyond-Atomic-Layouts/](https://hukcc.github.io/
 
 > ![北田俊輔の写真](assets/kitada-ly.jpg) ![北田俊輔のアイコン](assets/kitada-kita.jpg)
 >
-> [shunk031.me](https://shunk031.me) / X: [@shunk031](https://x.com/shunk031)
+> [shunk031.me](https://shunk031.me) [@shunk031](https://x.com/shunk031)
 >
 > **講座**
 >
