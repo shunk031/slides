@@ -58,9 +58,9 @@ _Project page: [hukcc.github.io/Beyond-Atomic-Layouts/](https://hukcc.github.io/
 >
 > [shunk031.me](https://shunk031.me) [@shunk031](https://x.com/shunk031)
 >
-> [![講座：画像生成AIにおける拡散モデルの理論と実践](assets/python-image-generation-course.png)](https://bit.ly/KitadaXColosoJP1)
+> [![講座：画像生成AIにおける拡散モデルの理論と実践](assets/python-image-generation-course.png)](https://bit.ly/KitadaXColosoJP1) [画像生成AIにおける拡散モデルの理論と実践](https://bit.ly/KitadaXColosoJP1)
 >
-> [![書籍：Pythonで学ぶ画像生成](assets/python-image-generation-book.png)](https://book.impress.co.jp/books/1123101104)
+> [![書籍：Pythonで学ぶ画像生成](assets/python-image-generation-book.png)](https://book.impress.co.jp/books/1123101104) [Pythonで学ぶ画像生成](https://book.impress.co.jp/books/1123101104)
 
 ---
 

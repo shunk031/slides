@@ -367,6 +367,7 @@ section.profile-slide {
   --profile-line-height: 1.35;
   --profile-link-font-size: 17px;
   --profile-photo-gap: 20px;
+  --profile-thumbnail-height: 150px;
   --profile-photo-size: calc((var(--profile-sidebar-width) - var(--profile-photo-gap)) / 2);
   --profile-accent-color: #ff0000;
   --footer-font-size: 16px;
@@ -465,12 +466,17 @@ section.profile-slide > blockquote:nth-of-type(2) > p:nth-child(2) {
 
 section.profile-slide > blockquote:nth-of-type(2) > p:nth-child(n + 3) {
   margin-top: var(--profile-section-gap);
+  font-size: var(--profile-link-font-size);
+  text-align: center;
 }
 
 section.profile-slide > blockquote:nth-of-type(2) > p:nth-child(n + 3) img {
   display: block;
-  width: 100%;
+  width: auto;
+  max-width: 100%;
   height: auto;
+  max-height: var(--profile-thumbnail-height);
+  margin: 0 auto;
 }
 
 /* Opt-in layout diagnostics */
