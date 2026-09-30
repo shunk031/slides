@@ -41,6 +41,8 @@
   --heading-description-ratio: calc(15 / 28);
   --heading-description-gap: 0.35em;
   --heading-description-line-height: 1.4;
+  --heading-separator-width: 4px;
+  --heading-separator-height: calc(var(--heading-font-size) * 0.9);
   --list-indent: 1.6em;
   --nested-list-font-size: 0.9em;
   --citation-font-size: 0.75em;
@@ -188,6 +190,14 @@ section:not(.first-slide) h2:has(> em:last-child) {
   align-items: center;
   gap: var(--heading-description-gap);
   white-space: nowrap;
+}
+
+/* Markdown: ## X **|** _Y_: draw the separator instead of its font glyph. */
+section:not(.first-slide) h2 > strong:has(+ em:last-child) {
+  flex-shrink: 0;
+  font-size: 0;
+  height: var(--heading-separator-height);
+  border-left: var(--heading-separator-width) solid var(--color-heading);
 }
 
 section:not(.first-slide) h2 > em:last-child {

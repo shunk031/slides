@@ -66,7 +66,7 @@ _Project page: [hukcc.github.io/Beyond-Atomic-Layouts/](https://hukcc.github.io/
 
 <!-- _class: content-slide-gray classification-public debug-layout -->
 
-## 本論文の選定理由 | _初稿生成だけでなく「狙って直せる」デザイン生成まで扱う_
+## 本論文の選定理由 **|** _初稿生成だけでなく「狙って直せる」デザイン生成まで扱う_
 
 **デザインの自動生成で気になる問題**
 
