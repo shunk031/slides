@@ -384,7 +384,6 @@ section.profile-slide {
   --profile-caption-padding: 4px 6px;
   --profile-photo-size: calc((var(--profile-sidebar-width) - var(--profile-photo-gap)) / 2);
   --profile-accent-color: #ff0000;
-  --footer-font-size: 16px;
   --profile-letter-spacing: 0;
 
   display: grid;

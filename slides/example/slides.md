@@ -33,7 +33,6 @@ _Project page: [hukcc.github.io/Beyond-Atomic-Layouts/](https://hukcc.github.io/
 ---
 
 <!-- _class: profile-slide content-slide-gray classification-public debug-layout -->
-<!-- _footer: © LY Corporation · ECCV2026 ワークショップ “FOUND: Foundation Data for Industrial Tech Transfer” を主催 -->
 
 ## 自己紹介: 北田俊輔 _Shunsuke KITADA_
 
