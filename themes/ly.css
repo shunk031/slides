@@ -468,6 +468,7 @@ section.profile-slide > blockquote:nth-of-type(2) > p:nth-child(2) {
 
 section.profile-slide > blockquote:nth-of-type(2) > p:nth-child(n + 3) {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   margin-top: var(--profile-section-gap);
   font-size: var(--profile-link-font-size);
   text-align: center;
@@ -479,6 +480,9 @@ section.profile-slide > blockquote:nth-of-type(2) > p:nth-child(n + 3) > a {
 
 section.profile-slide > blockquote:nth-of-type(2) > p:nth-child(n + 3) > a:not(:has(img)) {
   align-self: end;
+  justify-self: center;
+  width: max-content;
+  white-space: nowrap;
   z-index: 1;
   padding: var(--profile-caption-padding);
   background: var(--profile-caption-background);
