@@ -153,6 +153,32 @@ Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S0.F1)]: Com
 
 ---
 
+<!-- _class: content-slide-gray classification-public -->
+<!-- 発表目安 0:55。3つの提案の役割を説明し、詳細は後続スライドで扱う -->
+
+## 本論文の提案 **|** _合成レイアウト理解の課題・データセット・学習手法を提案_
+
+**① 課題: Compositional Layout Understanding**
+
+- 完成画像・レイヤー情報・指定要素から、合成関係にある要素とデザイン意図を予測
+  - 個別要素の認識ではなく、要素間の関係を問う課題として定式化
+
+**② データセット: CoDeLayout**
+
+- 約2万件の実デザインから、関連する要素ペアとデザイン意図を質問応答形式で注釈
+  - 複数レイヤーの編集構造を保持
+
+**③ 学習手法: MASON\
+（Multimodal Alignment and Structural perceptiON）**
+
+- Multimodal Alignment（MA）: 完成画像と各レイヤーの対応付けを学習
+- Structural Perception（SP）: レイヤー間の位置・重なり・前後関係を明示
+
+**主な結果:** 同一ベースモデル（Qwen2.5-VL 7B）の\
+関連要素特定精度 88.80% → 91.66%（+2.86 pt） _[[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.T4)]_
+
+---
+
 <!-- _class: problem-slide content-slide-gray classification-public -->
 <!-- 発表目安 1:00 -->
 
