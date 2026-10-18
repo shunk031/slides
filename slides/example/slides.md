@@ -86,7 +86,7 @@ _Project page: [hukcc.github.io/Beyond-Atomic-Layouts/](https://hukcc.github.io/
 >   - 関連レイヤーをまとめて特定してから編集
 > - 画像として見えている領域と、\
 >   編集すべきレイヤーの単位が\
->   一致しない場合がある _[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S1)_
+>   一致しない場合がある
 >
 > **本論文で注目したい点**
 >
@@ -171,6 +171,76 @@ Figure from [[Huang+ ECCV’26]](https://arxiv.org/html/2608.26716v1#S0.F1): 4�
 > - 2 つの要素が構成する視覚効果を自然言語で説明
 > - 単純な重なり・距離ではなく、\
 >   合成関係の認識が目的
+
+---
+
+<!-- _class: dataset-slide content-slide-gray classification-public debug-layout -->
+<!-- 発表目安 0:55 -->
+
+## CoDeLayout **|** _約2万件の実デザインに関連要素ペアと意図を付与_
+
+> ![Figure 2 左側: 完成画像と各要素のメタデータ](assets/beyond-atomic-fig2-metadata.png#crop-right)
+>
+> Figure from [[Huang+ ECCV’26]](https://arxiv.org/html/2608.26716v1#S3.F2): デザインとメタデータ
+
+> **1デザインから質問応答形式の教師データ**
+>
+> - 質問応答（Question Answering; QA）:\
+>   質問対象・正解要素のペアと意図説明
+> - 完成画像と各要素のJSONメタデータを保持
+> - 編集可能な複数レイヤーの構造を保持
+
+> **Train: 20,009 / Test: 387**
+>
+> - Test は全件人手確認
+> - 平均17.4レイヤー\
+>   99.8%が45レイヤー未満
+>
+> **4種類の関係・希少な Morphing も評価**
+>
+> | 関係         |     Train |       Test |
+> | :----------- | --------: | ---------: |
+> | Blending     |    56.78% |     40.06% |
+> | Overlaying   |    22.83% |     29.95% |
+> | Clipping     |    17.76% |     17.75% |
+> | **Morphing** | **2.63%** | **12.24%** |
+>
+> 訓練は自然な偏りを維持\
+> テストは Morphing の比率を増やし、\
+> 種類別に評価
+
+---
+
+<!-- _class: analysis-slide content-slide-gray classification-public debug-layout -->
+<!-- 発表目安 1:00 -->
+
+## 課題分析 **|** _VLM の失敗要因は「要素の取り違え」と「階層関係の曖昧さ」_
+
+視覚言語モデル（Vision-Language Model; VLM）の課題を GPT-4o で分析
+
+> ![Figure 3(a): 要素の対応付けと関連要素の特定精度](assets/beyond-atomic-semantic-drift.svg)
+>
+> Figure from [[Huang+ ECCV’26]](https://arxiv.org/html/2608.26716v1#S3.F3.sf1): 要素対応付けと特定精度
+
+> ![Figure 3(b): 空間関係の認識と関連要素の特定精度](assets/beyond-atomic-structural-ambiguity.svg)
+>
+> Figure from [[Huang+ ECCV’26]](https://arxiv.org/html/2608.26716v1#S3.F3.sf2): 空間関係認識と特定精度
+
+> **Semantic drift: 要素の取り違え**
+>
+> - 重なって隠れた指定要素を画像中で見失う
+> - 切り出し画像と完成画像からの説明を比較\
+>   BLEU _[[Papineni+ ACL’02]](https://aclanthology.org/P02-1040/)_\
+>   （Bilingual Evaluation Understudy）
+
+> **Structural ambiguity: 階層関係の曖昧さ**
+>
+> - 前後・包含・重なりは2次元位置だけでは\
+>   決まらず、レイヤー間の関係を捉えられない
+> - 各デザインから30組の要素ペアを抽出し、\
+>   空間関係の質問への正答率を測定
+
+**➜ 両者の精度が関連要素の特定精度と連動 → 対応付け・構造理解を分けて改善**
 
 ---
 

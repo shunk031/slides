@@ -49,6 +49,22 @@ function inspectStructure() {
       if ((link.textContent.match(/[\p{L}-]+\+/gu) || []).length > 1)
         findings.push({ slide: index + 1, kind: 'bundled-citation', text: link.textContent });
     }
+    for (const block of slide.querySelectorAll('p,li')) {
+      const walker = document.createTreeWalker(block, NodeFilter.SHOW_TEXT);
+      while (walker.nextNode()) {
+        const node = walker.currentNode;
+        if (node.parentElement.closest('p,li') !== block || node.parentElement.closest('a')) continue;
+        for (const match of node.textContent.matchAll(/\bBLEU\b/g)) {
+          let end = node;
+          while (!end.nextSibling && end.parentElement !== block) end = end.parentElement;
+          let next = end.nextSibling;
+          while (next?.nodeType === Node.TEXT_NODE && !next.textContent.trim()) next = next.nextSibling;
+          const link = next?.nodeType === Node.ELEMENT_NODE ? (next.matches('a') ? next : next.querySelector(':scope > a:only-child')) : null;
+          if (node.textContent.slice(match.index + match[0].length).trim() || !link?.getAttribute('href') || !/\+.*[’']\d{2}/.test(link.textContent))
+            findings.push({ slide: index + 1, kind: 'missing-metric-citation', text: block.textContent.trim() });
+        }
+      }
+    }
     const figures = [...slide.querySelectorAll('blockquote:has(> p > img)')].filter(el => !el.matches('.profile-slide > blockquote:nth-of-type(2)'));
     const sources = [...slide.querySelectorAll('p')].filter(p => /^Figure from \[[^\]]+\]:\s*\S.*$/.test(p.textContent.trim()) && p.querySelector('a'));
     for (const p of slide.querySelectorAll('p')) {
@@ -209,6 +225,12 @@ async function main() {
       assert.equal((await page.evaluate(inspectStructure)).some(f => f.kind === 'sparse-body'), false);
       await page.setContent('<section style="width:300px;height:100px"><blockquote style="height:160px">枠のはみ出し</blockquote></section>');
       assert.equal((await page.evaluate(inspectStructure)).some(f => f.kind === 'box-overflow'), true);
+      for (const text of ['BLEU', 'BLEU（Bilingual Evaluation Understudy）', 'BLEU で比較 <em><a href="https://aclanthology.org/P02-1040/">Papineni+ ACL’02</a></em>']) {
+        await page.setContent(`<section><p>${text}</p></section>`);
+        assert.equal((await page.evaluate(inspectStructure)).some(f => f.kind === 'missing-metric-citation'), true);
+      }
+      await page.setContent('<section><p><strong>BLEU</strong> <em><a href="https://aclanthology.org/P02-1040/">Papineni+ ACL’02</a></em> で比較</p></section>');
+      assert.deepEqual(await page.evaluate(inspectStructure), []);
       console.log('Layout inspection self-test passed');
       return;
     }
