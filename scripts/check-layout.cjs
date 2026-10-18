@@ -134,15 +134,18 @@ function inspectMidwordWraps() {
 
 function inspectGroupGaps() {
   const sections = [...document.querySelectorAll('section')];
-  const group = element => element && /^(P|UL|OL)$/.test(element.tagName) &&
-    !(element.tagName === 'P' && element.children.length === 1 && element.firstElementChild.matches('strong'));
+  const boldHeading = element => {
+    const strong = element?.querySelector(':scope > strong:only-child, :scope > a:only-child > strong:only-child');
+    return element?.tagName === 'P' && strong && element.textContent.trim() === strong.textContent.trim();
+  };
+  const group = element => element && /^(P|UL|OL|TABLE)$/.test(element.tagName) && !boldHeading(element);
   const lastGroup = box => [...box.children].reverse().find(group);
   const themeGap = Math.max(...sections.map(section => parseFloat(getComputedStyle(section).getPropertyValue('--list-group-gap'))).filter(Number.isFinite));
   const groups = [];
   for (const [index, slide] of sections.entries()) {
     if (slide.matches('.profile-slide,.first-slide,.lead,.takahashi,.title-slide-big,.layout-example')) continue;
     for (const heading of slide.querySelectorAll('p')) {
-      if (heading.children.length !== 1 || !heading.firstElementChild.matches('strong') || heading.closest('header,footer,blockquote:has(> p > img)')) continue;
+      if (!boldHeading(heading) || heading.closest('header,footer,blockquote:has(> p > img)')) continue;
       const next = heading.nextElementSibling;
       if (!group(next)) continue;
       let previous = heading.previousElementSibling;
@@ -644,6 +647,24 @@ async function main() {
       assert.deepEqual(groupGapFindings(await page.evaluate(inspectGroupGaps)), []);
       await page.setContent('<section style="font:20px/20px monospace;--list-group-gap:16px"><h2>Title</h2><p style="margin:0"><strong>Group</strong></p><ul style="margin:0"><li>Next</li></ul></section>');
       assert.deepEqual((await page.evaluate(inspectGroupGaps)).groups, []);
+      for (const heading of ['<strong>Group</strong>', '<strong><a href="#table">Group</a></strong>', '<a href="#table"><strong>Group</strong></a>']) {
+        await page.setContent(`<section style="font:20px/20px monospace;--list-group-gap:16px"><ul style="margin:0"><li>Previous</li></ul><p style="margin:0">${heading}</p><table><tr><td>Next</td></tr></table></section>`);
+        const tableGap = await page.evaluate(inspectGroupGaps);
+        assert.equal(tableGap.groups.length, 1);
+        assert.equal(tableGap.groups[0].next, 'table');
+        assert.ok(groupGapFindings(tableGap).some(f => f.gap === 0 && f.limit === 16));
+        await page.evaluate(() => { document.querySelector('p').style.marginTop = '16px'; });
+        assert.equal((await page.evaluate(inspectGroupGaps)).groups[0].gap, 16);
+        assert.deepEqual(groupGapFindings(await page.evaluate(inspectGroupGaps)), []);
+      }
+      await page.setContent('<section style="font:20px/20px monospace;--list-group-gap:16px"><table><tr><td>Previous</td></tr></table><p style="margin:0"><strong>Group</strong></p><ul><li>Next</li></ul></section>');
+      const previousTableGap = await page.evaluate(inspectGroupGaps);
+      assert.equal(previousTableGap.groups[0].previous, 'table');
+      assert.ok(groupGapFindings(previousTableGap).some(f => f.gap === 0));
+      for (const heading of ['Plain <strong>Group</strong>', '<a href="#table">Plain <strong>Group</strong></a>']) {
+        await page.setContent(`<section style="--list-group-gap:16px"><ul><li>Previous</li></ul><p>${heading}</p><table><tr><td>Next</td></tr></table></section>`);
+        assert.deepEqual((await page.evaluate(inspectGroupGaps)).groups, []);
+      }
       assert.ok(groupGapFindings({ themeGap: 16, groups: [
         { slide: 1, role: 'body-group-heading', text: 'A', gap: 16, sectionGap: 16 },
         { slide: 2, role: 'body-group-heading', text: 'B', gap: 22, sectionGap: 16 },
