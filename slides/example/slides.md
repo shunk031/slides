@@ -343,7 +343,7 @@ $$
 
 ## MASON 3/3 **|** _SP: 質問対象レイヤーとの関係をメタデータへ明示_
 
-> ![Figure 4 の SP Module: 隣の MA Module を背景に、メタデータから空間関係を計算](assets/beyond-atomic-sp-context.png#crop-left)
+> ![Figure 4 の SP Module: 左の MA Module と右の VLM Training を背景に、メタデータから空間関係を計算](assets/beyond-atomic-sp-context.png#crop-left)
 >
 > Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S3.F4)]:\
 > レイヤー間の空間関係を計算
