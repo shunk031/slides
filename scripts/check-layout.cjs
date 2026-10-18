@@ -50,8 +50,10 @@ function inspectStructure() {
         findings.push({ slide: index + 1, kind: 'bundled-citation', text: link.textContent });
     }
     const figures = [...slide.querySelectorAll('blockquote:has(> p > img)')].filter(el => !el.matches('.profile-slide > blockquote:nth-of-type(2)'));
-    const sources = [...slide.querySelectorAll('p')].filter(p => /^Figure from \[[^\]]+\](?::\s*\S.*)?$/.test(p.textContent.trim()) && p.querySelector('a'));
+    const sources = [...slide.querySelectorAll('p')].filter(p => /^Figure from \[[^\]]+\]:\s*\S.*$/.test(p.textContent.trim()) && p.querySelector('a'));
     for (const p of slide.querySelectorAll('p')) {
+      if (/^Figure from\b/.test(p.textContent.trim()) && !sources.includes(p))
+        findings.push({ slide: index + 1, kind: 'figure-caption-missing', text: p.textContent.trim() });
       if (/^(出典|Source)\s*[:：]/i.test(p.textContent.trim()))
         findings.push({ slide: index + 1, kind: 'redundant-source', text: p.textContent.trim() });
     }
@@ -73,6 +75,26 @@ function inspectStructure() {
       }
     }
     const bounds = slide.getBoundingClientRect();
+    for (const el of slide.querySelectorAll('blockquote,img')) {
+      const box = el.getBoundingClientRect();
+      if (box.width && box.height && (box.left < bounds.left - 1 || box.right > bounds.right + 1 || box.top < bounds.top - 1 || box.bottom > bounds.bottom + 1))
+        findings.push({ slide: index + 1, kind: 'box-overflow', text: el.textContent.trim() || el.getAttribute('alt') });
+    }
+    const heading = slide.querySelector(':scope > h2');
+    if (heading && !slide.matches('.first-slide,.lead,.takahashi,.title-slide-big,.layout-example')) {
+      const top = heading.getBoundingClientRect().bottom;
+      const bottom = bounds.bottom - (parseFloat(getComputedStyle(slide).paddingBottom) || 0);
+      const occupied = [...slide.querySelectorAll('p,li,td,th,img')].flatMap(el => {
+        if (el.closest('header,footer')) return [];
+        const range = document.createRange();
+        range.selectNodeContents(el);
+        return [...range.getClientRects(), ...(el.matches('img') ? [el.getBoundingClientRect()] : [])]
+          .filter(r => r.width && r.height && r.top >= top).map(r => r.bottom);
+      });
+      const used = (Math.max(top, ...occupied) - top) / (bottom - top);
+      if (bottom > top && used < 0.6)
+        findings.push({ slide: index + 1, kind: 'sparse-body', text: `Content reaches only ${Math.round(used * 100)}% of the body height; redesign the page.` });
+    }
     for (const block of slide.querySelectorAll('h1,h2,h3,h4,h5,h6,p,li,figcaption,td,th')) {
       const hasItems = ['grid', 'inline-grid', 'flex', 'inline-flex'].includes(getComputedStyle(block).display);
       const walker = document.createTreeWalker(block, NodeFilter.SHOW_TEXT);
@@ -172,6 +194,21 @@ async function main() {
       assert.deepEqual((await page.evaluate(inspectStructure)).map(f => f.kind), ['redundant-source', 'figure-source-gap']);
       await page.evaluate(() => { document.querySelector('#footer').remove(); document.querySelector('#source').style.marginTop = '0'; });
       assert.deepEqual(await page.evaluate(inspectStructure), []);
+      for (const caption of ['Figure from <a>[Huang+ ECCV’26]</a>', 'Figure from <a>[Huang+ ECCV’26]</a>: ']) {
+        await page.setContent(`<section><p>${caption}</p></section>`);
+        assert.equal((await page.evaluate(inspectStructure)).some(f => f.kind === 'figure-caption-missing'), true);
+      }
+      await page.setContent('<section style="width:1280px;height:720px;padding-bottom:48px"><h2>比較</h2><p>文書・画面理解</p><p>デザイン生成</p><p id="last">本研究</p></section>');
+      assert.equal((await page.evaluate(inspectStructure)).some(f => f.kind === 'sparse-body'), true);
+      // A tall empty wrapper must not disguise sparse text.
+      await page.addStyleTag({ content: 'p {height:100px}' });
+      assert.equal((await page.evaluate(inspectStructure)).some(f => f.kind === 'sparse-body'), true);
+      await page.addStyleTag({ content: '#last {margin-top:200px}' });
+      assert.equal((await page.evaluate(inspectStructure)).some(f => f.kind === 'sparse-body'), false);
+      await page.setContent('<section class="layout-example" style="height:720px"><h2>背景の見本</h2><p>クラス名</p></section>');
+      assert.equal((await page.evaluate(inspectStructure)).some(f => f.kind === 'sparse-body'), false);
+      await page.setContent('<section style="width:300px;height:100px"><blockquote style="height:160px">枠のはみ出し</blockquote></section>');
+      assert.equal((await page.evaluate(inspectStructure)).some(f => f.kind === 'box-overflow'), true);
       console.log('Layout inspection self-test passed');
       return;
     }
@@ -225,7 +262,7 @@ async function main() {
       fs.writeFileSync(path.join(output, 'review.md'), report.join('\n'));
       console.log(`${sections.length} slides saved: ${path.join(output, 'review.md')}`);
     }
-    console.log(`${candidateCount} findings require review; citation, figure-source, text-overflow and font-size errors fail the check.`);
+    console.log(`${candidateCount} findings require review; all structure/typography findings except large-prose-gap fail the check.`);
     if (structuralErrors) throw new Error(`${structuralErrors} structural/typography errors: see review.md.`);
   } finally {
     await browser.close();

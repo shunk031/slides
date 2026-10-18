@@ -266,7 +266,7 @@ section.paper-title {
   --paper-note-font-size: 16px;
   --paper-logo-width: 160px;
   --paper-banner-width: 360px;
-  --paper-banner-inset: var(--paper-padding-inline);
+  --paper-banner-inset: 24px;
 
   display: grid;
   grid-template-columns: var(--paper-presenter-width) 1fr;
@@ -597,8 +597,33 @@ section.background-slide > p:has(> a) {
   font-size: var(--figure-caption-font-size);
 }
 
+section.comparison-slide {
+  --comparison-label-width: 240px;
+  --comparison-row-height: 150px;
+  --comparison-padding: 24px;
+}
+section.comparison-slide > blockquote {
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: var(--comparison-label-width) minmax(0, 1fr);
+  align-items: center;
+  min-height: var(--comparison-row-height);
+  margin: var(--content-gap) 0 0;
+  padding: var(--comparison-padding);
+  border: 0;
+  border-left: var(--heading-separator-width) solid var(--color-heading);
+  background: rgb(255 255 255 / var(--white-background-opacity));
+  color: var(--color-text);
+  font-size: var(--body-font-size);
+}
+section.comparison-slide > blockquote::before,
+section.comparison-slide > blockquote::after { content: none; }
+section.comparison-slide > blockquote > p { margin: 0; }
+section.comparison-slide > blockquote > p:first-child { color: var(--color-heading); }
+
 section.problem-slide {
   --problem-figure-height: 250px;
+  --content-gap: 12px;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--content-gap);
