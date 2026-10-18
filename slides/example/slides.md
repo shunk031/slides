@@ -245,35 +245,61 @@ Multimodal Alignment and Structural perceptiON
 <!-- _class: analysis-slide failure-analysis-slide content-slide-gray classification-public -->
 <!-- 発表目安 1:00 -->
 
-## 課題分析 **|** _VLM の失敗要因は「要素の取り違え」と「階層関係の曖昧さ」_
+## 課題分析 1/2 **|** _要素の取り違え: メタデータと見た目が一致しない_
 
-Vision-Language Model（VLM）である GPT-4o の失敗要因を分析
+Vision-Language Model（VLM）である GPT-4o の要素対応付けを測定
 
-> ![Figure 3(a): 要素の対応付けと関連要素の特定精度](assets/beyond-atomic-semantic-drift.svg)
+> ![Figure 3(a): 要素説明の一致度が高いデザインほど関連要素の特定正解率が高い](assets/beyond-atomic-semantic-drift.svg)
 >
-> Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S3.F3.sf1)]: 要素対応付けと特定精度\
-> 横軸: 説明文の語句一致度（平均 BLEU [[Papineni+ ACL’02](https://aclanthology.org/P02-1040/)]）\
-> 縦軸: 関連要素の特定正解率（%）
-
-> ![Figure 3(b): 空間関係の認識と関連要素の特定精度](assets/beyond-atomic-structural-ambiguity.svg)
->
-> Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S3.F3.sf2)]: 空間関係認識と特定精度\
-> 横軸: 空間関係の正答率\
+> Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S3.F3.sf1)]: 説明が一致するほど特定も正確\
+> 横軸: 要素説明の語句一致度（平均 BLEU [[Papineni+ ACL’02](https://aclanthology.org/P02-1040/)]）\
 > 縦軸: 関連要素の特定正解率（%）
 
 > **Semantic drift:**\
 > メタデータと画像中の見た目の不一致
 >
-> - 比較対象は要素画像と完成画像の説明
->   - 重なって隠れた指定要素を見失う
+> - GPT-4o が同じ要素を 2 回説明
+>   - 切り出し画像 → 参照文\
+>     完成画像＋メタデータ → 生成文
+
+> **説明の一致度でデザインを区分**
+>
+> - 各要素の説明文の語句一致度を平均
+>   - 高い区分ほど特定正解率も高い
+> - 失敗例: 重なって隠れた要素を見失う
+
+**➜ MASON の Multimodal Alignment（MA）で要素 ID と見た目の対応付けを支援**
+
+---
+
+<!-- _class: analysis-slide failure-analysis-slide content-slide-gray classification-public -->
+<!-- 発表目安 1:00 -->
+
+## 課題分析 2/2 **|** _階層関係の曖昧さ: 要素の位置だけでは関係を捉えにくい_
+
+GPT-4o のレイヤー間の位置関係を読み取る能力を測定
+
+> ![Figure 3(b): 位置関係の質問への正答率が高いデザインほど関連要素の特定正解率が高い](assets/beyond-atomic-structural-ambiguity.svg)
+>
+> Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S3.F3.sf2)]: 関係に正答するほど特定も正確\
+> 横軸: 要素ペアの位置関係を問う Yes/No 正答率\
+> 縦軸: 関連要素の特定正解率（%）
 
 > **Structural ambiguity:**\
 > レイヤー間の曖昧な関係
 >
-> - 1 デザイン 30 組の要素ペアで測定
->   - 位置だけでは前後・包含・重なりは不明
+> - 完成画像＋メタデータを GPT-4o へ入力
+>   - 要素ペアを各デザインで 30 組無作為抽出
+>   - 「要素 A は要素 B より上か？」に回答
 
-**➜ GPT-4o の分析で両精度が要素特定と連動 → 対応付け・構造理解を別々に改善**
+> **質問への正答率でデザインを区分**
+>
+> - 30 組の正答率を平均
+>   - 高い区分ほど特定正解率も高い
+> - 失敗例: 座標だけでは関係を捉えにくい
+>   - 前後・包含・重なりを区別しにくい
+
+**➜ MASON の Structural Perception（SP）でレイヤー間の位置関係を明示**
 
 ---
 
