@@ -46,7 +46,7 @@ Chrome で実際に描画し、フォントと画像の読み込み後に各行�
 
 最終行がそれ以前の最長行の 25%未満なら確認候補として報告します。短いキャプションや意図した改行もあるため、自動エラーにはしません。
 読みやすさ全般を判定する検査ではありません。文字の重なりや図内の文字サイズは原寸画像で確認してください。
-本文・図の著者年付き引用リンクに表示用の角括弧がない場合はエラーにします。
+本文・図の著者年付き引用に角括弧がない場合、または括弧をリンクに含めた場合はエラーにします。
 BLEUの直後に著者・年付きの引用リンクがない場合もエラーにします（正式名称だけ、離れた位置の引用では通りません）。
 引用リンク内に複数の `Author+` 表記がある場合と、文字が本文ボックス・スライド外へ出る場合はエラーにします。画像より広いグリッドのキャプションは、そのキャプション自身のボックスで検査します。図・比較枠（blockquote）そのものがスライド外へ出た場合もエラーにします。
 隣り合う本文の段落・リスト間に、指定マージンに加えて 1 行分を超える空白がある場合も確認候補にします。図のキャプション間隔はこの検査の対象外です。
@@ -133,19 +133,21 @@ CSS の `grid-template-areas` では、それぞれを `paper-title`・`authors`
 
 ### 引用を小さく表示する
 
-段落や箇条書きでは、`_[Author+ ConfName'YY](URL)_` のようにリンクを `_` で囲むと、斜体にせず共通の 18px で表示します。`--citation-font-size` で調整できます。通常のリンクは元のサイズのままです。
+段落や箇条書きでは、`_[[Author+ ConfName'YY](URL)]_` のようにリンクを `_` で囲むと、斜体にせず共通の 18px で表示します。`--citation-font-size` で調整できます。通常のリンクは元のサイズのままです。
 
-複数研究を並べる例: `LayoutLMv3 _[Huang+ MM’22](文献URL)_ / ScreenQA _[Hsiao+ NAACL’25](文献URL)_`。リンク先はそれぞれの論文または対応する参考文献項目です。
+複数研究を並べる例: `LayoutLMv3 _[[Huang+ MM’22](文献URL)]_ / ScreenQA _[[Hsiao+ NAACL’25](文献URL)]_`。リンク先はそれぞれの論文または対応する参考文献項目です。
+
+同一著者の複数論文は `_[[Kitada+ IEEE Access’21](URL1), [Appl. Intell.’22](URL2)]_` とまとめます。括弧とカンマはリンクの外に置きます。
 
 ### 図とキャプション
 
 ```markdown
 > ![Figure 2: 入出力の対応](assets/figure.png)
 >
-> Figure from [[Huang+ ECCV’26]](https://arxiv.org/html/2608.26716v1#S3.F2): 画像・メタデータ・質問・回答の対応
+> Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S3.F2)]: 画像・メタデータ・質問・回答の対応
 ```
 
-内側の角括弧は表示用です。図の出典・説明は共通の `--figure-caption-font-size`（20px）で中央揃えにします。本文は `--body-font-size`（24px）、入れ子はその 90%を使います。
+外側の角括弧は表示用で、リンクには含めません。図の出典・説明は共通の `--figure-caption-font-size`（20px）で中央揃えにします。本文は `--body-font-size`（24px）、入れ子はその 90%を使います。
 切り出した画像の右端を背景へなじませる場合は、画像パスに `#crop-right` を付けます。フェード幅は `--crop-feather-width`（16px）で調整します。元画像は残し、切り出す範囲と境界の処理を別に確認してください。
 
 図の出典表記は [既存資料の 15 ページ](https://speakerdeck.com/shunk031/from-fragment-to-one-piece-a-survey-on-ai-driven-graphic-design?slide=15)・[30 ページ](https://speakerdeck.com/shunk031/from-fragment-to-one-piece-a-survey-on-ai-driven-graphic-design?slide=30)の `Figure from [引用]` を基にしています。

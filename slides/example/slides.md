@@ -49,14 +49,14 @@ _Project page: [hukcc.github.io/Beyond-Atomic-Layouts/](https://hukcc.github.io/
 > **研究分野**
 >
 > - 自然言語処理（NLP）/ 画像処理（CV）
->   - 摂動に頑健で解釈可能な深層学習 _[[Kitada+ IEEE Access’21]](https://shunk031.me/publication/kitada2021making/)_, _[[Appl. Intell.’22]](https://shunk031.me/publication/kitada2022making/)_
+>   - 摂動に頑健で解釈可能な深層学習 _[[Kitada+ IEEE Access’21](https://shunk031.me/publication/kitada2021making/), [Appl. Intell.’22](https://shunk031.me/publication/kitada2022making/)]_
 > - 計算機広告（Multi-modal / Vision & Language）
->   - 効果の高いデジタル広告の作成支援 _[[Kitada+ KDD’19]](https://shunk031.me/publication/kitada2019conversion/)_
->   - 効果の低いデジタル広告の停止支援 _[[Kitada+ Appl. Sci.’22]](https://shunk031.me/publication/kitada2022ad/)_
+>   - 効果の高いデジタル広告の作成支援 _[[Kitada+ KDD’19](https://shunk031.me/publication/kitada2019conversion/)]_
+>   - 効果の低いデジタル広告の停止支援 _[[Kitada+ Appl. Sci.’22](https://shunk031.me/publication/kitada2022ad/)]_
 > - **デザイン生成 AI**
->   - 離散拡散モデルで生成されたレイアウトの再調整 _[[Iwai+ ECCV’24]](https://shunk031.me/publication/iwai2024layout/)_
->   - LLM によるレイアウトの生成における自己修正 _[[Zhang+ arXiv’24]](https://shunk031.me/publication/zhang2024vascar/)_
->   - 田植えをするように潜在表現を植える画像生成 _[[Nagai+ CVPR-F’26]](https://shunk031.me/publication/nagai2026taue/)_
+>   - 離散拡散モデルで生成されたレイアウトの再調整 _[[Iwai+ ECCV’24](https://shunk031.me/publication/iwai2024layout/)]_
+>   - LLM によるレイアウトの生成における自己修正 _[[Zhang+ arXiv’24](https://shunk031.me/publication/zhang2024vascar/)]_
+>   - 田植えをするように潜在表現を植える画像生成 _[[Nagai+ CVPR-F’26](https://shunk031.me/publication/nagai2026taue/)]_
 
 > ![北田俊輔の写真](assets/kitada-ly.jpg) ![北田俊輔のアイコン](assets/kitada-kita.jpg)
 >
@@ -75,7 +75,7 @@ _Project page: [hukcc.github.io/Beyond-Atomic-Layouts/](https://hukcc.github.io/
 
 > ![Figure 1(e): 関連レイヤーを理解する design assistant の例](assets/beyond-atomic-fig1e.png)
 >
-> Figure from [[Huang+ ECCV’26]](https://arxiv.org/html/2608.26716v1#S0.F1.sf5): デザイン支援の例
+> Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S0.F1.sf5)]: デザイン支援の例
 
 > **デザインを「作る」だけでなく、\
 > 「意図どおりに直す」ことが難しい**
@@ -119,7 +119,7 @@ _Project page: [hukcc.github.io/Beyond-Atomic-Layouts/](https://hukcc.github.io/
 >
 > **(d) Morphing**: 文字の一部を図形・画像へ置換
 
-Figure from [[Huang+ ECCV’26]](https://arxiv.org/html/2608.26716v1#S0.F1): 4種類の合成関係
+Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S0.F1)]: 4種類の合成関係
 
 ---
 
@@ -129,12 +129,12 @@ Figure from [[Huang+ ECCV’26]](https://arxiv.org/html/2608.26716v1#S0.F1): 4�
 
 > **文書・画面理解**
 >
-> LayoutLMv3 _[[Huang+ MM’22]](https://arxiv.org/html/2608.26716v1#bib.bib17)_ / ScreenQA _[[Hsiao+ NAACL’25]](https://arxiv.org/html/2608.26716v1#bib.bib24)_\
+> LayoutLMv3 _[[Huang+ MM’22](https://arxiv.org/html/2608.26716v1#bib.bib17)]_ / ScreenQA _[[Hsiao+ NAACL’25](https://arxiv.org/html/2608.26716v1#bib.bib24)]_\
 > 文書や画面に含まれる**個別要素を理解**
 
 > **デザイン生成**
 >
-> COLE _[[Jia+ arXiv’23]](https://arxiv.org/html/2608.26716v1#bib.bib30)_ / ART _[[Pu+ CVPR’25]](https://arxiv.org/html/2608.26716v1#bib.bib31)_\
+> COLE _[[Jia+ arXiv’23](https://arxiv.org/html/2608.26716v1#bib.bib30)]_ / ART _[[Pu+ CVPR’25](https://arxiv.org/html/2608.26716v1#bib.bib31)]_\
 > 複数レイヤーからなる**編集可能なデザインを生成**
 
 > **本研究**
@@ -152,7 +152,7 @@ Figure from [[Huang+ ECCV’26]](https://arxiv.org/html/2608.26716v1#S0.F1): 4�
 
 > ![Figure 2: 完成画像・レイヤーのメタデータ・質問・回答の対応](assets/beyond-atomic-fig2.png)
 >
-> Figure from [[Huang+ ECCV’26]](https://arxiv.org/html/2608.26716v1#S3.F2): 画像・メタデータ・質問・回答の対応
+> Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S3.F2)]: 画像・メタデータ・質問・回答の対応
 
 > **入力: 完成画像 + 各レイヤーのメタデータ**
 >
@@ -181,7 +181,7 @@ Figure from [[Huang+ ECCV’26]](https://arxiv.org/html/2608.26716v1#S0.F1): 4�
 
 > ![Figure 2 左側: 完成画像と各要素のメタデータ](assets/beyond-atomic-fig2-metadata.png#crop-right)
 >
-> Figure from [[Huang+ ECCV’26]](https://arxiv.org/html/2608.26716v1#S3.F2): デザインとメタデータ
+> Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S3.F2)]: デザインとメタデータ
 
 > **1デザインから質問応答形式の教師データ**
 >
@@ -220,17 +220,17 @@ Figure from [[Huang+ ECCV’26]](https://arxiv.org/html/2608.26716v1#S0.F1): 4�
 
 > ![Figure 3(a): 要素の対応付けと関連要素の特定精度](assets/beyond-atomic-semantic-drift.svg)
 >
-> Figure from [[Huang+ ECCV’26]](https://arxiv.org/html/2608.26716v1#S3.F3.sf1): 要素対応付けと特定精度
+> Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S3.F3.sf1)]: 要素対応付けと特定精度
 
 > ![Figure 3(b): 空間関係の認識と関連要素の特定精度](assets/beyond-atomic-structural-ambiguity.svg)
 >
-> Figure from [[Huang+ ECCV’26]](https://arxiv.org/html/2608.26716v1#S3.F3.sf2): 空間関係認識と特定精度
+> Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S3.F3.sf2)]: 空間関係認識と特定精度
 
 > **Semantic drift: 要素の取り違え**
 >
 > - 重なって隠れた指定要素を画像中で見失う
 > - 切り出し画像と完成画像からの説明を比較\
->   BLEU _[[Papineni+ ACL’02]](https://aclanthology.org/P02-1040/)_\
+>   BLEU _[[Papineni+ ACL’02](https://aclanthology.org/P02-1040/)]_\
 >   （Bilingual Evaluation Understudy）
 
 > **Structural ambiguity: 階層関係の曖昧さ**

@@ -380,8 +380,8 @@ section.paper-title > p:nth-of-type(5) img {
   height: auto;
 }
 
-/* Markdown: _[Author+ ConfName'YY](url)_ */
-section :is(p, li) > em:has(> a:only-child) {
+/* Markdown: _[[Author+ ConfName'YY](url)]_ */
+section :is(p, li) > em:has(> a) {
   font-size: var(--citation-font-size);
   font-style: normal;
 }
