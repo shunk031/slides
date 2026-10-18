@@ -212,19 +212,27 @@ Multimodal Alignment and Structural perceptiON
 
 > ![Figure 2 左側: 完成画像と各要素のメタデータ](assets/beyond-atomic-fig2-metadata.png#crop-right)
 >
-> Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S3.F2)]: デザインとメタデータ
+> Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S3.F2)]: 画像とメタデータ
 
-> _元のデザインの出所: 論文本体・補足資料とも記載なし\
-> 要素ペア: 主にメタデータの種類別ルールで抽出（モデルで補完）\
-> 意図ラベル: GPT-4 構造記述 → GPT-4o 画像照合 → GPT-4 QA 生成\
-> 人手確認: テストのみ 3 人の全員一致 [[Huang+ ECCV’26 Supp.](https://hukcc.github.io/Beyond-Atomic-Layouts/assets/paper/beyond-atomic-layouts-supplementary.pdf)]_
+> **データの作り方**
+>
+> - 要素ペア: レイヤーのメタデータ\
+>   （重なり順・重なり率・包含・大きさ）に\
+>   種類ごとのルールを当てて抽出
+> - 質問と意図: GPT-4 / GPT-4o が自動生成\
+>   （構造を説明 → 画像で確認 → QA を作成）
+> - 人手確認: テストのみ、3 人全員が\
+>   正しいと判断したものを採用 _[[Huang+ ECCV’26 Supp.](https://hukcc.github.io/Beyond-Atomic-Layouts/assets/paper/beyond-atomic-layouts-supplementary.pdf)]_
+> - 完成画像と各要素の JSON メタデータを保持
+>
+> _元のデザインの出所は、論文本体・補足資料とも記載なし_
+>
+> 訓練は自然な偏りを維持 ／\
+> テストは Morphing を増やして種類別評価
 
 > **Train: 20,009 / Test: 387**
 >
-> - 平均 17.4 レイヤー\
->   99.8%が 45 レイヤー未満
->
-> **4 種類の関係・Morphing も評価**
+> - 平均 17.4 層／99.8%が 45 層未満
 >
 > | 関係         |     Train |       Test |
 > | :----------- | --------: | ---------: |
@@ -232,10 +240,6 @@ Multimodal Alignment and Structural perceptiON
 > | Overlaying   |    22.83% |     29.95% |
 > | Clipping     |    17.76% |     17.75% |
 > | **Morphing** | **2.63%** | **12.24%** |
-
-<!-- End of the table column; keep this note across both columns. -->
-
-訓練は自然な偏りを維持 ／ テストは Morphing を増やして種類別評価
 
 ---
 
