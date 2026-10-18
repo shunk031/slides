@@ -48,7 +48,7 @@
   --list-indent: 0.85em;
   --nested-list-indent: var(--list-indent);
   --nested-list-font-size: calc(var(--body-font-size) * 14 / 16);
-  --deep-list-font-size: calc(var(--body-font-size) * 12 / 16);
+  --deep-list-font-size: var(--nested-list-font-size);
   --citation-font-size: 20px;
   --figure-caption-font-size: 20px;
   --crop-feather-width: 16px;
