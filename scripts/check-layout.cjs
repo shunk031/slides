@@ -47,78 +47,152 @@ function inspectLines() {
         const ratio = width(shortest) / Math.max(...lines.map(width));
         const heading = /^H[1-6]$/.test(block.tagName);
         const limit = heading ? 0.6 : 0.25;
-        return { slide: index + 1, element: block.tagName.toLowerCase(), text: block.textContent.trim(), lines: lines.map(l => l.text), multiLineTitle: block.tagName === 'H2' && lines.length > 1, shortLine: shortest.text, shortLineRatio: Number(ratio.toFixed(3)), limit, suspect: ratio < limit };
+        return { slide: index + 1, element: block.tagName.toLowerCase(), text: block.textContent.trim(), lines: lines.map(l => l.text), multiLineTitle: block.tagName === 'H2' && block.parentElement === slide && lines.length > 1, shortLine: shortest.text, shortLineRatio: Number(ratio.toFixed(3)), limit, suspect: ratio < limit };
       });
     }).filter(block => block.lines.length));
 }
 
 function inspectMidwordWraps() {
   const selector = 'h1,h2,h3,h4,h5,h6,p,li,figcaption,td,th';
-  const segmenter = new Intl.Segmenter('ja', { granularity: 'word' });
   const findings = [];
-  for (const [index, slide] of [...document.querySelectorAll('section')].entries()) {
-    for (const block of slide.querySelectorAll(selector)) {
-      let text = '';
-      const lines = [];
-      const chars = [];
-      const append = (char, rect) => {
-        const line = lines.find(l => Math.min(l.bottom, rect.bottom) - Math.max(l.top, rect.top) > Math.min(l.bottom - l.top, rect.height) / 2);
-        const current = line || { top: rect.top, bottom: rect.bottom, text: '' };
-        if (!line) lines.push(current);
-        current.top = Math.min(current.top, rect.top);
-        current.bottom = Math.max(current.bottom, rect.bottom);
-        current.text += char;
-        chars.push({ index: text.length - char.length, char, line: current });
-      };
-      const walk = node => {
-        for (const child of node.childNodes) {
-          if (child.nodeType === Node.TEXT_NODE) {
-            if (child.parentElement.closest(selector) !== block) continue;
-            let offset = 0;
-            for (const char of child.textContent) {
-              const start = text.length;
-              text += char;
-              const range = document.createRange();
-              range.setStart(child, offset);
-              offset += char.length;
-              range.setEnd(child, offset);
-              const rect = range.getBoundingClientRect();
-              if (rect.width && rect.height) append(char, rect);
-            }
-          } else if (child.nodeType === Node.ELEMENT_NODE) {
-            if (child.matches('br,wbr')) {
-              text += '\n';
-            } else if (child.matches('mjx-container')) {
-              const rect = child.getBoundingClientRect();
-              text += '\uFFFC';
-              if (rect.width && rect.height) append('\uFFFC', rect);
-            } else if (child.matches(selector)) {
-              continue;
-            } else {
-              walk(child);
-            }
+  const collect = block => {
+    let text = '';
+    const lines = [];
+    const chars = [];
+    const append = (char, rect) => {
+      const start = text.length;
+      text += char;
+      if (!rect?.width || !rect.height) return;
+      let line = lines.find(l => Math.min(l.bottom, rect.bottom) - Math.max(l.top, rect.top) > Math.min(l.bottom - l.top, rect.height) / 2);
+      if (!line) {
+        line = { top: rect.top, bottom: rect.bottom, text: '' };
+        lines.push(line);
+      }
+      line.top = Math.min(line.top, rect.top);
+      line.bottom = Math.max(line.bottom, rect.bottom);
+      line.text += char;
+      chars.push({ index: start, char, line });
+    };
+    const walk = node => {
+      for (const child of node.childNodes) {
+        if (child.nodeType === Node.TEXT_NODE) {
+          if (child.parentElement.closest(selector) !== block) continue;
+          let offset = 0;
+          for (const char of child.textContent) {
+            const range = document.createRange();
+            range.setStart(child, offset);
+            offset += char.length;
+            range.setEnd(child, offset);
+            append(char, range.getBoundingClientRect());
           }
+        } else if (child.nodeType === Node.ELEMENT_NODE) {
+          if (child.matches('br,wbr')) text += '\n';
+          else if (child.matches('mjx-container,img')) append('\uFFFC', child.getBoundingClientRect());
+          else if (!child.matches(selector)) walk(child);
         }
-      };
-      walk(block);
-      if (!chars.length) continue;
-      const segments = [...segmenter.segment(text)].filter(segment => segment.isWordLike);
-      for (let i = 1; i < chars.length; i++) {
-        const before = chars[i - 1];
-        const after = chars[i];
-        if (before.line === after.line || text.slice(before.index + before.char.length, after.index).includes('\n')) continue;
-        const word = segments.find(segment => segment.index < after.index && after.index < segment.index + segment.segment.length);
-        if (word) findings.push({
+      }
+    };
+    walk(block);
+    return { text, lines, chars };
+  };
+  for (const [index, slide] of [...document.querySelectorAll('section')].entries()) {
+    const segmenter = new Intl.Segmenter(slide.lang || document.documentElement.lang || 'ja', { granularity: 'word' });
+    for (const block of slide.querySelectorAll(selector)) {
+      const actual = collect(block);
+      if (!actual.chars.length) continue;
+      const segments = [...segmenter.segment(actual.text.replace(/\uFFFC/g, ' '))].filter(segment => segment.isWordLike);
+      for (let i = 1; i < actual.chars.length; i++) {
+        const before = actual.chars[i - 1];
+        const after = actual.chars[i];
+        const boundary = before.index + before.char.length;
+        if (before.line === after.line || actual.text.slice(boundary, after.index).includes('\n')) continue;
+        const word = segments.find(segment => segment.index < boundary && boundary < segment.index + segment.segment.length);
+        if (!word) continue;
+        const splitWord = word.segment.replace(/\uFFFC/g, '').trim();
+        findings.push({
           slide: index + 1,
           kind: 'midword-wrap',
-          lines: [before.line.text.trim(), after.line.text.trim()],
-          word: word.segment,
-          text: `${before.line.text.trim()} / ${after.line.text.trim()} — split word: ${word.segment}`,
+          lines: [before.line.text.replace(/\uFFFC/g, '').trim(), after.line.text.replace(/\uFFFC/g, '').trim()],
+          word: splitWord,
+          text: `${before.line.text.replace(/\uFFFC/g, '').trim()} / ${after.line.text.replace(/\uFFFC/g, '').trim()} — split word: ${splitWord}`,
         });
       }
     }
   }
   return findings;
+}
+
+function inspectGroupGaps() {
+  const sections = [...document.querySelectorAll('section')];
+  const group = element => element && /^(P|UL|OL)$/.test(element.tagName) &&
+    !(element.tagName === 'P' && element.children.length === 1 && element.firstElementChild.matches('strong'));
+  const lastGroup = box => [...box.children].reverse().find(group);
+  const themeGap = Math.max(...sections.map(section => parseFloat(getComputedStyle(section).getPropertyValue('--list-group-gap'))).filter(Number.isFinite));
+  const groups = [];
+  for (const [index, slide] of sections.entries()) {
+    if (slide.matches('.profile-slide,.first-slide,.lead,.takahashi,.title-slide-big,.layout-example')) continue;
+    for (const heading of slide.querySelectorAll('p')) {
+      if (heading.children.length !== 1 || !heading.firstElementChild.matches('strong') || heading.closest('header,footer,blockquote:has(> p > img)')) continue;
+      const next = heading.nextElementSibling;
+      if (!group(next)) continue;
+      let previous = heading.previousElementSibling;
+      let crossesBox = false;
+      if (!group(previous)) {
+        const previousBox = heading.parentElement.previousElementSibling;
+        if (!previousBox || previousBox.parentElement !== slide || previousBox.tagName !== 'BLOCKQUOTE' || previousBox.querySelector('img')) continue;
+        const currentBox = heading.parentElement.getBoundingClientRect();
+        const previousBoxRect = previousBox.getBoundingClientRect();
+        if (previousBoxRect.right <= currentBox.left || currentBox.right <= previousBoxRect.left) continue;
+        previous = lastGroup(previousBox);
+        crossesBox = true;
+      }
+      if (!group(previous)) continue;
+      const before = previous.getBoundingClientRect();
+      const current = heading.getBoundingClientRect();
+      if (!before.width || !current.width || before.bottom > current.top) continue;
+      groups.push({
+        slide: index + 1,
+        role: `${heading.parentElement.tagName}:${previous.tagName}:${next.tagName}`,
+        text: heading.textContent.trim(),
+        previous: previous.tagName.toLowerCase(),
+        next: next.tagName.toLowerCase(),
+        gap: current.top - before.bottom,
+        sectionGap: parseFloat(getComputedStyle(slide).getPropertyValue('--list-group-gap')),
+        crossesBox,
+      });
+    }
+  }
+  return { themeGap, groups };
+}
+
+function groupGapFindings({ themeGap, groups }) {
+  if (!Number.isFinite(themeGap)) return groups.map(group => ({ slide: group.slide, kind: 'group-gap-config', text: `${group.text}: --list-group-gap is not defined by the theme.` }));
+  const medians = values => {
+    const sorted = [...values].sort((a, b) => a - b);
+    return sorted.length % 2 ? sorted[(sorted.length - 1) / 2] : (sorted[sorted.length / 2 - 1] + sorted[sorted.length / 2]) / 2;
+  };
+  return groups.flatMap(group => {
+    if (!Number.isFinite(group.sectionGap))
+      return [{ slide: group.slide, kind: 'group-gap-config', text: `${group.text}: --list-group-gap is not defined by the theme.` }];
+    const peers = groups.filter(other => other.role === group.role && other.sectionGap === group.sectionGap);
+    const pageGaps = new Map();
+    for (const peer of peers) {
+      if (!pageGaps.has(peer.slide)) pageGaps.set(peer.slide, []);
+      pageGaps.get(peer.slide).push(peer.gap);
+    }
+    const roleMedian = medians([...pageGaps.values()].map(medians));
+    const pageMedian = medians(pageGaps.get(group.slide));
+    const reasons = [];
+    if (group.gap < group.sectionGap) reasons.push(`gap ${Math.round(group.gap)}px is below the section gap ${Math.round(group.sectionGap)}px`);
+    if (pageGaps.size > 1 && Math.abs(pageMedian - roleMedian) > 2) reasons.push(`same-role gap differs from the ${Math.round(roleMedian)}px page median by more than 2px`);
+    return reasons.length ? [{
+      slide: group.slide,
+      kind: 'group-gap',
+      gap: group.gap,
+      limit: group.sectionGap,
+      text: `${group.text}: ${reasons.join('; ')}.`,
+    }] : [];
+  });
 }
 
 function inspectColumns() {
@@ -137,12 +211,27 @@ function inspectColumns() {
     return null;
   };
   return [...document.querySelectorAll('section')].flatMap((slide, index) => {
-    const blocks = [...slide.children].filter(block => !block.matches('header,footer') && block.textContent.trim()).map(block => {
+    const slideTop = slide.getBoundingClientRect().top;
+    const children = [...slide.children];
+    const blocks = children.filter(block => !block.matches('header,footer') && block.textContent.trim()).map(block => {
       const first = firstText(block);
       const box = block.getBoundingClientRect();
       const imageTops = [...block.querySelectorAll('img')].map(img => img.getBoundingClientRect()).filter(rect => rect.width && rect.height).map(rect => rect.top);
-      return first && box.width && box.height ? { block, box, first, imageLeading: imageTops.some(top => top <= first.top) } : null;
+      return first && box.width && box.height ? {
+        block,
+        box,
+        first,
+        order: children.indexOf(block),
+        imageLeading: imageTops.some(top => top <= first.top),
+        centered: getComputedStyle(block).alignSelf === 'center',
+      } : null;
     }).filter(Boolean);
+    const imageLeadsColumn = item => item.imageLeading || children.slice(0, item.order).some(previous => {
+      const previousBox = previous.getBoundingClientRect();
+      const previousImages = [...previous.querySelectorAll('img')].map(img => img.getBoundingClientRect()).filter(rect => rect.width && rect.height);
+      return previousImages.length && previousBox.bottom <= item.box.top + 2 &&
+        Math.abs((previousBox.left + previousBox.right) / 2 - (item.box.left + item.box.right) / 2) <= 2;
+    });
     const pairs = [];
     for (let i = 0; i < blocks.length; i++) {
       for (const right of blocks.slice(i + 1)) {
@@ -154,10 +243,11 @@ function inspectColumns() {
           slide: index + 1,
           leftText: first.first.text,
           rightText: second.first.text,
-          leftTop: first.first.top,
-          rightTop: second.first.top,
+          leftTop: first.first.top - slideTop,
+          rightTop: second.first.top - slideTop,
           difference: Math.abs(first.first.top - second.first.top),
-          imageLeading: left.imageLeading || right.imageLeading,
+          imageLeading: imageLeadsColumn(left) || imageLeadsColumn(right),
+          centered: left.centered || right.centered,
         });
       }
     }
@@ -166,7 +256,7 @@ function inspectColumns() {
 }
 
 function columnFindings(columns) {
-  return columns.filter(pair => !pair.imageLeading && pair.difference > 2).map(pair => ({
+  return columns.filter(pair => !pair.imageLeading && !pair.centered && pair.difference > 2).map(pair => ({
     slide: pair.slide,
     kind: 'column-alignment',
     text: `${pair.leftText} (${Math.round(pair.leftTop)}px) / ${pair.rightText} (${Math.round(pair.rightTop)}px)`,
@@ -283,12 +373,14 @@ function inspectStructure() {
     }
     const footer = slide.querySelector(':scope > footer');
     if (footer) {
-      const footerTop = footer.getBoundingClientRect().top;
-      for (const block of slide.querySelectorAll('h1,h2,h3,h4,h5,h6,p,li,figcaption,td,th')) {
-        if (block.closest('header,footer,.pagination,.classification,.background-decoration')) continue;
+      const slideTop = bounds.top;
+      const footerTop = footer.getBoundingClientRect().top - slideTop;
+      for (const block of slide.querySelectorAll('h1,h2,h3,h4,h5,h6,p,li,figcaption,td,th,img')) {
+        if (block.closest('header,footer,.pagination,.page-number,.classification,.classification-badge,.background-decoration')) continue;
         const box = block.getBoundingClientRect();
-        if (box.width && box.height && box.bottom >= footerTop)
-          findings.push({ slide: index + 1, kind: 'footer-overflow', text: `${block.textContent.trim()} (body bottom ${Math.round(box.bottom)}px, footer top ${Math.round(footerTop)}px)`, bodyBottom: box.bottom, footerTop });
+        const bodyBottom = box.bottom - slideTop;
+        if (box.width && box.height && bodyBottom >= footerTop)
+          findings.push({ slide: index + 1, kind: 'footer-overflow', text: `${block.textContent.trim() || block.getAttribute('alt') || ''} (body bottom ${Math.round(bodyBottom)}px, footer top ${Math.round(footerTop)}px)`, bodyBottom, footerTop });
       }
     }
     const heading = slide.querySelector(':scope > h2');
@@ -470,14 +562,28 @@ async function main() {
       console.log(`P3 baseline: legacy line-balance=${p3Legacy.some(r => r.suspect)}; lines=${JSON.stringify(p3Legacy.map(r => r.lines))}; mid-word=${JSON.stringify(p3Wraps)}`);
       assert.equal(p3Legacy.some(r => r.suspect), false);
       assert.ok(p3Wraps.some(r => r.word === 'どおり'));
-      await page.setContent('<section lang="ja" style="font:20px/30px monospace;word-break:auto-phrase;text-wrap:pretty"><p style="width:70px;margin:0">意図 どおり</p></section>');
+      assert.deepEqual([...new Intl.Segmenter('ja', { granularity: 'word' }).segment('意図どおり')].filter(s => s.isWordLike).map(s => s.segment), ['意図', 'どおり']);
+      await page.setContent('<section lang="ja" style="font:20px/30px sans-serif;word-break:auto-phrase;text-wrap:pretty"><p style="width:70px;margin:0">意図 どおり</p></section>');
       assert.deepEqual(await page.evaluate(inspectMidwordWraps), []);
       await page.setContent('<section style="font:20px monospace"><p style="width:80px;margin:0;word-break:break-all">ABCDEFGHIJKL</p></section>');
       assert.ok((await page.evaluate(inspectMidwordWraps)).some(r => r.word === 'ABCDEFGHIJKL'));
       await page.setContent('<section style="font:20px monospace"><p style="width:80px;margin:0;word-break:break-all">ABC<a>DEFGHI</a><mjx-container class="MathJax" style="display:inline-block;width:16px;height:20px"><svg width="16" height="20"></svg></mjx-container></p></section>');
       assert.ok((await page.evaluate(inspectMidwordWraps)).some(r => r.word === 'ABCDEFGHI'));
+      await page.setContent('<section style="font:20px monospace"><p style="width:80px;margin:0;word-break:break-all"><code>ABCDEFGHIJKL</code></p></section>');
+      assert.ok((await page.evaluate(inspectMidwordWraps)).some(r => r.word === 'ABCDEFGHIJKL'));
       await page.setContent('<section lang="ja" style="font:20px/30px sans-serif;word-break:auto-phrase;text-wrap:pretty"><p style="margin:0">デザインを「作る」だけでなく<br>「意図どおりに直す」ことが難しい</p></section>');
       assert.deepEqual(await page.evaluate(inspectMidwordWraps), []);
+      await page.setContent('<section style="font:20px/20px monospace;--list-group-gap:16px"><blockquote style="position:absolute;top:20px;left:0;margin:0"><ul style="margin:0;padding:0"><li style="margin:0;list-style:none">Previous</li></ul></blockquote><blockquote style="position:absolute;top:44px;left:0;margin:0"><p style="margin:0"><strong>Group</strong></p><ul style="margin:0;padding:0"><li style="margin:0;list-style:none">Next</li></ul></blockquote></section>');
+      const shortGroupGap = groupGapFindings(await page.evaluate(inspectGroupGaps));
+      assert.ok(shortGroupGap.some(f => f.kind === 'group-gap' && f.gap === 4));
+      await page.evaluate(() => { document.querySelectorAll('blockquote')[1].style.top = '56px'; });
+      assert.deepEqual(groupGapFindings(await page.evaluate(inspectGroupGaps)), []);
+      await page.setContent('<section style="font:20px/20px monospace;--list-group-gap:16px"><h2>Title</h2><p style="margin:0"><strong>Group</strong></p><ul style="margin:0"><li>Next</li></ul></section>');
+      assert.deepEqual((await page.evaluate(inspectGroupGaps)).groups, []);
+      assert.ok(groupGapFindings({ themeGap: 16, groups: [
+        { slide: 1, role: 'body-group-heading', text: 'A', gap: 16, sectionGap: 16 },
+        { slide: 2, role: 'body-group-heading', text: 'B', gap: 22, sectionGap: 16 },
+      ] }).length);
       for (const tag of ['p', 'li', 'td']) {
         const content = tag === 'td' ? '<table><tr><td>Long first line<br>x</td></tr></table>' : `<${tag}>Long first line<br>x</${tag}>`;
         await page.setContent(`<section style="font:20px monospace">${content}</section>`);
@@ -490,7 +596,9 @@ async function main() {
       await page.setContent('<section style="position:relative;width:500px;height:300px"><p style="position:absolute;top:20px">First</p><p style="position:absolute;top:20px">Second</p></section>');
       assert.equal((await page.evaluate(inspectStructure)).some(f => f.kind === 'text-overlap'), true);
       await page.setContent('<section style="position:relative;width:500px;height:300px;font:20px/20px monospace"><p style="position:absolute;top:240px;height:20px;margin:0">Touches footer</p><footer style="position:absolute;top:260px;height:20px">Footer</footer></section>');
-      assert.equal((await page.evaluate(inspectStructure)).some(f => f.kind === 'footer-overflow'), true);
+      const footerTouch = (await page.evaluate(inspectStructure)).find(f => f.kind === 'footer-overflow');
+      assert.equal(footerTouch.bodyBottom, 260);
+      assert.equal(footerTouch.footerTop, 260);
       await page.evaluate(() => { document.querySelector('p').style.top = '239px'; });
       assert.equal((await page.evaluate(inspectStructure)).some(f => f.kind === 'footer-overflow'), false);
       await page.setContent('<section class="paired-definitions" style="display:grid;grid-template-columns:1fr 1fr;font:20px/30px sans-serif"><blockquote style="margin:0"><p style="margin:0">Atomic<br>layout<br>definition</p></blockquote><blockquote style="margin:0"><p style="margin:0">Compositional<br>layout</p></blockquote></section>');
@@ -499,10 +607,14 @@ async function main() {
       assert.equal(columnFindings(await page.evaluate(inspectColumns)).some(f => f.kind === 'column-alignment'), true);
       await page.setContent('<section class="paired-definitions" style="display:grid;grid-template-columns:1fr 1fr;font:20px/30px sans-serif"><blockquote style="margin:0"><p style="margin:0">Atomic<br>layout</p></blockquote><blockquote style="margin:0"><p style="margin:0">Compositional<br>layout</p></blockquote></section>');
       assert.equal((await page.evaluate(inspectStructure)).some(f => f.kind === 'paired-definition-alignment'), false);
-      for (const top of [5, 10]) {
+      for (const [name, top] of [['P4 prior 5px offset', 5], ['P16 10px offset', 10]]) {
         await page.setContent(`<section style="display:grid;grid-template-columns:1fr 1fr;width:500px;font:20px/30px monospace"><blockquote style="margin:0">Left heading</blockquote><blockquote style="margin:${top}px 0 0">Right heading</blockquote></section>`);
-        assert.equal(columnFindings(await page.evaluate(inspectColumns)).some(f => f.kind === 'column-alignment'), true);
+        assert.equal(columnFindings(await page.evaluate(inspectColumns)).some(f => f.kind === 'column-alignment'), true, name);
       }
+      await page.setContent('<section style="display:grid;grid-template-columns:1fr 1fr;width:500px;font:20px/20px monospace"><blockquote style="grid-column:1;grid-row:1;margin:0"><p style="margin:0"><img alt="" style="width:80px;height:40px"></p></blockquote><blockquote style="grid-column:1;grid-row:2;margin:0">Left below figure</blockquote><blockquote style="grid-column:2;grid-row:1 / span 2;margin:0">Right column<br>continues<br>below</blockquote></section>');
+      assert.deepEqual(columnFindings(await page.evaluate(inspectColumns)), []);
+      await page.setContent('<section style="display:grid;grid-template-columns:1fr 1fr;width:500px;font:20px/20px monospace"><blockquote style="margin:0">Left column</blockquote><blockquote style="margin:0;align-self:center">Centered note</blockquote></section>');
+      assert.deepEqual(columnFindings(await page.evaluate(inspectColumns)), []);
       await page.setContent('<section style="display:grid;grid-template-columns:1fr 1fr;width:500px;font:20px/30px monospace"><blockquote style="margin:0">Left heading</blockquote><blockquote style="margin:0">Right heading</blockquote></section>');
       assert.deepEqual(columnFindings(await page.evaluate(inspectColumns)), []);
       await page.setContent('<section style="font:20px/30px monospace"><blockquote style="margin:0">One column</blockquote></section>');
@@ -648,10 +760,11 @@ async function main() {
       const termsPath = path.join(path.dirname(input), 'terms.json');
       const terms = fs.existsSync(termsPath) ? JSON.parse(fs.readFileSync(termsPath, 'utf8')) : {};
       const columns = await page.evaluate(inspectColumns);
-      const structure = [...await page.evaluate(inspectStructure), ...await page.evaluate(inspectTypography), ...await page.evaluate(inspectTerms, terms), ...await page.evaluate(inspectMidwordWraps), ...titleFindings, ...columnFindings(columns)];
+      const groupGaps = await page.evaluate(inspectGroupGaps);
+      const structure = [...await page.evaluate(inspectStructure), ...await page.evaluate(inspectTypography), ...await page.evaluate(inspectTerms, terms), ...await page.evaluate(inspectMidwordWraps), ...titleFindings, ...columnFindings(columns), ...groupGapFindings(groupGaps)];
       structuralErrors += structure.length + candidates.length;
       candidateCount += candidates.length + structure.length;
-      fs.writeFileSync(path.join(output, 'lines.json'), JSON.stringify({ input, browser: await browser.version(), blocks, columnPairs: columns, structure }, null, 2));
+      fs.writeFileSync(path.join(output, 'lines.json'), JSON.stringify({ input, browser: await browser.version(), blocks, columnPairs: columns, groupGaps, structure }, null, 2));
       await page.evaluate(() => document.querySelectorAll('.debug-layout').forEach(e => e.classList.remove('debug-layout')));
       const sections = await page.$$('section');
       if (!sections.length) throw new Error(`No slides rendered: ${input}`);
