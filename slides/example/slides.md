@@ -187,8 +187,8 @@ Multimodal Alignment and Structural perceptiON
 > **入力: 完成画像 + 各レイヤーのメタデータ**
 >
 > $$
-> \mathcal{L}=(\underbrace{\colorbox{#E2F0D9}{$\vphantom{\mathcal{IM}}\mathcal{I}$}}_{\mathclap{\bbox[0px,#E2F0D9]{\text{完成画像}}}},\hspace{1.6em}\underbrace{\colorbox{#DBEAFE}{$\vphantom{\mathcal{IM}}\mathcal{M}$}}_{\mathclap{\bbox[0px,#DBEAFE]{\text{メタデータ}}}}),
-> \bbox[0px,#DBEAFE]{\mathcal{M}}\!=\!\{\mathcal{M}_{e_1},\!\ldots,\mathcal{M}_{e_n}\}
+> \mathcal{L}=(\underbrace{\bbox[0px,#E2F0D9]{\vphantom{\mathcal{IM}}\mathcal{I}}}_{\mathclap{\bbox[0px,#E2F0D9]{\text{完成画像}}\hphantom{\text{完成}}}},\;\underbrace{\bbox[0px,#DBEAFE]{\vphantom{\mathcal{IM}}\mathcal{M}}}_{\mathclap{\hphantom{\text{完成}}\bbox[0px,#DBEAFE]{\text{メタデータ}}}}),\,
+> \bbox[0px,#DBEAFE]{\mathcal{M}}=\{\mathcal{M}_{e_1},\ldots,\mathcal{M}_{e_n}\}
 > $$
 >
 > - $\mathcal{M}_{e_i}$: 要素識別子（ID）・種類・位置・\
