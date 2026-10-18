@@ -745,6 +745,12 @@ section:is(.dataset-slide, .sp-slide) :is(th, td) { padding: var(--dataset-table
 section img[src$="#crop-right"] {
   mask-image: linear-gradient(to right, black calc(100% - var(--crop-feather-width)), transparent);
 }
+section.sp-slide img[src$="#crop-right"] {
+  mask-image:
+    linear-gradient(to right, transparent, black var(--crop-feather-width), black calc(100% - var(--crop-feather-width)), transparent),
+    linear-gradient(to bottom, transparent, black var(--crop-feather-width));
+  mask-composite: intersect;
+}
 
 section.analysis-slide {
   --analysis-figure-height: 230px;
