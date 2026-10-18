@@ -509,7 +509,7 @@ section.profile-slide > blockquote:nth-of-type(2) > p:nth-child(n + 3) img {
 
 /* Float the source figure so the rationale can continue beneath it. */
 section.selection-slide {
-  --selection-figure-width: 600px;
+  --selection-figure-width: 680px;
   display: block;
   letter-spacing: 0;
 }
@@ -546,7 +546,7 @@ section.selection-slide > blockquote:first-of-type > p:last-child { margin-botto
 section > blockquote:has(> p > img) > p { text-align: center; }
 
 section.background-slide {
-  --background-figure-height: 120px;
+  --background-figure-height: 175px;
   --content-gap: 8px;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -583,7 +583,7 @@ section.background-slide > p:has(> a) {
 }
 
 section.problem-slide {
-  --problem-figure-height: 220px;
+  --problem-figure-height: 250px;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--content-gap);

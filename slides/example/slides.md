@@ -75,13 +75,16 @@ _Project page: [hukcc.github.io/Beyond-Atomic-Layouts/](https://hukcc.github.io/
 >
 > Figure from [[Huang+ ECCV’26]](https://arxiv.org/html/2608.26716v1#S0.F1.sf5): デザイン支援の例
 
-> **デザインを「作る」だけでなく「意図どおりに直す」ことが難しい**
+> **デザインを「作る」だけでなく、\
+> 「意図どおりに直す」ことが難しい**
 >
 > - 文字を人物の背後に差し込む、\
 >   文字の一部を図形へ置き換えるなど、\
 >   複数のレイヤーで 1 つの視覚効果を表現
 >   - 関連レイヤーをまとめて特定してから編集
-> - 画像として見えている領域と、編集すべきレイヤーの単位が一致しない場合がある _[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S1)_
+> - 画像として見えている領域と、\
+>   編集すべきレイヤーの単位が\
+>   一致しない場合がある _[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S1)_
 >
 > **本論文で注目したい点**
 >
@@ -116,11 +119,18 @@ _Project page: [hukcc.github.io/Beyond-Atomic-Layouts/](https://hukcc.github.io/
 
 Figure from [[Huang+ ECCV’26]](https://arxiv.org/html/2608.26716v1#S0.F1)
 
-**既存研究との違い**
+---
 
-- **文書・画面理解**: LayoutLMv3 _[Huang+ MM’22](https://arxiv.org/html/2608.26716v1#bib.bib17)_ / ScreenQA _[Hsiao+ NAACL’25](https://arxiv.org/html/2608.26716v1#bib.bib24)_ は、主に個別要素を理解
-- **デザイン生成**: COLE _[Jia+ arXiv’23](https://arxiv.org/html/2608.26716v1#bib.bib30)_ / ART _[Pu+ CVPR’25](https://arxiv.org/html/2608.26716v1#bib.bib31)_ は、複数レイヤーからなる編集可能なデザインを生成
-- **本研究**: どのレイヤー同士が結びつき、どのデザイン意図を実現しているかを問う
+<!-- _class: content-slide-gray classification-public debug-layout -->
+
+## 既存研究との違い **|** _個別要素や生成から、レイヤー間の関係理解へ_
+
+- **文書・画面理解**: LayoutLMv3 _[Huang+ MM’22](https://arxiv.org/html/2608.26716v1#bib.bib17)_ / ScreenQA _[Hsiao+ NAACL’25](https://arxiv.org/html/2608.26716v1#bib.bib24)_\
+  主に文書や画面の個別要素を理解
+- **デザイン生成**: COLE _[Jia+ arXiv’23](https://arxiv.org/html/2608.26716v1#bib.bib30)_ / ART _[Pu+ CVPR’25](https://arxiv.org/html/2608.26716v1#bib.bib31)_\
+  複数レイヤーからなる編集可能なデザインを生成
+- **本研究**\
+  どのレイヤー同士が結びつき、どのデザイン意図を実現しているかを問う
 
 ---
 
