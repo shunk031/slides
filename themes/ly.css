@@ -781,6 +781,7 @@ section.analysis-slide > blockquote > p { margin: 0 0 var(--content-gap); }
 section.analysis-slide > blockquote:has(img) { font-size: var(--figure-caption-font-size); }
 section.analysis-slide > blockquote:has(img) > p:last-child { margin-bottom: 0; }
 section.analysis-slide img { width: 100%; height: var(--analysis-figure-height); object-fit: contain; }
+section.failure-analysis-slide { --analysis-figure-height: 175px; }
 
 /* Separate later list introductions without moving the first one. */
 section:not(.first-slide, .lead, .takahashi, .title-slide-big) :is(p, ul, ol, table) ~ p:has(+ :is(ul, ol)) {

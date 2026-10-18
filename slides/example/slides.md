@@ -241,7 +241,7 @@ Multimodal Alignment and Structural perceptiON
 
 ---
 
-<!-- _class: analysis-slide content-slide-gray classification-public -->
+<!-- _class: analysis-slide failure-analysis-slide content-slide-gray classification-public -->
 <!-- 発表目安 1:00 -->
 
 ## 課題分析 **|** _VLM の失敗要因は「要素の取り違え」と「階層関係の曖昧さ」_
