@@ -42,6 +42,47 @@ function inspectLines() {
     }).filter(block => block.lines.length));
 }
 
+function inspectStructure() {
+  return [...document.querySelectorAll('section')].flatMap((slide, index) => {
+    const findings = [];
+    for (const link of slide.querySelectorAll('em > a')) {
+      if ((link.textContent.match(/[\p{L}-]+\+/gu) || []).length > 1)
+        findings.push({ slide: index + 1, kind: 'bundled-citation', text: link.textContent });
+    }
+    const bounds = slide.getBoundingClientRect();
+    for (const block of slide.querySelectorAll('h1,h2,h3,h4,h5,h6,p,li,figcaption,td,th')) {
+      const hasItems = ['grid', 'inline-grid', 'flex', 'inline-flex'].includes(getComputedStyle(block).display);
+      const walker = document.createTreeWalker(block, NodeFilter.SHOW_TEXT);
+      let overflow = false;
+      while (walker.nextNode()) {
+        const node = walker.currentNode;
+        if (!node.textContent.trim() || node.parentElement.closest('h1,h2,h3,h4,h5,h6,p,li,figcaption,td,th') !== block) continue;
+        const range = document.createRange();
+        range.selectNodeContents(node);
+        let container = node.parentElement;
+        while (container !== block && container.parentElement !== block) container = container.parentElement;
+        // Grid/flex items can deliberately extend beyond an image-sized parent.
+        const box = (hasItems ? container : block).getBoundingClientRect();
+        overflow ||= [...range.getClientRects()].some(r => r.width && r.height && (
+          r.left < Math.max(bounds.left, box.left) - 1 || r.right > Math.min(bounds.right, box.right) + 1 ||
+          r.top < Math.max(bounds.top, box.top) - 1 || r.bottom > Math.min(bounds.bottom, box.bottom) + 1));
+      }
+      if (overflow) findings.push({ slide: index + 1, kind: 'text-overflow', text: block.textContent.trim() });
+    }
+    for (const block of slide.querySelectorAll('p,ul,ol')) {
+      const previous = block.previousElementSibling;
+      if (!previous?.matches('p,ul,ol') || block.closest('blockquote')?.querySelector('img')) continue;
+      const style = getComputedStyle(block);
+      const gap = block.getBoundingClientRect().top - previous.getBoundingClientRect().bottom;
+      const expected = Math.max(parseFloat(style.marginTop) || 0, parseFloat(getComputedStyle(previous).marginBottom) || 0);
+      const lineHeight = parseFloat(style.lineHeight) || parseFloat(style.fontSize) * 1.5;
+      if (gap > expected + lineHeight)
+        findings.push({ slide: index + 1, kind: 'large-prose-gap', text: block.textContent.trim(), gap: Math.round(gap), expected: Math.round(expected) });
+    }
+    return findings;
+  });
+}
+
 async function main() {
   const marpBin = process.env.PATH.split(path.delimiter).map(p => path.join(p, 'marp')).find(p => fs.existsSync(p));
   if (!marpBin) throw new Error('Run with mise: mise run check-layout');
@@ -61,6 +102,14 @@ async function main() {
       assert.deepEqual(result.filter(r => r.suspect).map(r => r.lines.at(-1)), ['表現']);
       assert.deepEqual(result.filter(r => r.element === 'li').map(r => r.lines), [['親の文章'], ['子の文章']]);
       assert.deepEqual(result.find(r => r.lines.join('').includes('引用')).lines, ['本文引用']);
+      await page.setContent('<section style="font:20px/30px sans-serif"><div style="float:right;width:20px;height:200px"></div><p>A <em><a>Huang+ MM’22 / Hsiao+ NAACL’25</a></em></p><p style="clear:right">離れた節</p><p>A <em><a>Huang+ MM’22</a></em> / B <em><a>Hsiao+ NAACL’25</a></em></p><blockquote><p><img></p><p style="margin-top:90px">図の説明</p></blockquote></section>');
+      const structure = await page.evaluate(inspectStructure);
+      assert.deepEqual(structure.map(f => f.kind), ['bundled-citation', 'large-prose-gap']);
+      assert.equal(structure[1].text, '離れた節');
+      await page.setContent('<section style="width:300px;height:120px;font:20px/30px sans-serif"><p style="width:80px;white-space:nowrap">Hsiao+ NAACL’25</p><p style="transform:translateY(100px)">下端のはみ出し</p><p style="height:5px">本文枠の下端</p></section>');
+      assert.equal((await page.evaluate(inspectStructure)).filter(f => f.kind === 'text-overflow').length, 3);
+      await page.setContent('<section style="width:300px;height:120px"><p style="display:grid;width:80px"><a style="width:max-content;white-space:nowrap">Intentional wide image caption</a></p></section>');
+      assert.deepEqual(await page.evaluate(inspectStructure), []);
       console.log('Layout inspection self-test passed');
       return;
     }
@@ -68,6 +117,7 @@ async function main() {
     if (!files.length) files.push(...fs.readdirSync('slides', { recursive: true }).filter(p => p.endsWith('.md')).map(p => path.join('slides', p)));
     if (!files.length) throw new Error('No Markdown slides found under slides/');
     let candidateCount = 0;
+    let structuralErrors = 0;
     for (const input of files) {
       const relative = path.relative(path.resolve('slides'), path.dirname(path.resolve(input)));
       if (relative.startsWith('..') || path.isAbsolute(relative)) throw new Error('Input must be under slides/');
@@ -88,12 +138,14 @@ async function main() {
       });
       const blocks = await page.evaluate(inspectLines);
       const candidates = blocks.filter(b => b.suspect);
-      candidateCount += candidates.length;
-      fs.writeFileSync(path.join(output, 'lines.json'), JSON.stringify({ input, browser: await browser.version(), blocks }, null, 2));
+      const structure = await page.evaluate(inspectStructure);
+      structuralErrors += structure.filter(f => f.kind !== 'large-prose-gap').length;
+      candidateCount += candidates.length + structure.length;
+      fs.writeFileSync(path.join(output, 'lines.json'), JSON.stringify({ input, browser: await browser.version(), blocks, structure }, null, 2));
       await page.evaluate(() => document.querySelectorAll('.debug-layout').forEach(e => e.classList.remove('debug-layout')));
       const sections = await page.$$('section');
       if (!sections.length) throw new Error(`No slides rendered: ${input}`);
-      const report = [`# Layout review: ${input}`, '', `${candidates.length} short-last-line candidates. Review each image at full size; zero candidates does not mean good layout.`, ''];
+      const report = [`# Layout review: ${input}`, '', `${candidates.length} short-last-line candidates; ${structure.length} citation/spacing/overflow findings. Review each image at full size; zero findings does not mean good layout.`, ''];
       for (let i = 0; i < sections.length; i++) {
         const filename = `slide-${i + 1}.png`;
         await sections[i].screenshot({ path: path.join(output, filename) });
@@ -102,11 +154,17 @@ async function main() {
           report.push(`Review ${candidate.element}: last line is ${Math.round(candidate.lastLineRatio * 100)}% of the longest preceding line.`, '', '```text', ...candidate.lines, '```', '');
           console.log(`${input}:${i + 1} REVIEW short last line: ${candidate.lines.at(-1)}`);
         }
+        for (const finding of structure.filter(f => f.slide === i + 1)) {
+          const message = `${finding.kind}: ${finding.text}${finding.gap === undefined ? '' : ` (gap ${finding.gap}px, margin ${finding.expected}px)`}`;
+          report.push(`Review ${message}`, '');
+          console.log(`${input}:${i + 1} REVIEW ${message}`);
+        }
       }
       fs.writeFileSync(path.join(output, 'review.md'), report.join('\n'));
       console.log(`${sections.length} slides saved: ${path.join(output, 'review.md')}`);
     }
-    console.log(`${candidateCount} candidates require visual review (not automatic failures).`);
+    console.log(`${candidateCount} findings require review; bundled citations and text overflow fail the check.`);
+    if (structuralErrors) throw new Error(`${structuralErrors} citation/overflow errors: see review.md.`);
   } finally {
     await browser.close();
   }

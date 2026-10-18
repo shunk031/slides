@@ -73,9 +73,7 @@ _Project page: [hukcc.github.io/Beyond-Atomic-Layouts/](https://hukcc.github.io/
 
 > ![Figure 1(e): 関連レイヤーを理解する design assistant の例](assets/beyond-atomic-fig1e.png)
 >
-> **Figure 1(e)** 関連レイヤーを理解するデザイン支援の例
->
-> 出典: [Huang+ ECCV’26, Sec. 1, Fig. 1](https://arxiv.org/html/2608.26716v1#S0.F1.sf5)
+> **Figure 1(e)** デザイン支援の例 _[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S0.F1.sf5)_
 
 > **デザインを「作る」だけでなく「意図どおりに直す」ことが難しい**
 >
@@ -116,8 +114,8 @@ _Project page: [hukcc.github.io/Beyond-Atomic-Layouts/](https://hukcc.github.io/
 
 **既存研究との違い**
 
-- **文書・画面理解**: LayoutLMv3 / ScreenQA は、主に個別要素を理解 _[Huang+ MM’22 / Hsiao+ NAACL’25](https://arxiv.org/html/2608.26716v1#S2.SS3)_
-- **デザイン生成**: COLE / ART は、複数レイヤーからなる編集可能なデザインを生成 _[Jia+ arXiv’23 / Pu+ CVPR’25](https://arxiv.org/html/2608.26716v1#S2.SS2)_
+- **文書・画面理解**: LayoutLMv3 _[Huang+ MM’22](https://arxiv.org/html/2608.26716v1#bib.bib17)_ / ScreenQA _[Hsiao+ NAACL’25](https://arxiv.org/html/2608.26716v1#bib.bib24)_ は、主に個別要素を理解
+- **デザイン生成**: COLE _[Jia+ arXiv’23](https://arxiv.org/html/2608.26716v1#bib.bib30)_ / ART _[Pu+ CVPR’25](https://arxiv.org/html/2608.26716v1#bib.bib31)_ は、複数レイヤーからなる編集可能なデザインを生成
 - **本研究**: どのレイヤー同士が結びつき、どのデザイン意図を実現しているかを問う
 
 出典: [Huang+ ECCV’26, Sec. 1–2, Fig. 1(a–d), Table 1](https://arxiv.org/html/2608.26716v1#S0.F1)

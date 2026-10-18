@@ -4,6 +4,7 @@ node = "24.18.0"
 
 [tasks.pdf]
 description = "すべての資料を dist/ に PDF 出力"
+depends = ["check-layout"]
 run = "marp --pdf --allow-local-files --input-dir slides --output dist"
 
 [tasks.preview]
@@ -15,7 +16,7 @@ description = "情報分類の検証が正常・不正な指定を判別する�
 run = "node scripts/check-classification.test.cjs"
 
 [tasks.check-layout]
-description = "実際の改行を検査し、短い最終行の候補と全ページの画像を出力"
+description = "改行・引用・空白・文字のはみ出しを検査し、全ページの画像を出力"
 run = "node scripts/check-layout.cjs"
 
 [tasks.test-layout]
