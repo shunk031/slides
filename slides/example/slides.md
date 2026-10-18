@@ -445,12 +445,13 @@ _[[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.T4)]: Table 4 の主
 >
 > _[[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.T4)]: Table 4 を再構成_
 >
-> **30% は主タスク QA データの割合**
+> **MA・SP で主タスクの必要データ量を削減**
 >
-> - MASON: 主タスク QA 約 6K ペア＋補助 Grounding QA 約 2K ペア
-> - DF: 主タスク QA 約 20K ペア
-
-**➜ 要素対応・構造関係の追加学習によって主タスクの必要データ量を削減**
+> - MASON（主タスク 30%）
+>   - 主タスク QA 約 6K ペア
+>   - 補助 Grounding QA 約 2K ペア
+> - DF（主タスク 100%）
+>   - 主タスク QA 約 20K ペア
 
 ---
 
