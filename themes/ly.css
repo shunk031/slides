@@ -210,7 +210,6 @@ section:not(.first-slide) h2 > em:last-child {
 
 section[lang="ja"] :is(h1, h2, h3, h4, h5, h6) {
   font-feature-settings: "palt";
-  word-break: auto-phrase;
 }
 
 section code {
@@ -218,7 +217,7 @@ section code {
   background-color: var(--color-code-background);
 }
 
-section[lang="ja"] p {
+section[lang="ja"] {
   word-break: auto-phrase;
 }
 
@@ -297,7 +296,6 @@ section.paper-title > h1 {
   font-size: var(--paper-title-font-size);
   line-height: var(--paper-title-line-height);
   text-wrap: wrap;
-  word-break: normal;
 }
 
 section.paper-title > p:nth-of-type(1) {
@@ -507,21 +505,16 @@ section.profile-slide > blockquote:nth-of-type(2) > p:nth-child(n + 3) img {
   margin: 0 auto;
 }
 
-/* Paper selection: rationale beside the source figure. */
+/* Float the source figure so the rationale can continue beneath it. */
 section.selection-slide {
-  --selection-figure-width: 440px;
+  --selection-figure-width: 600px;
   --selection-font-size: 24px;
   --selection-caption-font-size: 20px;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) var(--selection-figure-width);
-  grid-template-rows: auto auto 1fr;
-  gap: var(--content-gap);
+  display: block;
   letter-spacing: 0;
 }
-section.selection-slide::before,
 section.selection-slide > h2 {
-  grid-column: 1 / -1;
-  margin: 0;
+  margin: 0 0 var(--content-gap);
 }
 section.selection-slide > blockquote {
   min-width: 0;
@@ -537,11 +530,55 @@ section.selection-slide > blockquote::before,
 section.selection-slide > blockquote::after { content: none; }
 section.selection-slide > blockquote > p { margin: 0 0 var(--content-gap); }
 section.selection-slide > blockquote > ul + p { margin-top: var(--content-gap); }
-section.selection-slide > blockquote:last-of-type {
-  align-self: center;
+section.selection-slide > blockquote:first-of-type {
+  float: right;
+  width: var(--selection-figure-width);
+  margin: 0 0 var(--content-gap) var(--content-gap);
   font-size: var(--selection-caption-font-size);
 }
 section.selection-slide > blockquote img { width: 100%; height: auto; }
+
+/* Keep figure captions centered with their images. */
+section > blockquote:has(> p > img) > p { text-align: center; }
+
+section.background-slide {
+  --background-figure-height: 120px;
+  --background-font-size: 20px;
+  --background-caption-font-size: 18px;
+  --content-gap: 8px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--content-gap);
+  align-content: start;
+  letter-spacing: 0;
+}
+section.background-slide::before,
+section.background-slide > :is(h2, p, ul) {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+section.background-slide > :is(p, ul) { font-size: var(--background-font-size); }
+section.background-slide > h2 + p { margin-top: 0; }
+section.background-slide > blockquote {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: var(--color-text);
+  font-size: var(--background-caption-font-size);
+  line-height: var(--body-line-height);
+}
+section.background-slide > blockquote::before,
+section.background-slide > blockquote::after { content: none; }
+section.background-slide > blockquote > p { margin: 0; }
+section.background-slide img {
+  height: var(--background-figure-height);
+  width: auto;
+  max-width: 100%;
+}
+section.background-slide > p:last-of-type {
+  text-align: center;
+  font-size: var(--background-caption-font-size);
+}
 
 /* Opt-in layout diagnostics */
 section.debug-layout {

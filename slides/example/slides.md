@@ -71,6 +71,12 @@ _Project page: [hukcc.github.io/Beyond-Atomic-Layouts/](https://hukcc.github.io/
 
 ## 本論文の選定理由 **|** _デザインの編集には、見た目とレイヤーの関係を同時に理解する必要_
 
+> ![Figure 1(e): 関連レイヤーを理解する design assistant の例](assets/beyond-atomic-fig1e.png)
+>
+> **Figure 1(e)** 関連レイヤーを理解するデザイン支援の例
+>
+> 出典: [Huang+ ECCV’26, Sec. 1, Fig. 1](https://arxiv.org/html/2608.26716v1#S0.F1.sf5)
+
 > **デザインを「作る」だけでなく「意図どおりに直す」ことが難しい**
 >
 > - 文字を人物の背後に差し込む、文字の一部を図形へ置き換えるなど、複数のレイヤーで 1 つの視覚効果を表現
@@ -83,11 +89,38 @@ _Project page: [hukcc.github.io/Beyond-Atomic-Layouts/](https://hukcc.github.io/
 > - 単純に近い／重なる要素ではなく、デザイン上の意図で結びついた要素を推定できるか
 > - その能力を何の教師信号で学習させるのか
 
-> ![Figure 1(e): 関連レイヤーを理解する design assistant の例](assets/beyond-atomic-fig1e.png)
+---
+
+<!-- _class: background-slide content-slide-gray classification-public debug-layout -->
+<!-- 発表目安 1:05 -->
+
+## 背景 **|** _独立した要素の理解から、複数レイヤーの合成関係の理解へ_
+
+**Compositional layout: 複数レイヤーが協調して 1 つの表現を構成**
+
+> ![Figure 1(a): Clipping](assets/beyond-atomic-clipping.png)
 >
-> **Figure 1(e)** 関連レイヤーを理解するデザイン支援の例
+> **(a) Clipping**: 元画像から切り抜いた領域を前面へ配置し、途中に別要素を挿入
+
+> ![Figure 1(b): Blending](assets/beyond-atomic-blending.png)
 >
-> 出典: [Huang+ ECCV’26, Sec. 1, Fig. 1](https://arxiv.org/html/2608.26716v1#S0.F1.sf5)
+> **(b) Blending**: 異なる画像領域を組み合わせ、統一的な形状を構成
+
+> ![Figure 1(c): Overlaying](assets/beyond-atomic-overlaying.png)
+>
+> **(c) Overlaying**: 輪郭・影などを重ね、要素の視覚的な階層を強調
+
+> ![Figure 1(d): Morphing](assets/beyond-atomic-morphing.png)
+>
+> **(d) Morphing**: 文字の一部を図形・画像へ置換
+
+**既存研究との違い**
+
+- **文書・画面理解**: LayoutLMv3 / ScreenQA は、主に文書や画面の個別要素を理解 _[Huang+ MM’22 / Hsiao+ NAACL’25](https://arxiv.org/html/2608.26716v1#S2.SS3)_
+- **デザイン生成**: COLE / ART は、複数レイヤーからなる編集可能なデザインを生成 _[Jia+ arXiv’23 / Pu+ CVPR’25](https://arxiv.org/html/2608.26716v1#S2.SS2)_
+- **本研究**: どのレイヤー同士が結びつき、どのデザイン意図を実現しているかを問う
+
+出典: [Huang+ ECCV’26, Sec. 1–2, Fig. 1(a–d), Table 1](https://arxiv.org/html/2608.26716v1#S0.F1)
 
 ---
 
