@@ -521,46 +521,31 @@ _[[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.T5)]: Table 5 の主
 ---
 
 <!-- _class: analysis-slide efficiency-slide qualitative-slide content-slide-gray classification-public -->
-<!-- 発表目安 1:00 -->
+<!-- 発表目安 2:00 -->
 
-## 定性結果 1/2 **|** _Clipping で正しい切り抜き先を特定_
+## 定性結果・制限 **|** _Clipping の切り抜き先を特定・Morphing はなお難しい_
 
 > ![Figure 6(c): Clippingの完成画像・質問対象・DFとMASONの対応先](assets/beyond-atomic-case-clipping.png)
 >
-> Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.F6.sf3)]:\
-> Clipping の完成画像・質問対象と両モデルの対応先
-
-> **切り抜き画像と元画像の関係を認識**
->
-> - 質問対象: 切り抜く前の人物画像
-> - DF: 元画像と幅が似た装飾へ誤対応
->   - 切り抜き画像と元画像の関係を捉えられず
-> - MASON: 切り抜いた人物の前景を特定
->   - 元画像と合成関係にある要素を認識
-
----
-
-<!-- _class: analysis-slide efficiency-slide qualitative-slide content-slide-gray classification-public -->
-<!-- 発表目安 1:00 -->
-
-## 定性結果 2/2 **|** _Morphing の成功例と残る制限_
+> Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.F6.sf3)]: Clipping の比較
 
 > ![Figure 6(a): Morphingの完成画像・質問対象・DFとMASONの対応先](assets/beyond-atomic-case-morphing.png)
 >
-> Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.F6.sf1)]:\
-> Morphing の完成画像・質問対象と両モデルの対応先
+> Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.F6.sf1)]: Morphing の比較
 
-> **文字を置き換える花を特定**
->
-> - DF: 色・配置が似た別要素へ誤対応
-> - MASON:「FLORAL」の「O」を置き換える花を特定
->
-> **残る課題・著者らの将来方向**
->
-> - Morphing: 全データでも **70.21%**
->   - 訓練データに占める割合は **2.63%**
->   - 大きな変形と意味の置き換えが必要
-> - 将来方向: レイヤー構造を考慮する視覚エンコーダと、視覚・言語の対応付けの強化
+> - **Clipping**
+>   - 質問対象: 切り抜く前の人物画像
+>   - DF: 切り抜き画像と元画像の関係を捉えられず、幅の似た装飾へ誤対応
+>   - MASON: 元画像と合成関係にある人物の切り抜き前景を特定
+
+> - **Morphing**
+>   - 質問対象:「FLORAL」の文字レイヤー
+>   - DF: 色・配置が似た別要素へ誤対応
+>   - MASON:「O」を置き換える花を特定
+
+- **残る課題・著者らの将来方向**
+  - Morphing: 全データ精度 **70.21%**／訓練比率 **2.63%**／大きな変形と意味の置き換えが必要
+  - レイヤー構造を考慮する視覚エンコーダと、視覚・言語の対応付けの強化
 
 ---
 
