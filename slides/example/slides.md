@@ -510,25 +510,27 @@ _[[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.T5)]: Table 5 の主
 
 ---
 
-<!-- _class: analysis-slide efficiency-slide content-slide-gray classification-public -->
+<!-- _class: analysis-slide efficiency-slide qualitative-slide content-slide-gray classification-public -->
 <!-- 発表目安 1:00 -->
 
 ## 定性結果 1/2 **|** _Clipping で正しい切り抜き先を特定_
 
-> ![h:460 Figure 6(c): Clippingの完成画像・質問対象・DFとMASONの対応先](assets/beyond-atomic-case-clipping.png)
+> ![Figure 6(c): Clippingの完成画像・質問対象・DFとMASONの対応先](assets/beyond-atomic-case-clipping.png)
 >
 > Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.F6.sf3)]:\
 > Clipping の完成画像・質問対象と両モデルの対応先
 
-> **見た目が似た別要素への誤対応を回避**
+> **切り抜き画像と元画像の関係を認識**
 >
 > - 質問対象: 切り抜く前の人物画像
 > - DF: 元画像と幅が似た装飾へ誤対応
+>   - 切り抜き画像と元画像の関係を捉えられず
 > - MASON: 切り抜いた人物の前景を特定
+>   - 元画像と合成関係にある要素を認識
 
 ---
 
-<!-- _class: analysis-slide efficiency-slide content-slide-gray classification-public -->
+<!-- _class: analysis-slide efficiency-slide qualitative-slide content-slide-gray classification-public -->
 <!-- 発表目安 1:00 -->
 
 ## 定性結果 2/2 **|** _Morphing の成功例と残る制限_
