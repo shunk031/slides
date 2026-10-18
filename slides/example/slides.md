@@ -161,8 +161,7 @@ Multimodal Alignment and Structural perceptiON
 
 - **レイアウトの理解: 個別要素の位置・意味を認識**
   - LayoutLMv3 _[[Huang+ MM’22](https://arxiv.org/abs/2204.08387)]_: 文書の文字・画像・位置を統合
-  - ScreenQA _[[Hsiao+ NAACL’25](https://arxiv.org/abs/2209.08199)]_ / CogAgent _[[Hong+ CVPR’24](https://openaccess.thecvf.com/content/CVPR2024/html/Hong_CogAgent_A_Visual_Language_Model_for_GUI_Agents_CVPR_2024_paper.html)]_:\
-    画面の質問応答・操作対象を認識
+  - ScreenQA _[[Hsiao+ NAACL’25](https://arxiv.org/abs/2209.08199)]_ / CogAgent _[[Hong+ CVPR’24](https://openaccess.thecvf.com/content/CVPR2024/html/Hong_CogAgent_A_Visual_Language_Model_for_GUI_Agents_CVPR_2024_paper.html)]_: 画面の質問応答・操作対象認識
   - InfographicVQA _[[Mathew+ WACV’22](https://openaccess.thecvf.com/content/WACV2022/html/Mathew_InfographicVQA_WACV_2022_paper.html)]_: 図表＋文字の意味理解を評価
 - **デザインの生成: 要素の配置・編集可能なレイヤーを出力**
   - LayoutDM _[[Inoue+ CVPR’23](https://openaccess.thecvf.com/content/CVPR2023/html/Inoue_LayoutDM_Discrete_Diffusion_Model_for_Controllable_Layout_Generation_CVPR_2023_paper.html)]_: 要素の位置・種類を生成
