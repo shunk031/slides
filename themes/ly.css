@@ -113,8 +113,8 @@ section:not(.first-slide, .lead, .takahashi)::before {
   margin-bottom: var(--content-gap);
 }
 
-section:not(.first-slide, .lead, .takahashi) > :is(h1, h2) + :not(header, footer) {
-  margin-top: var(--content-gap);
+section:not(.first-slide, .lead, .takahashi) > :is(h1, h2) {
+  margin-bottom: var(--content-gap);
 }
 
 section.classification-top-secret::before {
@@ -464,7 +464,6 @@ section.profile-slide > blockquote::after {
 
 section.profile-slide > h2 + blockquote {
   grid-area: biography;
-  margin-top: 0;
 }
 
 section.profile-slide > blockquote > p {
@@ -572,7 +571,6 @@ section.selection-slide > blockquote {
   font-size: var(--body-font-size);
   line-height: var(--body-line-height);
 }
-section.selection-slide > h2 + blockquote { margin-top: var(--selection-content-gap); }
 section.selection-slide > blockquote::before,
 section.selection-slide > blockquote::after { content: none; }
 section.selection-slide > blockquote > p { margin: 0 0 var(--selection-content-gap); }
