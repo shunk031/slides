@@ -1,7 +1,22 @@
 /* @theme ly */
 
 @import "gaia";
-@import url("https://fonts.googleapis.com/css2?family=LINE+Seed+JP:wght@400;700&display=swap");
+
+@font-face {
+  font-family: "LINE Seed JP";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../../themes/assets/ly/fonts/LINESeedJP-Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "LINE Seed JP";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("../../themes/assets/ly/fonts/LINESeedJP-Bold.ttf") format("truetype");
+}
 
 :root {
   /* Shared colors and typography */
@@ -233,6 +248,10 @@ section:not(.first-slide) h2 > em:last-child {
   line-height: var(--heading-description-line-height);
   white-space: normal;
   text-wrap: balance;
+}
+
+section[lang="ja"] {
+  font-variant-east-asian: proportional-width;
 }
 
 section[lang="ja"] :is(h1, h2, h3, h4, h5, h6) {
