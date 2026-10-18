@@ -80,7 +80,7 @@ _Project page: [hukcc.github.io/Beyond-Atomic-Layouts/](https://hukcc.github.io/
 > **デザインを「作る」だけでなく「意図どおりに直す」ことが難しい**
 >
 > - 文字を人物の背後に差し込む、文字の一部を図形へ置き換えるなど、複数のレイヤーで 1 つの視覚効果を表現
->   - 1 つの見た目を編集するにも、関連レイヤーをまとめて見つける必要
+>   - 関連レイヤーをまとめて特定してから編集
 > - 画像として見えている領域と、編集すべきレイヤーの単位が一致しない場合がある _[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S1)_
 >
 > **本論文で注目したい点**
@@ -100,7 +100,7 @@ _Project page: [hukcc.github.io/Beyond-Atomic-Layouts/](https://hukcc.github.io/
 
 > ![Figure 1(a): Clipping](assets/beyond-atomic-clipping.png)
 >
-> **(a) Clipping**: 元画像から切り抜いた領域を前面へ配置し、途中に別要素を挿入
+> **(a) Clipping**: 元画像の切り抜きを前面に置き、間に別要素を挿入
 
 > ![Figure 1(b): Blending](assets/beyond-atomic-blending.png)
 >

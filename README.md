@@ -34,6 +34,25 @@ mise run pdf
 
 `slides/` 内の資料をまとめて変換し、サンプルは `dist/example/slides.pdf` に出力します。`dist/` は Git 管理対象外です。
 
+## 改行と見た目を確認する
+
+```sh
+mise run check-layout
+```
+
+Chrome で実際に描画し、フォントと画像の読み込み後に各行を測ります。
+`dist/<発表名>/slides-review/` に全ページの原寸 PNG、改行情報 `lines.json`、確認用の `review.md` を出力します。
+画像では `debug-layout` を一時的に無効にします。元の Markdown は変更しません。
+
+最終行がそれ以前の最長行の 25%未満なら確認候補として報告します。短いキャプションや意図した改行もあるため、自動エラーにはしません。
+読みやすさ全般を判定する検査ではありません。文字の重なりや図内の文字サイズは原寸画像で確認してください。
+フォント・画像の読み込み失敗や実行エラーは非ゼロで終了します。Google Chrome の位置は必要に応じて `CHROME_PATH` で指定できます。
+Marp CLI に同梱された Puppeteer を使うため、追加インストールは不要です。Marp 更新時は `mise run test-layout` で検査自体も確認します。
+
+日本語の文節分割は `word-break: auto-phrase`、短い最終行を避ける調整は `text-wrap: pretty` が担当します。
+後者は全ての不自然な改行を防ぐ保証ではありません。候補が残る場合は、文章・ボックス幅・図の配置を見直します。
+参考: [Chrome の pretty 解説](https://developer.chrome.com/blog/css-text-wrap-pretty)、[BudouX の文節分割](https://github.com/google/budoux/blob/main/README.md)、[Chromium の行分割実装](https://github.com/chromium/chromium/blob/main/third_party/blink/renderer/core/layout/inline/score_line_breaker.cc)。
+
 ## 資料を追加する
 
 `slides/example/slides.md` を `slides/<発表名>/slides.md` にコピーし、本文を書き換えます。図は同じディレクトリの `assets/` に置き、`![図の説明](assets/figure.png)` のように参照します。
@@ -90,7 +109,7 @@ CSS の `grid-template-areas` では、それぞれを `paper-title`・`authors`
 
 ### 自己紹介スライドを作る
 
-`profile-slide content-slide-gray classification-public` を指定し、`##` の見出し、経歴・研究分野の引用ブロック、写真・関連リンクの引用ブロックの順に書きます。右列の先頭段落に写真を2枚、次の段落にプロフィールへのリンクを置きます。その後に `[![説明](assets/画像.png)](URL)` と書くと、リンク付きサムネイルを配置できます。同じ行に続けて `[説明](URL)` を書くと、画像の下部に、不透明度85%の白背景を付けたテキストリンクを重ねて表示します。リンクは画像の中央を基準に、文字数に応じた幅で1行表示します。白背景の標準不透明度は共通変数 `--white-background-opacity` で調整します。値を大きくすると白が濃くなります。画像の高さ上限は `--profile-thumbnail-height`、リンクの背景と余白は `--profile-caption-*` で調整します。`debug-layout` も併用できます。
+`profile-slide content-slide-gray classification-public` を指定し、`##` の見出し、経歴・研究分野の引用ブロック、写真・関連リンクの引用ブロックの順に書きます。右列の先頭段落に写真を 2 枚、次の段落にプロフィールへのリンクを置きます。その後に `[![説明](assets/画像.png)](URL)` と書くと、リンク付きサムネイルを配置できます。同じ行に続けて `[説明](URL)` を書くと、画像の下部に、不透明度 85%の白背景を付けたテキストリンクを重ねて表示します。リンクは画像の中央を基準に、文字数に応じた幅で 1 行表示します。白背景の標準不透明度は共通変数 `--white-background-opacity` で調整します。値を大きくすると白が濃くなります。画像の高さ上限は `--profile-thumbnail-height`、リンクの背景と余白は `--profile-caption-*` で調整します。`debug-layout` も併用できます。
 
 列幅・文字サイズ・写真の間隔は `themes/ly.css` の `--profile-*` 変数で調整します。研究分野の親項目を `**太字**` にすると赤く強調します。
 

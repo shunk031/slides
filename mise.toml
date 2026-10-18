@@ -13,3 +13,11 @@ run = "marp --server ."
 [tasks.test]
 description = "情報分類の検証が正常・不正な指定を判別するか確認"
 run = "node scripts/check-classification.test.cjs"
+
+[tasks.check-layout]
+description = "実際の改行を検査し、短い最終行の候補と全ページの画像を出力"
+run = "node scripts/check-layout.cjs"
+
+[tasks.test-layout]
+description = "改行検査が短い最終行・入れ子リスト・引用を扱えるか確認"
+run = "node scripts/check-layout.cjs --self-test"
