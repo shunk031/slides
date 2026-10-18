@@ -410,19 +410,6 @@ section :is(p, li) > em:has(> a) {
   font-style: normal;
 }
 
-section.floating-footnote { --footer-bottom: 0px; }
-section.floating-footnote > p:last-of-type {
-  position: absolute;
-  grid-area: auto;
-  right: var(--slide-padding);
-  bottom: var(--footer-bottom);
-  left: var(--slide-padding);
-  margin: 0;
-  font-size: var(--citation-font-size);
-  line-height: 1.15;
-  text-align: right;
-}
-
 /* Self-introduction: biography on the left, portraits and links on the right. */
 section.profile-slide {
   --profile-sidebar-width: 320px;

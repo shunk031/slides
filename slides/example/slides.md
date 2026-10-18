@@ -205,7 +205,8 @@ Multimodal Alignment and Structural perceptiON
 
 ---
 
-<!-- _class: dataset-slide floating-footnote content-slide-gray classification-public -->
+<!-- _class: dataset-slide content-slide-gray classification-public -->
+<!-- _footer: "© LY Corporation　／　データ作成: 種類別ルールでペア抽出 → GPT-4 / GPT-4o で QA・意図生成 → テストは 3 人全員一致　／　なお、元のデザインの出どころは論文本体・補足資料ともに記載なし" -->
 <!-- 発表目安 0:55 -->
 
 ## CoDeLayout **|** _約 2 万件の実デザインに関連要素ペアと意図を付与_
@@ -238,9 +239,6 @@ Multimodal Alignment and Structural perceptiON
 <!-- End of the table column; keep this note across both columns. -->
 
 訓練は自然な偏りを維持 ／ テストは Morphing を増やして種類別評価
-
-_データ作成: 種類別ルールでペア抽出 → GPT-4 / GPT-4o で QA・意図生成 → テストは 3 人全員一致_\
-_なお、元のデザインの出どころは論文本体・補足資料ともに記載なし_
 
 ---
 
