@@ -129,28 +129,6 @@ Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S0.F1)]: Com
 ---
 
 <!-- _class: content-slide-gray classification-public -->
-<!-- 発表目安 0:55。代表研究のみ口頭説明、全研究名を読み上げない -->
-
-## 関連研究 **|** _個別要素の理解・レイヤー生成だけでは、合成関係を説明できない_
-
-- **レイアウトの理解: 個別要素の位置・意味を認識**
-  - LayoutLMv3 _[[Huang+ MM’22](https://arxiv.org/abs/2204.08387)]_: 文書の文字・画像・位置を統合
-  - ScreenQA _[[Hsiao+ NAACL’25](https://arxiv.org/abs/2209.08199)]_ / CogAgent _[[Hong+ CVPR’24](https://openaccess.thecvf.com/content/CVPR2024/html/Hong_CogAgent_A_Visual_Language_Model_for_GUI_Agents_CVPR_2024_paper.html)]_:\
-    画面の質問応答や操作対象の認識
-  - InfographicVQA _[[Mathew+ WACV’22](https://openaccess.thecvf.com/content/WACV2022/html/Mathew_InfographicVQA_WACV_2022_paper.html)]_: 図表と文字を組み合わせた意味理解を評価
-- **デザインの生成: 要素の配置・編集可能なレイヤーを出力**
-  - LayoutDM _[[Inoue+ CVPR’23](https://openaccess.thecvf.com/content/CVPR2023/html/Inoue_LayoutDM_Discrete_Diffusion_Model_for_Controllable_Layout_Generation_CVPR_2023_paper.html)]_: 要素の位置・種類を生成
-  - COLE _[[Jia+ arXiv’23](https://arxiv.org/abs/2311.16974)]_ / ART _[[Pu+ CVPR’25](https://openaccess.thecvf.com/content/CVPR2025/html/Pu_ART_Anonymous_Region_Transformer_for_Variable_Multi-Layer_Transparent_Image_Generation_CVPR_2025_paper.html)]_: 複数レイヤーからなるデザインを生成
-- **本論文との差分**
-  - PubLayNet _[[Zhong+ ICDAR’19](https://arxiv.org/abs/1908.07836)]_ / DocLayNet _[[Pfitzmann+ KDD’22](https://arxiv.org/abs/2206.01062)]_ は個別領域、\
-    Crello _[[Yamaguchi ICCV’21](https://arxiv.org/abs/2108.01249)]_ / MLTD _[[Pu+ CVPR’25](https://openaccess.thecvf.com/content/CVPR2025/html/Pu_ART_Anonymous_Region_Transformer_for_Variable_Multi-Layer_Transparent_Image_Generation_CVPR_2025_paper.html)]_ はレイヤー構造を提供
-    - 合成要素ペアとデザイン意図の明示的注釈はない _[[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S3.T1)]_
-
-<!-- Table 1 は比較の典拠として参照。大きな表画像は1枚に併置しない -->
-
----
-
-<!-- _class: content-slide-gray classification-public -->
 <!-- 発表目安 0:55。3つの提案の役割を説明し、詳細は後続スライドで扱う -->
 
 ## 本論文の提案 **|** _合成レイアウト理解の課題・データセット・学習手法を提案_
@@ -173,6 +151,28 @@ Multimodal Alignment and Structural perceptiON
 
 **主な結果: 同一ベースモデル（Qwen2.5-VL 7B）の関連要素特定精度** _[[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.T4)]_\
 主タスク QA のみで微調整 88.80% → MASON 91.66%（+2.86 pt）
+
+---
+
+<!-- _class: content-slide-gray classification-public -->
+<!-- 発表目安 0:55。代表研究のみ口頭説明、全研究名を読み上げない -->
+
+## 関連研究 **|** _個別要素の理解・レイヤー生成だけでは、合成関係を説明できない_
+
+- **レイアウトの理解: 個別要素の位置・意味を認識**
+  - LayoutLMv3 _[[Huang+ MM’22](https://arxiv.org/abs/2204.08387)]_: 文書の文字・画像・位置を統合
+  - ScreenQA _[[Hsiao+ NAACL’25](https://arxiv.org/abs/2209.08199)]_ / CogAgent _[[Hong+ CVPR’24](https://openaccess.thecvf.com/content/CVPR2024/html/Hong_CogAgent_A_Visual_Language_Model_for_GUI_Agents_CVPR_2024_paper.html)]_:\
+    画面の質問応答や操作対象の認識
+  - InfographicVQA _[[Mathew+ WACV’22](https://openaccess.thecvf.com/content/WACV2022/html/Mathew_InfographicVQA_WACV_2022_paper.html)]_: 図表と文字を組み合わせた意味理解を評価
+- **デザインの生成: 要素の配置・編集可能なレイヤーを出力**
+  - LayoutDM _[[Inoue+ CVPR’23](https://openaccess.thecvf.com/content/CVPR2023/html/Inoue_LayoutDM_Discrete_Diffusion_Model_for_Controllable_Layout_Generation_CVPR_2023_paper.html)]_: 要素の位置・種類を生成
+  - COLE _[[Jia+ arXiv’23](https://arxiv.org/abs/2311.16974)]_ / ART _[[Pu+ CVPR’25](https://openaccess.thecvf.com/content/CVPR2025/html/Pu_ART_Anonymous_Region_Transformer_for_Variable_Multi-Layer_Transparent_Image_Generation_CVPR_2025_paper.html)]_: 複数レイヤーからなるデザインを生成
+- **本論文との差分**
+  - PubLayNet _[[Zhong+ ICDAR’19](https://arxiv.org/abs/1908.07836)]_ / DocLayNet _[[Pfitzmann+ KDD’22](https://arxiv.org/abs/2206.01062)]_ は個別領域、\
+    Crello _[[Yamaguchi ICCV’21](https://arxiv.org/abs/2108.01249)]_ / MLTD _[[Pu+ CVPR’25](https://openaccess.thecvf.com/content/CVPR2025/html/Pu_ART_Anonymous_Region_Transformer_for_Variable_Multi-Layer_Transparent_Image_Generation_CVPR_2025_paper.html)]_ はレイヤー構造を提供
+    - 合成要素ペアとデザイン意図の明示的注釈はない _[[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S3.T1)]_
+
+<!-- Table 1 は比較の典拠として参照。大きな表画像は1枚に併置しない -->
 
 ---
 
