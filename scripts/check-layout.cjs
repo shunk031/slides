@@ -446,7 +446,7 @@ function inspectStructure() {
     const horizontalAxis = /(?:横軸|x軸)/i;
     const verticalAxis = /(?:(?:左|右)?縦軸|y軸)/i;
     const axisBlocks = [...slide.querySelectorAll('h1,h2,h3,h4,h5,h6,p,li,figcaption,td,th')]
-      .filter(block => !block.querySelector('h1,h2,h3,h4,h5,h6,p,li,figcaption,td,th') && /(?:横軸|(?:(?:左|右)?縦軸)|[xy]軸)/i.test(axisText(block.textContent)));
+      .filter(block => !block.querySelector('h1,h2,h3,h4,h5,h6,p,li,figcaption,td,th') && /(?:横軸|[左右]?縦軸|[xy]軸)[:：]\S/i.test(axisText(block.textContent)));
     const captionFigures = figures.filter(figure => sources.some(source => figure.contains(source)));
     const captionSources = sources.filter(source => !captionFigures.some(figure => figure.contains(source)));
     for (const block of axisBlocks) {
@@ -890,6 +890,15 @@ async function main() {
       assert.deepEqual((await page.evaluate(inspectStructure)).filter(f => f.kind.startsWith('axis-')), []);
       await page.setContent('<section><p>横 軸: body text</p></section>');
       assert.equal((await page.evaluate(inspectStructure)).some(f => f.kind === 'axis-outside-figure-caption'), true);
+      const axisReference = '<p>横軸の区間ごとに特定正解率（縦軸）を集計</p>';
+      await page.setContent(`<section><blockquote><p><img></p><p>Figure from [<a>Huang+ ECCV’26</a>]: 説明<br>横軸: 語句一致度<br>縦軸: 特定正解率</p></blockquote>${axisReference}</section>`);
+      assert.deepEqual((await page.evaluate(inspectStructure)).filter(f => f.kind.startsWith('axis-')), []);
+      await page.evaluate(() => { document.querySelector('blockquote p:last-child').innerHTML = 'Figure from [<a>Huang+ ECCV’26</a>]: 説明<br>縦軸: 特定正解率'; });
+      assert.deepEqual((await page.evaluate(inspectStructure)).filter(f => f.kind.startsWith('axis-')).map(f => f.kind), ['axis-pair-missing']);
+      for (const label of ['横軸:', '縦軸：', '左縦軸:', '右縦軸:', 'x 軸:', 'Y 軸:']) {
+        await page.setContent(`<section><p>図の説明 — ${label} 説明文</p></section>`);
+        assert.equal((await page.evaluate(inspectStructure)).filter(f => f.kind === 'axis-outside-figure-caption').length, 1, label);
+      }
       await page.setContent('<section><p style="font-size:24px">本文</p><blockquote><p><img></p><p style="font-size:20px">図の説明</p></blockquote></section><section><p style="font-size:24px">本文</p><blockquote><p><img></p><p style="font-size:18px">図の説明</p></blockquote></section>');
       assert.deepEqual((await page.evaluate(inspectTypography)).map(f => f.slide), [1, 2]);
       await page.addStyleTag({ content: 'blockquote p {font-size:20px!important}' });
