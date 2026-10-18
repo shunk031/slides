@@ -314,7 +314,44 @@ $$
 
 ---
 
-<!-- _class: title-slide-big classification-public debug-layout -->
+<!-- _class: method-slide sp-slide content-slide-gray classification-public debug-layout -->
+<!-- 発表目安 1:00 -->
+
+## MASON 3/3 **|** _SP: 質問対象レイヤーとの関係をメタデータへ明示_
+
+> ![Figure 4 の SP Module: メタデータから空間関係を計算](assets/beyond-atomic-sp.png#crop-right)
+>
+> Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S3.F4)]:\
+> レイヤー間の空間関係を計算
+
+> **注目要素 $e^q$ に対する各候補 $e_i$ の関係を追加**
+>
+> **[spatialRelationship の属性（Table 3）](https://arxiv.org/html/2608.26716v1#S4.T3)**
+>
+> | 関係       | 属性                              | 意味                 |
+> | :--------- | :-------------------------------- | :------------------- |
+> | 重なり     | hasOverlap / overlapPercentage    | 有無・重複率         |
+> | 包含       | containment                       | 含む・含まれる・なし |
+> | 距離・位置 | centerDistance / relativePosition | 中心間距離・上下左右 |
+> | 前後       | layerOrder                        | どちらが前面か       |
+>
+> - 質問対象を基準に、各候補の位置・包含・階層関係を揃える
+> - **学習時・推論時の両方で拡張メタデータ $\mathcal{M}'$ を利用**
+
+> **推論前に計算できる構造を明示**
+>
+> 矩形座標や重なり順の列だけでは、\
+> 候補同士の関係が読みにくい\
+> → 質問対象との関係へ変換
+
+$$
+\underbrace{\mathcal{M}'_{e_i}}_{\text{拡張メタデータ}}
+= \underbrace{\mathcal{M}_{e_i}}_{\text{元の属性}}
+\cup \underbrace{\texttt{spatialRelationship}(e_i,e^q)}_{\text{候補要素と質問対象の関係}}
+$$
+
+---
+
 
 # 表紙用の背景
 

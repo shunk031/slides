@@ -665,29 +665,33 @@ section.method-slide {
   --content-gap: 8px;
 }
 
-section.ma-slide {
+section:is(.ma-slide, .sp-slide) {
   --problem-figure-height: 230px;
   grid-template-columns: 1fr 2fr;
 }
-section.ma-slide > blockquote:first-of-type { grid-column: 1; grid-row: 3; }
-section.ma-slide > blockquote:nth-of-type(2) { grid-column: 2; grid-row: 3 / span 2; }
-section.ma-slide > blockquote:nth-of-type(3) { grid-column: 1; grid-row: 4; }
+section.ma-slide { --crop-feather-width: 32px; }
+section:is(.ma-slide, .sp-slide) > blockquote:first-of-type { grid-column: 1; grid-row: 3; }
+section:is(.ma-slide, .sp-slide) > blockquote:nth-of-type(2) { grid-column: 2; grid-row: 3 / span 2; }
+section:is(.ma-slide, .sp-slide) > blockquote:nth-of-type(3) { grid-column: 1; grid-row: 4; }
 
 section.dataset-slide {
   --dataset-column-gap: 24px;
-  --dataset-table-padding: 4px 12px;
   grid-template-columns: 1.4fr 1fr;
   column-gap: var(--dataset-column-gap);
 }
 section.dataset-slide > blockquote:first-of-type { grid-column: 1; grid-row: 3; }
 section.dataset-slide > blockquote:nth-of-type(2) { grid-column: 1; grid-row: 4; }
 section.dataset-slide > blockquote:nth-of-type(3) { grid-column: 2; grid-row: 3 / span 2; }
-section.dataset-slide table {
+section:is(.dataset-slide, .sp-slide) { --dataset-table-padding: 4px 12px; }
+section.sp-slide th:nth-child(1) { width: 18%; }
+section.sp-slide th:nth-child(2) { width: 47%; }
+section.sp-slide th:nth-child(3) { width: 35%; }
+section:is(.dataset-slide, .sp-slide) table {
   width: 100%;
   margin: var(--content-gap) 0;
   font-size: var(--body-font-size);
 }
-section.dataset-slide :is(th, td) { padding: var(--dataset-table-padding); }
+section:is(.dataset-slide, .sp-slide) :is(th, td) { padding: var(--dataset-table-padding); }
 
 section img[src$="#crop-right"] {
   mask-image: linear-gradient(to right, black calc(100% - var(--crop-feather-width)), transparent);
@@ -719,6 +723,11 @@ section.analysis-slide > blockquote > p { margin: 0 0 var(--content-gap); }
 section.analysis-slide > blockquote:has(img) { font-size: var(--figure-caption-font-size); }
 section.analysis-slide > blockquote:has(img) > p:last-child { margin-bottom: 0; }
 section.analysis-slide img { width: 100%; height: var(--analysis-figure-height); object-fit: contain; }
+
+/* Separate later list introductions without moving the first one. */
+section:not(.first-slide, .lead, .takahashi, .title-slide-big) :is(p, ul, ol, table) ~ p:has(+ :is(ul, ol)) {
+  margin-top: var(--paragraph-gap);
+}
 
 /* Opt-in layout diagnostics */
 section.debug-layout {
