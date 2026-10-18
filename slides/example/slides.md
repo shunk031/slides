@@ -285,17 +285,15 @@ Vision-Language Model（VLM）である GPT-4o の失敗要因を分析
 
 > **Multimodal Alignment（MA）**
 >
-> - 解決する問題: メタデータと画像中の\
->   見た目の不一致（Semantic drift）
-> - 方針: 要素 ID と見た目の\
->   対応を教える質問応答（QA）を追加
+> - 対処する失敗要因: Semantic drift
+> - 方針: ID と見た目の対応を質問応答に含める
 
 > **Structural Perception（SP）**
 >
-> - 解決する問題: レイヤー間の曖昧な関係（Structural ambiguity）
-> - 方針: 質問対象との前後・重なり・包含を計算し、メタデータへ追加
+> - 対処する失敗要因: Structural ambiguity
+> - 方針: 質問対象との空間関係をメタデータに含める
 
-Qwen2.5-VL 7B _[[Bai+ arXiv’25](https://arxiv.org/abs/2502.13923)]_ を追加学習：教師データ・入力を拡張（構造は維持）
+Qwen2.5-VL 7B _[[Bai+ arXiv’25](https://arxiv.org/abs/2502.13923)]_ を追加学習：入力・教師データ拡張、モデル構造は不変
 
 ---
 
