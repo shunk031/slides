@@ -372,10 +372,10 @@ $$
 ## 実験設定 **|** _主タスクだけで微調整した DF と比べ、MA・SP の効果を評価_
 
 $$
-\underbrace{\hat A}_{\mathclap{\text{回答}}}
-=\operatorname{VLM}\Bigl((\underbrace{\mathcal I}_{\mathclap{\text{完成画像}}},\qquad
-\underbrace{\mathcal M'}_{\mathclap{\text{拡張メタデータ}}}),\qquad\qquad
-\underbrace{Q}_{\mathclap{\text{2種類の質問}}}\Bigr)
+\underbrace{\vphantom{\hat A\mathcal M'Q}\hat A}_{\mathclap{\text{回答}}}
+=\operatorname{VLM}\Bigl((\underbrace{\vphantom{\hat A\mathcal M'Q}\mathcal I}_{\mathclap{\text{完成画像}}},\qquad
+\underbrace{\vphantom{\hat A\mathcal M'Q}\mathcal M'}_{\mathclap{\text{拡張メタデータ}}}),\qquad\,
+\underbrace{\vphantom{\hat A\mathcal M'Q}Q}_{\mathclap{\text{2 種類の質問}}}\Bigr)
 $$
 
 > **学習条件の比較**
