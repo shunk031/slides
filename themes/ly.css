@@ -511,6 +511,7 @@ section.profile-slide > blockquote:nth-of-type(2) > p:nth-child(n + 3) img {
 section.debug-layout {
   --debug-color: #e53935;
   --debug-pseudo-color: #1976d2;
+  --debug-outline-opacity: 50%;
   --debug-outline-width: 1px;
   --debug-label-padding: 2px 4px;
   --debug-label-font-size: 14px;
@@ -518,10 +519,10 @@ section.debug-layout {
 }
 
 section.debug-layout * {
-  outline: var(--debug-outline-width) solid var(--debug-color);
+  outline: var(--debug-outline-width) solid color-mix(in srgb, var(--debug-color) var(--debug-outline-opacity), transparent);
 }
 section.debug-layout::before, section.debug-layout::after {
-  outline: var(--debug-outline-width) dashed var(--debug-pseudo-color);
+  outline: var(--debug-outline-width) dashed color-mix(in srgb, var(--debug-pseudo-color) var(--debug-outline-opacity), transparent);
 }
 section.debug-layout :is(h1, h2, h3, h4, h5, h6, p, code) {
   position: relative;
