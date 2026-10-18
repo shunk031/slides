@@ -338,7 +338,7 @@ $$
 
 ## MASON 3/3 **|** _SP: 質問対象レイヤーとの関係をメタデータへ明示_
 
-> ![Figure 4 の SP Module: メタデータから空間関係を計算](assets/beyond-atomic-sp.png#crop-right)
+> ![Figure 4 の SP Module: 隣の MA Module を背景に、メタデータから空間関係を計算](assets/beyond-atomic-sp-context.png#crop-left)
 >
 > Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S3.F4)]:\
 > レイヤー間の空間関係を計算
@@ -346,9 +346,9 @@ $$
 > **座標・重なり順だけでは要素間の関係が読みにくい**
 >
 > - 各候補 $e_i$ に、質問対象 $e^q$ との空間関係を追加
->   - メタデータの spatialRelationship フィールドに記述
+>   - `spatialRelationship` フィールドに記述
 >
-> **[質問対象から見た候補の空間関係（Table 3）](https://arxiv.org/html/2608.26716v1#S4.T3)**
+> **[質問対象 $e^q$ から見た候補 $e_i$ の空間関係（Table 3）](https://arxiv.org/html/2608.26716v1#S4.T3)**
 >
 > | 関係       | 属性が表す内容     |
 > | :--------- | :----------------- |
