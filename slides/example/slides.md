@@ -391,25 +391,23 @@ $$
 <!-- _class: analysis-slide results-slide content-slide-gray classification-public -->
 <!-- 発表目安 1:20 -->
 
-## 結果 1/2 **|** _MASON は同一モデルの直接微調整から +2.86 pt 改善_
+## 結果 1/2 **|** _MASON は DF より +2.86 pt 改善_
 
 **CoDeLayout: 関連要素の特定精度（%）**
 
-| Model                      | Weighted Acc. |  Clipping |  Morphing |
-| :------------------------- | ------------: | --------: | --------: |
-| Max-Overlap                |         44.27 |     69.70 |     36.17 |
-| Qwen2.5-VL 7B（zero-shot） |         52.60 |     37.88 |     36.17 |
-| Qwen3-VL（zero-shot）      |         77.08 |     71.21 |     55.32 |
-| GPT-o3（zero-shot）        |         79.68 |     63.64 |     68.09 |
-| DF（全データ）             |         88.80 |     83.33 |     65.96 |
-| **MASON（全データ）**      |     **91.66** | **90.91** | **70.21** |
+| モデル        | 学習データ         | 重み付き精度 |  Clipping |  Morphing |
+| :------------ | :----------------- | -----------: | --------: | --------: |
+| Max-Overlap   | なし（規則ベース） |        44.27 |     69.70 |     36.17 |
+| Qwen2.5-VL 7B | zero-shot          |        52.60 |     37.88 |     36.17 |
+| Qwen3-VL      | zero-shot          |        77.08 |     71.21 |     55.32 |
+| GPT-o3        | zero-shot          |        79.68 |     63.64 |     68.09 |
+| DF            | 全データ           |        88.80 |     83.33 |     65.96 |
+| **MASON**     | **全データ**       |    **91.66** | **90.91** | **70.21** |
 
-_[[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.T4)]: Table 4 の主要列を再構成 / Weighted Acc.はテスト件数で重み付け_
+_[[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.T4)]: Table 4 の主要列を再構成。重み付き精度はテストデータの構成比で重み付け_
 
-- **DF 比: +2.86 pt**（88.80 → 91.66、同一モデル・全データ）
 - Clipping: DF 83.33 → MASON 90.91（+7.58 pt）/ Morphing は 70.21%に留まる
 - GPT-o3 比: +11.98 pt（79.68 → 91.66）
-  - GPT-o3 は zero-shot、MASON はタスク固有の追加学習後
 
 ---
 
