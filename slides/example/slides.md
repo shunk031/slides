@@ -214,15 +214,13 @@ Multimodal Alignment and Structural perceptiON
 >
 > Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S3.F2)]: デザインとメタデータ
 
-> **実デザインを質問応答形式の教師データに変換**
->
-> - 質問対象と正解要素のペアに意図を付与
-> - 完成画像と各要素の JSON メタデータを保持
-> - 編集可能な複数レイヤーの構造を保持
+> _元のデザインの出所: 論文本体・補足資料とも記載なし\
+> 要素ペア: 主にメタデータの種類別ルールで抽出（モデルで補完）\
+> 意図ラベル: GPT-4 構造記述 → GPT-4o 画像照合 → GPT-4 QA 生成\
+> 人手確認: テストのみ 3 人の全員一致 [[Huang+ ECCV’26 Supp.](https://hukcc.github.io/Beyond-Atomic-Layouts/assets/paper/beyond-atomic-layouts-supplementary.pdf)]_
 
 > **Train: 20,009 / Test: 387**
 >
-> - Test は全件人手確認
 > - 平均 17.4 レイヤー\
 >   99.8%が 45 レイヤー未満
 >
