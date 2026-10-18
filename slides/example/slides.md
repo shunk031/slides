@@ -371,7 +371,6 @@ $$
 >
 > - 主タスク: 関連要素 ID と意図を回答
 > - Direct Finetune（DF）: 主タスク QA のみで微調整
->   - 原文: “finetuned solely on compositional QA data”
 > - MASON: 主タスク＋ MA・SP
 
 > **共通のモデル・実行条件**
@@ -382,7 +381,10 @@ $$
 >   - ランク 4 / 8×A100
 > - 画像 336×336 / 出力は最大 256 トークン
 
-**指標**: Accuracy（ID 一致率）・GPT-Score _[[Zheng+ NeurIPS’23](https://arxiv.org/abs/2306.05685)]_（意図との意味的一致、0‑10）・BLEU _[[Papineni+ ACL’02](https://aclanthology.org/P02-1040/)]_・ROUGE _[[Lin+ ACL WS’04](https://aclanthology.org/W04-1013/)]_（参照文との語句一致）
+**指標**: Accuracy（ID 一致率）
+
+- GPT-Score _[[Zheng+ NeurIPS’23](https://arxiv.org/abs/2306.05685)]_: 意図との意味的一致（0–10）
+- BLEU _[[Papineni+ ACL’02](https://aclanthology.org/P02-1040/)]_・ROUGE _[[Lin+ ACL WS’04](https://aclanthology.org/W04-1013/)]_: 参照文との語句一致
 
 ---
 
