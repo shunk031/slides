@@ -45,7 +45,9 @@ function inspectLines() {
 function inspectStructure() {
   return [...document.querySelectorAll('section')].flatMap((slide, index) => {
     const findings = [];
-    for (const link of slide.querySelectorAll('em > a')) {
+    for (const link of slide.querySelectorAll('a')) {
+      if (/[’']\d{2}/.test(link.textContent) && !/^\[[^\[\]]+\]$/.test(link.textContent.trim()))
+        findings.push({ slide: index + 1, kind: 'unbracketed-citation', text: link.textContent });
       if ((link.textContent.match(/[\p{L}-]+\+/gu) || []).length > 1)
         findings.push({ slide: index + 1, kind: 'bundled-citation', text: link.textContent });
     }
@@ -188,7 +190,7 @@ async function main() {
       assert.deepEqual(result.filter(r => r.suspect).map(r => r.lines.at(-1)), ['表現']);
       assert.deepEqual(result.filter(r => r.element === 'li').map(r => r.lines), [['親の文章'], ['子の文章']]);
       assert.deepEqual(result.find(r => r.lines.join('').includes('引用')).lines, ['本文引用']);
-      await page.setContent('<section style="font:20px/30px sans-serif"><div style="float:right;width:20px;height:200px"></div><p>A <em><a>Huang+ MM’22 / Hsiao+ NAACL’25</a></em></p><p style="clear:right">離れた節</p><p>A <em><a>Huang+ MM’22</a></em> / B <em><a>Hsiao+ NAACL’25</a></em></p><blockquote><p><img></p><p style="margin-top:90px">Figure from <a>[Author+ Venue’25]</a>: 図の説明</p></blockquote></section>');
+      await page.setContent('<section style="font:20px/30px sans-serif"><div style="float:right;width:20px;height:200px"></div><p>A <em><a>[Huang+ MM’22 / Hsiao+ NAACL’25]</a></em></p><p style="clear:right">離れた節</p><p>A <em><a>[Huang+ MM’22]</a></em> / B <em><a>[Hsiao+ NAACL’25]</a></em></p><blockquote><p><img></p><p style="margin-top:90px">Figure from <a>[Author+ Venue’25]</a>: 図の説明</p></blockquote></section>');
       const structure = await page.evaluate(inspectStructure);
       assert.deepEqual(structure.map(f => f.kind), ['bundled-citation', 'large-prose-gap']);
       assert.equal(structure[1].text, '離れた節');
@@ -196,7 +198,7 @@ async function main() {
       assert.equal((await page.evaluate(inspectStructure)).filter(f => f.kind === 'text-overflow').length, 3);
       await page.setContent('<section style="width:300px;height:120px"><p style="display:grid;width:80px"><a style="width:max-content;white-space:nowrap">Intentional wide image caption</a></p></section>');
       assert.deepEqual(await page.evaluate(inspectStructure), []);
-      await page.setContent('<section><blockquote><p><img></p><p>Figure 2 description <em><a>Huang+ ECCV’26</a></em></p></blockquote></section>');
+      await page.setContent('<section><blockquote><p><img></p><p>Figure 2 description <em><a>[Huang+ ECCV’26]</a></em></p></blockquote></section>');
       assert.equal((await page.evaluate(inspectStructure)).filter(f => f.kind === 'figure-source').length, 2);
       await page.setContent('<section><blockquote><p><img></p><p>Figure from <a>[Huang+ ECCV’26]</a>: 図の説明</p></blockquote></section>');
       assert.deepEqual(await page.evaluate(inspectStructure), []);
@@ -225,11 +227,15 @@ async function main() {
       assert.equal((await page.evaluate(inspectStructure)).some(f => f.kind === 'sparse-body'), false);
       await page.setContent('<section style="width:300px;height:100px"><blockquote style="height:160px">枠のはみ出し</blockquote></section>');
       assert.equal((await page.evaluate(inspectStructure)).some(f => f.kind === 'box-overflow'), true);
-      for (const text of ['BLEU', 'BLEU（Bilingual Evaluation Understudy）', 'BLEU で比較 <em><a href="https://aclanthology.org/P02-1040/">Papineni+ ACL’02</a></em>']) {
+      for (const text of ['BLEU', 'BLEU（Bilingual Evaluation Understudy）', 'BLEU で比較 <em><a href="https://aclanthology.org/P02-1040/">[Papineni+ ACL’02]</a></em>']) {
         await page.setContent(`<section><p>${text}</p></section>`);
         assert.equal((await page.evaluate(inspectStructure)).some(f => f.kind === 'missing-metric-citation'), true);
       }
-      await page.setContent('<section><p><strong>BLEU</strong> <em><a href="https://aclanthology.org/P02-1040/">Papineni+ ACL’02</a></em> で比較</p></section>');
+      await page.setContent('<section><p><strong>BLEU</strong> <em><a href="https://aclanthology.org/P02-1040/">[Papineni+ ACL’02]</a></em> で比較</p></section>');
+      assert.deepEqual(await page.evaluate(inspectStructure), []);
+      await page.setContent('<section><p>手法 <em><a>Kitada+ IEEE Access’21</a></em></p></section>');
+      assert.equal((await page.evaluate(inspectStructure)).some(f => f.kind === 'unbracketed-citation'), true);
+      await page.evaluate(() => { document.querySelector('a').textContent = '[Kitada+ IEEE Access’21]'; });
       assert.deepEqual(await page.evaluate(inspectStructure), []);
       console.log('Layout inspection self-test passed');
       return;

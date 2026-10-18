@@ -49,14 +49,14 @@ _Project page: [hukcc.github.io/Beyond-Atomic-Layouts/](https://hukcc.github.io/
 > **研究分野**
 >
 > - 自然言語処理（NLP）/ 画像処理（CV）
->   - 摂動に頑健で解釈可能な深層学習 _[Kitada+ IEEE Access’21](https://shunk031.me/publication/kitada2021making/)_, _[Appl. Intell.’22](https://shunk031.me/publication/kitada2022making/)_
+>   - 摂動に頑健で解釈可能な深層学習 _[[Kitada+ IEEE Access’21]](https://shunk031.me/publication/kitada2021making/)_, _[[Appl. Intell.’22]](https://shunk031.me/publication/kitada2022making/)_
 > - 計算機広告（Multi-modal / Vision & Language）
->   - 効果の高いデジタル広告の作成支援 _[Kitada+ KDD’19](https://shunk031.me/publication/kitada2019conversion/)_
->   - 効果の低いデジタル広告の停止支援 _[Kitada+ Appl. Sci.’22](https://shunk031.me/publication/kitada2022ad/)_
+>   - 効果の高いデジタル広告の作成支援 _[[Kitada+ KDD’19]](https://shunk031.me/publication/kitada2019conversion/)_
+>   - 効果の低いデジタル広告の停止支援 _[[Kitada+ Appl. Sci.’22]](https://shunk031.me/publication/kitada2022ad/)_
 > - **デザイン生成 AI**
->   - 離散拡散モデルで生成されたレイアウトの再調整 _[Iwai+ ECCV’24](https://shunk031.me/publication/iwai2024layout/)_
->   - LLM によるレイアウトの生成における自己修正 _[Zhang+ arXiv’24](https://shunk031.me/publication/zhang2024vascar/)_
->   - 田植えをするように潜在表現を植える画像生成 _[Nagai+ CVPR-F’26](https://shunk031.me/publication/nagai2026taue/)_
+>   - 離散拡散モデルで生成されたレイアウトの再調整 _[[Iwai+ ECCV’24]](https://shunk031.me/publication/iwai2024layout/)_
+>   - LLM によるレイアウトの生成における自己修正 _[[Zhang+ arXiv’24]](https://shunk031.me/publication/zhang2024vascar/)_
+>   - 田植えをするように潜在表現を植える画像生成 _[[Nagai+ CVPR-F’26]](https://shunk031.me/publication/nagai2026taue/)_
 
 > ![北田俊輔の写真](assets/kitada-ly.jpg) ![北田俊輔のアイコン](assets/kitada-kita.jpg)
 >
@@ -129,12 +129,12 @@ Figure from [[Huang+ ECCV’26]](https://arxiv.org/html/2608.26716v1#S0.F1): 4�
 
 > **文書・画面理解**
 >
-> LayoutLMv3 _[Huang+ MM’22](https://arxiv.org/html/2608.26716v1#bib.bib17)_ / ScreenQA _[Hsiao+ NAACL’25](https://arxiv.org/html/2608.26716v1#bib.bib24)_\
+> LayoutLMv3 _[[Huang+ MM’22]](https://arxiv.org/html/2608.26716v1#bib.bib17)_ / ScreenQA _[[Hsiao+ NAACL’25]](https://arxiv.org/html/2608.26716v1#bib.bib24)_\
 > 文書や画面に含まれる**個別要素を理解**
 
 > **デザイン生成**
 >
-> COLE _[Jia+ arXiv’23](https://arxiv.org/html/2608.26716v1#bib.bib30)_ / ART _[Pu+ CVPR’25](https://arxiv.org/html/2608.26716v1#bib.bib31)_\
+> COLE _[[Jia+ arXiv’23]](https://arxiv.org/html/2608.26716v1#bib.bib30)_ / ART _[[Pu+ CVPR’25]](https://arxiv.org/html/2608.26716v1#bib.bib31)_\
 > 複数レイヤーからなる**編集可能なデザインを生成**
 
 > **本研究**
