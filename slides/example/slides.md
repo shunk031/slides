@@ -383,19 +383,20 @@ $$
 > **学習条件の比較**
 >
 > - 主タスク: 関連要素 ID と意図を回答
-> - Direct Finetune（DF）: 主タスク QA のみで微調整
+> - Direct Finetune（DF）
+>   - 主タスク QA のみで微調整
 > - MASON: 主タスク＋ MA・SP
 
 > **共通のモデル・実行条件**
 >
-> - Qwen2.5-VL 7B _[[Bai+ arXiv’25](https://arxiv.org/abs/2502.13923)]_
-> - 低ランク適応（Low-Rank Adaptation; LoRA） _[[Hu+ ICLR’22](https://arxiv.org/abs/2106.09685)]_
->   - 3 エポック / 学習率 $3\times10^{-5}$
->   - ランク 4 / 8×A100
+> - Qwen2.5-VL 7B _[[Bai+ arXiv’25](https://arxiv.org/abs/2502.13923)]_ / 8×A100
+> - 低ランク適応（LoRA） _[[Hu+ ICLR’22](https://arxiv.org/abs/2106.09685)]_
+>   - 3 エポック / 学習率 $3\times10^{-5}$ / ランク 4
 > - 画像 336×336 / 出力は最大 256 トークン
 
-**指標**: Accuracy（ID 一致率）
+**指標**
 
+- Accuracy: ID 一致率
 - GPT-Score _[[Zheng+ NeurIPS’23](https://arxiv.org/abs/2306.05685)]_: 意図との意味的一致（0–10）
 - BLEU _[[Papineni+ ACL’02](https://aclanthology.org/P02-1040/)]_・ROUGE _[[Lin+ ACL WS’04](https://aclanthology.org/W04-1013/)]_: 参照文との語句一致
 
