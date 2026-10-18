@@ -858,9 +858,11 @@ section.efficiency-slide img { width: 100%; height: var(--efficiency-figure-heig
 section.efficiency-slide table { width: 100%; margin: 0; font-size: var(--body-font-size); line-height: var(--list-line-height); }
 section.efficiency-slide :is(th, td) { padding: var(--efficiency-cell-padding); }
 section.efficiency-slide > blockquote > p:has(> em > a) { text-align: center; }
+section.qualitative-slide { --efficiency-figure-height: 460px; }
+section.qualitative-slide > blockquote:last-of-type { align-self: center; }
 
 section.case-study-slide {
   --analysis-figure-height: 430px;
-  grid-template-columns: 0.9fr 1.3fr 1.8fr;
+  grid-template-columns: 1.2fr 1.3fr 1.8fr;
 }
 section.case-study-slide blockquote:has(img) a { white-space: nowrap; }
