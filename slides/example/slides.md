@@ -5,7 +5,7 @@ class: classification-public debug-layout
 size: 16:9
 lang: ja
 footer: © LY Corporation
-_class: paper-title title-slide-big first-slide classification-public debug-layout
+_class: paper-title title-slide-big first-slide classification-public
 paginate: true
 _paginate: false
 ---
@@ -37,13 +37,13 @@ _Project page: [hukcc.github.io/Beyond-Atomic-Layouts/](https://hukcc.github.io/
 
 ---
 
-<!-- _class: profile-slide content-slide-gray classification-public debug-layout -->
+<!-- _class: profile-slide content-slide-gray classification-public -->
 
 ## 自己紹介: 北田俊輔 _Shunsuke KITADA_
 
 > **経歴**
 >
-> - ’23/04 LINE → ’23/10 LINEヤフー Research Scientist
+> - ’23/04 LINE → ’23/10 LINE ヤフー Research Scientist
 > - ’23/03 法政大学大学院 彌冨研 博士（工学）/ 学振 DC2
 >
 > **研究分野**
@@ -62,90 +62,98 @@ _Project page: [hukcc.github.io/Beyond-Atomic-Layouts/](https://hukcc.github.io/
 >
 > [shunk031.me](https://shunk031.me) [@shunk031](https://x.com/shunk031)
 >
-> [![講座：画像生成AIにおける拡散モデルの理論と実践](assets/python-image-generation-course.png)](https://bit.ly/KitadaXColosoJP1) [画像生成AIにおける拡散モデルの理論と実践](https://bit.ly/KitadaXColosoJP1)
+> [![講座：画像生成AIにおける拡散モデルの理論と実践](assets/python-image-generation-course.png)](https://bit.ly/KitadaXColosoJP1) [画像生成 AI における拡散モデルの理論と実践](https://bit.ly/KitadaXColosoJP1)
 >
-> [![書籍：Pythonで学ぶ画像生成](assets/python-image-generation-book.png)](https://book.impress.co.jp/books/1123101104) [Pythonで学ぶ画像生成](https://book.impress.co.jp/books/1123101104)
+> [![書籍：Pythonで学ぶ画像生成](assets/python-image-generation-book.png)](https://book.impress.co.jp/books/1123101104) [Python で学ぶ画像生成](https://book.impress.co.jp/books/1123101104)
 
 ---
 
-<!-- _class: selection-slide content-slide-gray classification-public debug-layout -->
+<!-- _class: selection-slide content-slide-gray classification-public -->
 <!-- 発表目安 0:45 -->
 
-## 本論文の選定理由 **|** _デザインの編集には、見た目とレイヤーの関係を同時に理解する必要_
+## 本論文の選定理由 **|** _デザイン編集に向けたレイヤー間の関係へ注目_
 
 > ![Figure 1(e): 関連レイヤーを理解する design assistant の例](assets/beyond-atomic-fig1e.png)
 >
 > Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S0.F1.sf5)]: デザイン支援の例
 
-> **デザインを「作る」だけでなく、\
+> **デザインを「作る」だけでなく\
 > 「意図どおりに直す」ことが難しい**
 >
-> - 文字を人物の背後に差し込む、\
->   文字の一部を図形へ置き換えるなど、\
->   複数のレイヤーで 1 つの視覚効果を表現
->   - 関連レイヤーをまとめて特定・編集
-> - 画像として見えている領域と、\
->   編集すべきレイヤーの単位が\
->   一致しない場合がある
->
+> - 複数のレイヤーで 1 つの視覚効果を表現
+>   - 文字を人物の背後に差し込む
+>   - 文字の一部を図形へ置き換える
+> - 1 つの見た目を編集するにも、関連する\
+>   レイヤーをまとめて見つける必要あり
+> - 完成画像だけでは、どのレイヤーを編集するか分かりにくい
+
 > **本論文で注目したい点**
 >
-> - 完成画像と編集可能なレイヤー情報から、関連要素を特定できるか
-> - 近さや重なりではなく、デザイン上の意図で結びつく要素を推定できるか
+> - 完成画像だけでなく、編集可能なレイヤー情報まで使って関連要素を特定できるか
+> - 単純に近い／重なる要素ではなく、デザイン上の意図で結びついた要素を推定できるか
 > - その能力を何の教師信号で学習させるのか
 
 ---
 
-<!-- _class: background-slide content-slide-gray classification-public debug-layout -->
-<!-- 発表目安 1:05 -->
+<!-- _class: background-slide paired-definitions content-slide-gray classification-public -->
+<!-- 発表目安 1:35 -->
 
-## 背景 **|** _独立した要素の理解から、複数レイヤーの合成関係の理解へ_
+## 背景 **|** _独立要素を扱う Atomic layout から、レイヤーを組み合わせる Compositional layout へ_
 
-**Compositional layout: 複数レイヤーが協調して 1 つの表現を構成**
+> **Atomic layout:** 文書・画面の文字・画像・ボタンを独立要素として扱う
+
+> **Compositional layout:** 複数レイヤーが組み合わさり、1 つの視覚効果を構成
+
+**➜ 位置・種類・読み順だけでは、レイヤー間の合成関係は分からない**
 
 > ![Figure 1(a): Clipping](assets/beyond-atomic-clipping.png)
 >
-> **(a) Clipping**: 切り抜きを前面に置き、間に別要素を挿入
+> **(a) Clipping**: 切り抜いた画像と元画像の間に別要素を挿入
 
 > ![Figure 1(b): Blending](assets/beyond-atomic-blending.png)
 >
-> **(b) Blending**: 異なる画像領域を組み合わせ、統一的な形状を構成
+> **(b) Blending**: 同じ画像の異なる領域を組み合わせて形状を表現
 
 > ![Figure 1(c): Overlaying](assets/beyond-atomic-overlaying.png)
 >
-> **(c) Overlaying**: 輪郭・影などを重ね、要素の視覚的な階層を強調
+> **(c) Overlaying**: 輪郭や影を重ねて視覚的な階層を強調
 
 > ![Figure 1(d): Morphing](assets/beyond-atomic-morphing.png)
 >
-> **(d) Morphing**: 文字の一部を図形・画像へ置換
+> **(d) Morphing**: 文字の一部を画像・図形に置き換え
 
-Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S0.F1)]: 4種類の合成関係
-
----
-
-<!-- _class: comparison-slide content-slide-gray classification-public debug-layout -->
-
-## 既存研究との違い **|** _個別要素や生成から、レイヤー間の関係理解へ_
-
-> **文書・画面理解**
->
-> LayoutLMv3 _[[Huang+ MM’22](https://arxiv.org/html/2608.26716v1#bib.bib17)]_ / ScreenQA _[[Hsiao+ NAACL’25](https://arxiv.org/html/2608.26716v1#bib.bib24)]_\
-> 文書や画面に含まれる**個別要素を理解**
-
-> **デザイン生成**
->
-> COLE _[[Jia+ arXiv’23](https://arxiv.org/html/2608.26716v1#bib.bib30)]_ / ART _[[Pu+ CVPR’25](https://arxiv.org/html/2608.26716v1#bib.bib31)]_\
-> 複数レイヤーからなる**編集可能なデザインを生成**
-
-> **本研究**
->
-> **レイヤー間の合成関係を理解**\
-> どのレイヤー同士が結びつき、\
-> どのデザイン意図を実現しているかを問う
+Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S0.F1)]: Compositional layout の代表的な合成表現
 
 ---
 
-<!-- _class: problem-slide content-slide-gray classification-public debug-layout -->
+<!-- _class: content-slide-gray classification-public -->
+<!-- 発表目安 1:25 -->
+
+## 関連研究 **|** _個別要素の理解と複数レイヤーの生成は進展・合成関係の理解は未整備_
+
+**文書・画面の理解: 個別要素の認識・質問応答が中心**
+
+- LayoutLMv3 _[[Huang+ MM’22](https://arxiv.org/abs/2204.08387)]_: テキスト・画像・2 次元位置を統合し、文書の領域や内容を理解
+  - 文書レイアウト解析や文書への質問応答を対象・編集レイヤーの合成関係は対象外
+- ScreenQA _[[Hsiao+ NAACL’25](https://arxiv.org/abs/2209.08199)]_: モバイルアプリ画面への質問応答と、回答箇所の特定を扱う
+  - 画面内の個別要素を扱う・複数レイヤーが作る視覚効果の意図は問わない
+
+**グラフィックデザインの生成: 複数レイヤーを扱うが関係の注釈はない**
+
+- COLE _[[Jia+ arXiv’23](https://arxiv.org/abs/2311.16974)]_: デザイン意図を分解し、レイアウト計画とレイヤー単位の生成を組み合わせる
+  - 編集可能な複数レイヤーの生成が目的
+- Anonymous Region Transformer (ART) _[[Pu+ CVPR’25](https://openaccess.thecvf.com/content/CVPR2025/html/Pu_ART_Anonymous_Region_Transformer_for_Variable_Multi-Layer_Transparent_Image_Generation_CVPR_2025_paper.html)]_: 領域配置とテキスト指示から透明レイヤーを生成
+  - 可変レイヤー数に対応・50 層以上の生成も扱う
+
+**本論文との違い**
+
+- 既存の理解系: Atomic な要素の認識が中心
+- 既存の生成系: レイヤー構造はあるが、どの要素同士が、何の意図で組み合わされるかは明示的に注釈されない
+- CoDeLayout _[[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S3.T1)]_: 合成関係にある要素ペアとデザイン意図を質問応答として注釈
+
+---
+
+<!-- _class: problem-slide content-slide-gray classification-public -->
 <!-- 発表目安 1:00 -->
 
 ## 問題設定 **|** _指定レイヤーと合成関係にある要素を特定・意図を説明_
@@ -157,7 +165,7 @@ Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S0.F1)]: 4�
 > **入力: 完成画像 + 各レイヤーのメタデータ**
 >
 > $$
-> \mathcal{L}=(\underbrace{\colorbox{#E2F0D9}{$\mathcal{I}$}}_{\text{完成画像}},\underbrace{\colorbox{#DBEAFE}{$\mathcal{M}$}}_{\text{メタデータ}}),\quad
+> \mathcal{L}=(\underbrace{\colorbox{#E2F0D9}{$\mathcal{I}$}}_{\mathclap{\text{完成画像}}}\quad,\underbrace{\colorbox{#DBEAFE}{$\mathcal{M}$}}_{\mathclap{\text{メタデータ}}}),\,
 > \mathcal{M}=\{\mathcal{M}_{e_1},\ldots,\mathcal{M}_{e_n}\}
 > $$
 >
@@ -174,29 +182,28 @@ Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S0.F1)]: 4�
 
 ---
 
-<!-- _class: dataset-slide content-slide-gray classification-public debug-layout -->
+<!-- _class: dataset-slide content-slide-gray classification-public -->
 <!-- 発表目安 0:55 -->
 
-## CoDeLayout **|** _約2万件の実デザインに関連要素ペアと意図を付与_
+## CoDeLayout **|** _約 2 万件の実デザインに関連要素ペアと意図を付与_
 
 > ![Figure 2 左側: 完成画像と各要素のメタデータ](assets/beyond-atomic-fig2-metadata.png#crop-right)
 >
 > Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S3.F2)]: デザインとメタデータ
 
-> **1デザインから質問応答形式の教師データ**
+> **1 デザインから質問応答形式の教師データ**
 >
-> - 質問応答（Question Answering; QA）:\
->   質問対象・正解要素のペアと意図説明
-> - 完成画像と各要素のJSONメタデータを保持
+> - 質問対象・正解要素のペアと意図説明
+> - 完成画像と各要素の JSON メタデータを保持
 > - 編集可能な複数レイヤーの構造を保持
 
 > **Train: 20,009 / Test: 387**
 >
 > - Test は全件人手確認
-> - 平均17.4レイヤー\
->   99.8%が45レイヤー未満
+> - 平均 17.4 レイヤー\
+>   99.8%が 45 レイヤー未満
 >
-> **4種類の関係・Morphing も評価**
+> **4 種類の関係・Morphing も評価**
 >
 > | 関係         |     Train |       Test |
 > | :----------- | --------: | ---------: |
@@ -204,117 +211,116 @@ Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S0.F1)]: 4�
 > | Overlaying   |    22.83% |     29.95% |
 > | Clipping     |    17.76% |     17.75% |
 > | **Morphing** | **2.63%** | **12.24%** |
->
-> 訓練: 自然な偏りを維持\
-> テスト: Morphing を増やし種類別評価
+
+<!-- End of the table column; keep this note across both columns. -->
+
+訓練は自然な偏りを維持 ／ テストは Morphing を増やして種類別評価
 
 ---
 
-<!-- _class: analysis-slide content-slide-gray classification-public debug-layout -->
+<!-- _class: analysis-slide content-slide-gray classification-public -->
 <!-- 発表目安 1:00 -->
 
 ## 課題分析 **|** _VLM の失敗要因は「要素の取り違え」と「階層関係の曖昧さ」_
 
-視覚言語モデル（Vision-Language Model; VLM）の課題を GPT-4o で分析
+Vision-Language Model（VLM）である GPT-4o の失敗要因を分析
 
 > ![Figure 3(a): 要素の対応付けと関連要素の特定精度](assets/beyond-atomic-semantic-drift.svg)
 >
-> Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S3.F3.sf1)]: 要素対応付けと特定精度
+> Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S3.F3.sf1)]: 要素対応付けと特定精度\
+> 横軸: 説明文の語句一致度（平均 BLEU [[Papineni+ ACL’02](https://aclanthology.org/P02-1040/)]）\
+> 縦軸: 関連要素の特定正解率（%）
 
 > ![Figure 3(b): 空間関係の認識と関連要素の特定精度](assets/beyond-atomic-structural-ambiguity.svg)
 >
-> Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S3.F3.sf2)]: 空間関係認識と特定精度
+> Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S3.F3.sf2)]: 空間関係認識と特定精度\
+> 横軸: 空間関係の正答率\
+> 縦軸: 関連要素の特定正解率（%）
 
-> **Semantic drift: 要素の取り違え**
+> **Semantic drift:**\
+> メタデータと画像中の見た目の不一致
 >
-> - 重なって隠れた指定要素を見失う
-> - 切り出し画像と完成画像の説明を\
->   BLEU _[[Papineni+ ACL’02](https://aclanthology.org/P02-1040/)]_ で比較
+> - 比較対象は要素画像と完成画像の説明
+>   - 重なって隠れた指定要素を見失う
 
-> **Structural ambiguity: 階層関係の曖昧さ**
+> **Structural ambiguity:**\
+> レイヤー間の曖昧な関係
 >
-> - 2次元位置だけでは、レイヤー間の\
->   前後・包含・重なりを捉えられない
-> - 1デザイン30組の要素ペアを抽出し、\
->   空間関係の質問への正答率を測定
+> - 1 デザイン 30 組の要素ペアで測定
+>   - 位置だけでは前後・包含・重なりは不明
 
-**➜ 両者の精度が関連要素の特定精度と連動 → 対応付け・構造理解を別々に改善**
+**➜ GPT-4o の分析で両精度が要素特定と連動 → 対応付け・構造理解を別々に改善**
 
 ---
 
 <!-- _class: method-slide content-slide-gray classification-public -->
 <!-- 発表目安 0:45 -->
 
-## MASON 1/3 **|** _2つの失敗要因へ別々の学習支援を追加_
+## MASON 1/3 **|** _2 つの失敗要因へ別々の学習支援を追加_
 
 > ![Figure 4: 左の MA Module は要素対応付け、中央の SP Module は空間関係、右は VLM の追加学習](assets/beyond-atomic-pipeline.png)
 >
 > Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S3.F4)]: MA・SP を組み込む追加学習の全体像
 
-> **図左: Multimodal Alignment（MA）**
+> **Multimodal Alignment（MA）**
 >
-> - Semantic drift:\
->   メタデータと見た目の不一致
-> - 指定レイヤーと見た目の対応を学習
->   - 見た目・位置を答える教師データを追加
+> - 解決する問題: メタデータと画像中の\
+>   見た目の不一致（Semantic drift）
+> - 方針: 要素 ID と見た目の\
+>   対応を教える質問応答（QA）を追加
 
-> **図中央: Structural Perception（SP）**
+> **Structural Perception（SP）**
 >
-> - Structural ambiguity:\
->   レイヤー間の曖昧な関係
-> - 前後・重なり・包含を明示
->   - 入力メタデータへ空間関係を追加
+> - 解決する問題: レイヤー間の曖昧な関係（Structural ambiguity）
+> - 方針: 質問対象との前後・重なり・包含を計算し、メタデータへ追加
 
-**MASON: 既存の VLM を追加学習する枠組み**\
-Qwen2.5-VL 7B _[[Bai+ arXiv’25](https://arxiv.org/abs/2502.13923)]_ の教師データ・入力を拡張（新規ネットワークなし）
+Qwen2.5-VL 7B _[[Bai+ arXiv’25](https://arxiv.org/abs/2502.13923)]_ を追加学習：教師データ・入力を拡張（構造は維持）
 
 ---
 
 <!-- _class: method-slide ma-slide content-slide-gray classification-public -->
 <!-- 発表目安 1:00 -->
 
-## MASON 2/3 **|** _MA: 要素IDと完成画像中の見た目を対応付けて学習_
+## MASON 2/3 **|** _MA: 要素 ID と完成画像中の見た目を対応付けて学習_
 
 > ![Figure 4 の MA Module: 要素画像とメタデータから Grounding QA を生成](assets/beyond-atomic-ma.png#crop-right)
 >
 > Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S3.F4)]:\
-> 補助QAの生成
+> 補助 QA の生成
 
 > **Grounding QA（要素の対応付け問題）を生成**
 >
 > - 入力: 完成画像・対象要素の切り出し画像\
 >   対象要素のメタデータ・質問
 > - 出力: 対象要素の視覚的特徴と位置を記述した回答
-> - 完成画像と切り出し画像の対応から、\
->   重なって認識しにくい要素の対応付けを学習
 >
-> **GPT-4o は学習用の補助QAを生成**
+> **GPT-4o は学習用の補助 QA を生成**
 >
 > - $Q^g(e_i)$: 要素 $e_i$ を特定・説明する質問
 > - $A^g(e_i)$: MASON の学習に使う回答
 > - MASON の推論時に GPT-4o を呼ぶわけではない
 
-> **[質問例（Table 2の要約）](https://arxiv.org/html/2608.26716v1#S4.T2)**
+> **[質問例（Table 2 の要約）](https://arxiv.org/html/2608.26716v1#S4.T2)**
 >
 > 「指定要素の見た目と、\
 > 画像内の位置を説明して」
 
 $$
-\underbrace{A^g(e_i)}_{\text{学習用の回答}} =
-\underbrace{\mathcal{G}}_{\text{GPT-4o}}\!\Bigl(
-\underbrace{\mathcal{P}_{\mathrm{ground}}}_{\text{生成用プロンプト}}\Bigl(
-\underbrace{\mathcal{L}}_{\text{完成画像＋メタデータ}},
-\underbrace{\mathcal{I}_{e_i}}_{\text{切り出し画像}},
-\underbrace{\mathcal{M}_{e_i}}_{\text{対象要素の属性}},
-\underbrace{Q^g(e_i)}_{\text{質問}}
+\underbrace{A^g(e_i)}_{\mathclap{\text{学習用の回答}}} =
+\underbrace{\mathcal{G}}_{\mathclap{\text{GPT-4o}}}\qquad\Bigl(
+\underbrace{\mathcal{P}_{\mathrm{ground}}}_{\mathclap{\text{生成用プロンプト}}}\qquad\quad\Bigl(
+\underbrace{\mathcal{L}}_{\mathclap{\text{画像＋メタデータ}}},\qquad\quad
+\underbrace{\mathcal{I}_{e_i}}_{\mathclap{\text{切り出し画像}}},\qquad\quad
+\underbrace{\mathcal{M}_{e_i}}_{\mathclap{\text{対象要素の属性}}},\qquad
+\underbrace{Q^g(e_i)}_{\mathclap{\text{質問}}}
 \Bigr)\Bigr)
 $$
 
-**➜ 関連要素を探す前提となる、要素単位の視覚と言語の対応を強化**
+**➜ 完成画像と切り出し画像を対応付け、隠れた要素の視覚と言語の対応を強化**
 
 ---
 
-<!-- _class: method-slide sp-slide content-slide-gray classification-public debug-layout -->
+<!-- _class: method-slide sp-slide content-slide-gray classification-public -->
 <!-- 発表目安 1:00 -->
 
 ## MASON 3/3 **|** _SP: 質問対象レイヤーとの関係をメタデータへ明示_
@@ -324,34 +330,265 @@ $$
 > Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S3.F4)]:\
 > レイヤー間の空間関係を計算
 
-> **注目要素 $e^q$ に対する各候補 $e_i$ の関係を追加**
->
 > **[spatialRelationship の属性（Table 3）](https://arxiv.org/html/2608.26716v1#S4.T3)**
 >
-> | 関係       | 属性                              | 意味                 |
-> | :--------- | :-------------------------------- | :------------------- |
-> | 重なり     | hasOverlap / overlapPercentage    | 有無・重複率         |
+> | 関係       | 属性                              | 意味               |
+> | :--------- | :-------------------------------- | :----------------- |
+> | 重なり     | hasOverlap / overlapPercentage    | 有無・重複率       |
 > | 包含       | containment                       | 包含・被包含・なし |
 > | 位置・距離 | centerDistance / relativePosition | 中心距離・上下左右 |
-> | 前後       | layerOrder                        | どちらが前面か       |
+> | 前後       | layerOrder                        | どちらが前面か     |
 >
-> - 質問対象を基準に位置・包含・階層関係を揃える
+> - 各候補 $e_i$ と質問対象 $e^q$ の空間関係を追加
 > - **学習時・推論時の両方で拡張メタデータ $\mathcal{M}'$ を利用**
 
-> **推論前に計算できる構造を明示**
+> **推論前に構造を明示**
 >
 > 座標・重なり順だけでは\
 > 候補同士の関係が読みにくい\
 > → 質問対象との関係へ変換
 
 $$
-\underbrace{\mathcal{M}'_{e_i}}_{\text{拡張メタデータ}}
-= \underbrace{\mathcal{M}_{e_i}}_{\text{元の属性}}
-\cup \underbrace{\texttt{spatialRelationship}(e_i,e^q)}_{\text{候補要素と質問対象の関係}}
+\mathcal{M}'_{e_i}=\mathcal{M}_{e_i}\cup\texttt{spatialRelationship}(e_i,e^q)
 $$
 
 ---
 
+<!-- _class: analysis-slide experiment-slide content-slide-gray classification-public -->
+<!-- 発表目安 0:50 -->
+<!-- 論文: https://arxiv.org/html/2608.26716v1 Sec. 4.3, Sec. 5.1–5.2, Eq. 4 -->
+
+## 実験設定 **|** _主タスクだけで微調整した DF と比べ、MA・SP の効果を評価_
+
+$$
+\underbrace{\hat A}_{\mathclap{\text{回答}}}
+=\operatorname{VLM}\Bigl((\underbrace{\mathcal I}_{\mathclap{\text{完成画像}}},\qquad
+\underbrace{\mathcal M'}_{\mathclap{\text{拡張メタデータ}}}),\qquad\qquad
+\underbrace{Q}_{\mathclap{\text{2種類の質問}}}\Bigr)
+$$
+
+> **学習条件の比較**
+>
+> - 主タスク: 関連要素 ID と意図を回答
+> - Direct Finetune（DF）: 主タスク QA のみで微調整
+>   - 原文: “finetuned solely on compositional QA data”
+> - MASON: 主タスク＋ MA・SP
+
+> **共通のモデル・実行条件**
+>
+> - Qwen2.5-VL 7B _[[Bai+ arXiv’25](https://arxiv.org/abs/2502.13923)]_
+> - 低ランク適応（Low-Rank Adaptation; LoRA） _[[Hu+ ICLR’22](https://arxiv.org/abs/2106.09685)]_
+>   - 3 エポック / 学習率 $3\times10^{-5}$
+>   - ランク 4 / 8×A100
+> - 画像 336×336 / 出力は最大 256 トークン
+
+**指標**: Accuracy（ID 一致率）・GPT-Score _[[Zheng+ NeurIPS’23](https://arxiv.org/abs/2306.05685)]_（意図との意味的一致、0‑10）・BLEU _[[Papineni+ ACL’02](https://aclanthology.org/P02-1040/)]_・ROUGE _[[Lin+ ACL WS’04](https://aclanthology.org/W04-1013/)]_（参照文との語句一致）
+
+---
+
+<!-- _class: analysis-slide results-slide content-slide-gray classification-public -->
+<!-- 発表目安 1:20 -->
+
+## 結果 1/2 **|** _MASON は同一モデルの直接微調整から +2.86 pt 改善_
+
+**CoDeLayout: 関連要素の特定精度（%）**
+
+| Model                      | Weighted Acc. |  Clipping |  Morphing |
+| :------------------------- | ------------: | --------: | --------: |
+| Max-Overlap                |         44.27 |     69.70 |     36.17 |
+| Qwen2.5-VL 7B（zero-shot） |         52.60 |     37.88 |     36.17 |
+| Qwen3-VL（zero-shot）      |         77.08 |     71.21 |     55.32 |
+| GPT-o3（zero-shot）        |         79.68 |     63.64 |     68.09 |
+| DF（全データ）             |         88.80 |     83.33 |     65.96 |
+| **MASON（全データ）**      |     **91.66** | **90.91** | **70.21** |
+
+_[[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.T4)]: Table 4 の主要列を再構成 / Weighted Acc.はテスト件数で重み付け_
+
+- **DF 比: +2.86 pt**（88.80 → 91.66、同一モデル・全データ）
+- Clipping: DF 83.33 → MASON 90.91（+7.58 pt）/ Morphing は 70.21%に留まる
+- GPT-o3 比: +11.98 pt（79.68 → 91.66）
+  - GPT-o3 は zero-shot、MASON はタスク固有の追加学習後
+
+---
+
+<!-- _class: analysis-slide efficiency-slide content-slide-gray classification-public -->
+<!-- 発表目安 0:50 -->
+
+## 結果 2/2 **|** _MASON は 30%の主タスクデータでも全量 DF を上回る_
+
+> ![Figure 5: 訓練データ割合に対するDFとMASONのWeighted Accuracyと精度差](assets/beyond-atomic-datascale.svg)
+>
+> Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.F5.fig1)]: 訓練規模と精度\
+> 横軸: 主タスクの訓練データ割合（%）\
+> 左縦軸: Weighted Acc.（%）/ 右縦軸: 精度差（pt）\
+> 各訓練規模で MASON が DF を上回る
+
+> **使用データ量と関連要素の特定精度（%）**
+>
+> | Model     | 主タスク | Weighted Acc. | Average Acc. |
+> | :-------- | -------: | ------------: | -----------: |
+> | DF        |     100% |         88.80 |        84.30 |
+> | **MASON** |  **30%** |     **89.32** |    **86.12** |
+> | MASON     |     100% |         91.66 |        88.07 |
+>
+> _[[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.T4)]: Table 4 を再構成_
+>
+> **「30%」は主タスクのみ**
+>
+> - MASON: 主タスク約 6K ＋\
+>   別途、補助 QA 約 2K を追加
+> - DF: 主タスク約 20K
+
+**➜ 要素対応・構造関係の追加学習によって主タスクの必要データ量を削減**
+
+---
+
+<!-- _class: analysis-slide results-slide content-slide-gray classification-public -->
+<!-- 発表目安 1:10 -->
+
+## Ablation 1/2 **|** _MA・SP の組み合わせ効果は単純な加算ではない_
+
+**種類ごとの件数を均衡化した部分データで構成要素を比較（精度 %）**
+
+| Model          | Weighted Acc. | Average Acc. |  Clipping |  Morphing |
+| :------------- | ------------: | -----------: | --------: | --------: |
+| DF             |         80.21 |        78.36 |     74.24 |     72.34 |
+| DF + MA        |         82.03 |        80.32 |     81.82 |     70.21 |
+| DF + SP        |         83.85 |        82.51 | **83.33** |     74.47 |
+| MASON（MA+SP） |     **84.11** |    **83.40** |     81.82 | **80.85** |
+
+_[[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.T5)]: Table 5 の主要列を再構成_
+
+**各構成要素の寄与（Table 4 の全データ結果とは別条件）**
+
+- DF 比の Weighted Acc.: MA **+1.82 pt** / SP **+3.64 pt**
+- MA+SP: **+3.90 pt**（SP 単独からの改善は +0.26 pt）
+- Morphing: DF 72.34 → MA+SP **80.85**
+- Clipping: SP 単独 **83.33** > MA+SP 81.82（組み合わせで低下）
+
+---
+
+<!-- _class: analysis-slide efficiency-slide content-slide-gray classification-public -->
+<!-- 発表目安 0:55 -->
+
+## Ablation 2/2 **|** _構造情報だけでは不十分・画像と要素対応の両方が重要_
+
+> **画像入力の除去で両モデルの精度が低下**
+>
+> | Model | 画像あり | 画像なし |
+> | :---- | -------: | -------: |
+> | DF    |     88.8 |     60.9 |
+> | MASON | **91.6** | **65.1** |
+>
+> _[[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.T7)]: Table 7 / Weighted Acc.（%）_
+>
+> - MASON: **−26.5 pt**（91.6 → 65.1）
+> - SP で重なり・包含・レイヤー順を付与しても、画像に依存する視覚的な意味関係は残る
+
+> **Grounding QA の生成モデルを比較**
+>
+> | 生成モデル                 | Weighted Acc. |
+> | :------------------------- | ------------: |
+> | GPT-4o                     |      **91.6** |
+> | Qwen3-VL（直接生成）       |          90.7 |
+> | Qwen3-VL（スクリプト併用） |          91.1 |
+>
+> _[[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.T6)]: Table 6 / 精度（%）_
+>
+> - 直接生成: 見た目の説明と位置を生成
+> - スクリプト併用: 位置をメタデータから取得・モデルは見た目を説明
+
+**示唆: 特定の教師モデルの能力だけでなく、要素の対応付けを学ぶ形式が寄与**
+
+---
+
+<!-- _class: analysis-slide case-study-slide content-slide-gray classification-public -->
+<!-- 発表目安 1:00 -->
+
+## 定性結果・制限 **|** _Clipping で正しい切り抜きを特定・Morphing はなお難しい_
+
+> ![Figure 6(c): Clippingの完成画像・質問対象・DFとMASONの対応先](assets/beyond-atomic-case-clipping.png)
+>
+> Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.F6.sf3)]:\
+> Clipping の対応先
+
+> ![Figure 6(a): Morphingの完成画像・質問対象・DFとMASONの対応先](assets/beyond-atomic-case-morphing.png)
+>
+> Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.F6.sf1)]:\
+> Morphing の対応先
+
+> **見た目が似た別要素への誤対応を回避**
+>
+> - Clipping
+>   - DF: 元画像と幅が似た装飾へ誤対応
+>   - MASON: 切り抜いた前景を特定
+> - Morphing
+>   - DF: 色・配置が似た別要素へ誤対応
+>   - MASON:「O」を置き換える花を特定
+>
+> **残る課題・著者らの将来方向**
+>
+> - Morphing: 全データでも **70.21%**
+>   - 訓練の **2.63%**・大きな変形と意味の置き換えが必要
+> - レイヤー構造を考慮する視覚エンコーダと、視覚・言語の対応付けの強化
+
+---
+
+<!-- _class: analysis-slide content-slide-gray classification-public -->
+<!-- 発表目安 0:50 -->
+<!-- 考察の根拠: https://arxiv.org/html/2608.26716v1 Sec. 4.2, Sec. 5.3–5.4, Tables 4–5, 7 -->
+
+## 気になったところ **|** _本当に「画像から構造を理解する」能力が改善したのか？_
+
+**発表者の考察**
+
+> **推論時の入力と評価対象**
+>
+> - MASON は推論時にも画像・正確な要素メタデータ・前後／包含／重なりの関係を入力
+> - 編集可能なデザインファイルを扱う支援システムでは自然な前提
+> - レイヤーのない 1 枚の画像から、構造自体を復元する設定とは異なる
+>
+> **分離して検証したい能力**
+>
+> - 画像から構造を推定する能力
+> - 与えられた構造を利用する能力
+
+> **関係別の教師信号**
+>
+> - Clipping（Table 5）
+>   - SP 単独 **83.33%** > MA+SP **81.82%**
+> - Morphing（Table 5）
+>   - DF **72.34%** → MA+SP **80.85%**
+>   - 全データ条件では **70.21%**（Table 4）
+>
+> **追加で確認したい点**
+>
+> - 関係ごとに教師信号を変えた場合の効果
+> - 希少な関係への追加データの効果
+
+---
+
+<!-- _class: analysis-slide efficiency-slide content-slide-gray classification-public -->
+<!-- 発表目安 0:20 -->
+<!-- 主結果: https://arxiv.org/html/2608.26716v1#S5.T4 -->
+
+## まとめ **|** _要素の「見た目」と「レイヤー間の関係」を同時に扱うことが重要_
+
+> ![Figure 1(e): 見た目と関連レイヤーを理解するデザイン支援の例](assets/beyond-atomic-fig1e.png)
+>
+> Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S0.F1.sf5)]: 見た目と関連レイヤーを扱うデザイン支援
+
+> - **課題**: 複数レイヤーが協調するデザインでは、独立要素の位置認識だけでは不十分
+> - **CoDeLayout**: 約 20K 件のデザインで関連要素ペアとデザイン意図を評価
+> - **MASON**: MA の視覚的対応付けと\
+>   SP のレイヤー関係で追加学習
+> - **残る論点**: Morphing の難しさ・推論時に必要な正確なメタデータ
+
+**同一 Qwen2.5-VL 7B: DF 88.80% → MASON 91.66%（+2.86 pt）**
+
+---
+
+<!-- _class: title-slide-big classification-public debug-layout-->
 
 # 表紙用の背景
 
@@ -359,7 +596,7 @@ $$
 
 ---
 
-<!-- _class: content-slide-gray classification-public debug-layout layout-example -->
+<!-- _class: content-slide-gray classification-public layout-example -->
 
 ## 図や説明を置くページ
 
@@ -367,6 +604,6 @@ $$
 
 ---
 
-<!-- _class: takahashi classification-public debug-layout -->
+<!-- _class: takahashi classification-public -->
 
 # 伝えたいことを一つ

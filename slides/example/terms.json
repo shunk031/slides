@@ -1,0 +1,6 @@
+{
+  "Atomic layout": "文書・画面の文字・画像・ボタンを独立要素として扱う",
+  "Compositional layout": "複数レイヤーが組み合わさり、1 つの視覚効果を構成",
+  "Semantic drift": "メタデータと画像中の見た目の不一致",
+  "Structural ambiguity": "レイヤー間の曖昧な関係"
+}
