@@ -319,13 +319,13 @@ Qwen2.5-VL 7B _[[Bai+ arXiv’25](https://arxiv.org/abs/2502.13923)]_ を追加�
 > - 推論時には GPT-4o を使用しない
 
 $$
-\underbrace{A^g(e_i)}_{\mathclap{\text{学習用の回答}}} =
-\underbrace{\mathcal{G}}_{\mathclap{\text{GPT-4o}}}\qquad\Bigl(
-\underbrace{\mathcal{P}_{\mathrm{ground}}}_{\mathclap{\text{生成用プロンプト}}}\qquad\quad\Bigl(
-\underbrace{\mathcal{L}}_{\mathclap{\text{画像＋メタデータ}}},\qquad\quad
-\underbrace{\mathcal{I}_{e_i}}_{\mathclap{\text{切り出し画像}}},\qquad\quad
-\underbrace{\mathcal{M}_{e_i}}_{\mathclap{\text{対象要素の属性}}},\qquad
-\underbrace{Q^g(e_i)}_{\mathclap{\text{質問}}}
+\underbrace{\vphantom{A^g(e_i)\mathcal{P}_{\mathrm{ground}}}A^g(e_i)}_{\mathclap{\text{学習用の回答}}} =
+\underbrace{\vphantom{A^g(e_i)\mathcal{P}_{\mathrm{ground}}}\mathcal{G}}_{\mathclap{\vphantom{\text{学習用の回答}}\text{GPT-4o}}}\qquad\Bigl(
+\underbrace{\vphantom{A^g(e_i)\mathcal{P}_{\mathrm{ground}}}\mathcal{P}_{\mathrm{ground}}}_{\mathclap{\text{生成用プロンプト}}}\qquad\quad\Bigl(
+\underbrace{\vphantom{A^g(e_i)\mathcal{P}_{\mathrm{ground}}}\mathcal{L}}_{\mathclap{\text{画像＋メタデータ}}},\qquad\quad
+\underbrace{\vphantom{A^g(e_i)\mathcal{P}_{\mathrm{ground}}}\mathcal{I}_{e_i}}_{\mathclap{\text{切り出し画像}}},\qquad\quad
+\underbrace{\vphantom{A^g(e_i)\mathcal{P}_{\mathrm{ground}}}\mathcal{M}_{e_i}}_{\mathclap{\text{対象要素の属性}}},\quad
+\underbrace{\vphantom{A^g(e_i)\mathcal{P}_{\mathrm{ground}}}Q^g(e_i)}_{\mathclap{\text{質問}}}
 \Bigr)\Bigr)
 $$
 
