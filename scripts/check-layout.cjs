@@ -174,22 +174,22 @@ function groupGapFindings({ themeGap, groups }) {
   return groups.flatMap(group => {
     if (!Number.isFinite(group.sectionGap))
       return [{ slide: group.slide, kind: 'group-gap-config', text: `${group.text}: --list-group-gap is not defined by the theme.` }];
-    const peers = groups.filter(other => other.role === group.role && other.sectionGap === group.sectionGap);
+    const peers = groups.filter(other => other.role === group.role);
     const pageGaps = new Map();
     for (const peer of peers) {
       if (!pageGaps.has(peer.slide)) pageGaps.set(peer.slide, []);
       pageGaps.get(peer.slide).push(peer.gap);
     }
-    const roleMedian = medians([...pageGaps.values()].map(medians));
+    const roleMedian = Math.max(themeGap, medians([...pageGaps.values()].map(medians)));
     const pageMedian = medians(pageGaps.get(group.slide));
     const reasons = [];
-    if (group.gap < group.sectionGap) reasons.push(`gap ${Math.round(group.gap)}px is below the section gap ${Math.round(group.sectionGap)}px`);
+    if (group.gap < themeGap) reasons.push(`gap ${Math.round(group.gap)}px is below the deck gap ${Math.round(themeGap)}px`);
     if (pageGaps.size > 1 && Math.abs(pageMedian - roleMedian) > 2) reasons.push(`same-role gap differs from the ${Math.round(roleMedian)}px page median by more than 2px`);
     return reasons.length ? [{
       slide: group.slide,
       kind: 'group-gap',
       gap: group.gap,
-      limit: group.sectionGap,
+      limit: themeGap,
       text: `${group.text}: ${reasons.join('; ')}.`,
     }] : [];
   });
@@ -578,12 +578,27 @@ async function main() {
       assert.ok(shortGroupGap.some(f => f.kind === 'group-gap' && f.gap === 4));
       await page.evaluate(() => { document.querySelectorAll('blockquote')[1].style.top = '56px'; });
       assert.deepEqual(groupGapFindings(await page.evaluate(inspectGroupGaps)), []);
+      await page.evaluate(() => {
+        document.querySelector('section').style.setProperty('--list-group-gap', '8px');
+        document.querySelectorAll('blockquote')[1].style.top = '48px';
+        document.body.insertAdjacentHTML('beforeend', '<section style="--list-group-gap:16px"></section>');
+      });
+      assert.ok(groupGapFindings(await page.evaluate(inspectGroupGaps)).some(f => f.kind === 'group-gap' && f.gap === 8 && f.limit === 16));
+      await page.evaluate(() => { document.querySelectorAll('blockquote')[1].style.top = '56px'; });
+      assert.deepEqual(groupGapFindings(await page.evaluate(inspectGroupGaps)), []);
       await page.setContent('<section style="font:20px/20px monospace;--list-group-gap:16px"><h2>Title</h2><p style="margin:0"><strong>Group</strong></p><ul style="margin:0"><li>Next</li></ul></section>');
       assert.deepEqual((await page.evaluate(inspectGroupGaps)).groups, []);
       assert.ok(groupGapFindings({ themeGap: 16, groups: [
         { slide: 1, role: 'body-group-heading', text: 'A', gap: 16, sectionGap: 16 },
         { slide: 2, role: 'body-group-heading', text: 'B', gap: 22, sectionGap: 16 },
       ] }).length);
+      assert.ok(groupGapFindings({ themeGap: 16, groups: [
+        { slide: 1, role: 'body-group-heading', text: 'A', gap: 16, sectionGap: 16 },
+        { slide: 2, role: 'body-group-heading', text: 'B', gap: 22, sectionGap: 8 },
+      ] }).some(f => f.text.includes('same-role gap')));
+      assert.deepEqual(groupGapFindings({ themeGap: 16, groups: [16, 8, 8, 8].map((gap, index) => ({
+        slide: index + 1, role: 'body-group-heading', text: 'Group', gap, sectionGap: gap,
+      })) }).map(f => f.slide), [2, 3, 4]);
       for (const tag of ['p', 'li', 'td']) {
         const content = tag === 'td' ? '<table><tr><td>Long first line<br>x</td></tr></table>' : `<${tag}>Long first line<br>x</${tag}>`;
         await page.setContent(`<section style="font:20px monospace">${content}</section>`);
