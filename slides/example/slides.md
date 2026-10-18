@@ -95,32 +95,34 @@ _Project page: [hukcc.github.io/Beyond-Atomic-Layouts/](https://hukcc.github.io/
 
 ---
 
-<!-- _class: background-slide paired-definitions content-slide-gray classification-public -->
-<!-- 発表目安 1:35 -->
+<!-- _class: background-slide content-slide-gray classification-public -->
+<!-- 発表目安 0:50 -->
 
-## 背景 **|** _独立要素を扱う Atomic layout から、レイヤーを組み合わせる Compositional layout へ_
+## 背景 **|** _Atomic layout と compositional layout の違い_
 
-> **Atomic layout:** 文書・画面の文字・画像・ボタンを独立要素として扱う
+- **Atomic layout:** 文書や画面を、文字・画像・ボタンなどの独立した要素として扱う
+  - 位置・種類・読み順を手掛かりに、個別要素や画面の内容を理解
+- **Compositional layout:** 複数のレイヤーが組み合わさり、1 つの視覚効果を構成
 
-> **Compositional layout:** 複数レイヤーが組み合わさり、1 つの視覚効果を構成
+  - **(a) Clipping:**\
+    切り抜いた画像と元画像の間に別要素を挿入
 
-**➜ 位置・種類・読み順だけでは、レイヤー間の合成関係は分からない**
+    ![Figure 1(a): Clipping](assets/beyond-atomic-clipping.png)
 
-> ![Figure 1(a): Clipping](assets/beyond-atomic-clipping.png)
->
-> **(a) Clipping**: 切り抜いた画像と元画像の間に別要素を挿入
+  - **(b) Blending:**\
+    同じ画像の異なる領域を組み合わせて形状を表現
 
-> ![Figure 1(b): Blending](assets/beyond-atomic-blending.png)
->
-> **(b) Blending**: 同じ画像の異なる領域を組み合わせて形状を表現
+    ![Figure 1(b): Blending](assets/beyond-atomic-blending.png)
 
-> ![Figure 1(c): Overlaying](assets/beyond-atomic-overlaying.png)
->
-> **(c) Overlaying**: 輪郭や影を重ねて視覚的な階層を強調
+  - **(c) Overlaying:**\
+    輪郭や影を重ねて視覚的な階層を強調
 
-> ![Figure 1(d): Morphing](assets/beyond-atomic-morphing.png)
->
-> **(d) Morphing**: 文字の一部を画像・図形に置き換え
+    ![Figure 1(c): Overlaying](assets/beyond-atomic-overlaying.png)
+
+  - **(d) Morphing:**\
+    文字の一部を画像・図形に置き換え
+
+    ![Figure 1(d): Morphing](assets/beyond-atomic-morphing.png)
 
 Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S0.F1)]: Compositional layout の代表的な合成表現
 
