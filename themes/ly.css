@@ -15,7 +15,7 @@
   --color-code-background: #f2f2f2;
 
   /* Slide spacing */
-  --slide-padding: 16px;
+  --slide-padding: 20px;
   --slide-padding-block: 48px;
   --slide-top: var(--slide-padding);
   --top-row-height: 24px;
@@ -36,15 +36,17 @@
 
   /* Body slides */
   --body-font-size: 30px;
-  --body-line-height: 1.2;
+  --body-line-height: 1.45;
+  --list-line-height: 1.2;
+  --list-item-gap: calc((var(--body-line-height) - var(--list-line-height)) * 1em);
   --heading-font-size: 48px;
   --heading-description-ratio: calc(15 / 28);
   --heading-description-gap: 0.35em;
   --heading-description-line-height: 1.4;
   --heading-separator-width: 4px;
   --heading-separator-height: calc(var(--heading-font-size) * 0.9);
-  --list-indent: 1.6em;
-  --nested-list-indent: 0.85em;
+  --list-indent: 0.85em;
+  --nested-list-indent: var(--list-indent);
   --nested-list-font-size: calc(var(--body-font-size) * 14 / 16);
   --deep-list-font-size: calc(var(--body-font-size) * 12 / 16);
   --citation-font-size: 20px;
@@ -181,6 +183,15 @@ section:not(.first-slide, .lead, .takahashi) ul {
 
 section:not(.first-slide, .lead, .takahashi) li {
   margin: 0;
+  line-height: var(--list-line-height);
+}
+
+section:not(.first-slide, .lead, .takahashi) li + li {
+  margin-top: var(--list-item-gap);
+}
+
+section:not(.first-slide, .lead, .takahashi, .title-slide-big) p:has(> br):not(:has(img)):not(:has(> a)) {
+  line-height: var(--list-line-height);
 }
 
 section:not(.first-slide, .lead, .takahashi) ul ul {
@@ -217,6 +228,7 @@ section:not(.first-slide) h2 > em:last-child {
   font-style: normal;
   line-height: var(--heading-description-line-height);
   white-space: normal;
+  text-wrap: balance;
 }
 
 section[lang="ja"] :is(h1, h2, h3, h4, h5, h6) {
@@ -387,7 +399,8 @@ section.paper-title > p:nth-of-type(5) img {
   height: auto;
 }
 
-/* Markdown: _[[Author+ ConfName'YY](url)]_ */
+/* Inline annotations and citations share the same size. */
+section:not(.paper-title) :is(p, li) > em,
 section :is(p, li) > em:has(> a) {
   font-size: var(--citation-font-size);
   font-style: normal;
@@ -400,7 +413,8 @@ section.profile-slide {
   --profile-section-gap: 22px;
   --profile-list-gap: 8px;
   --profile-name-ratio: 0.68;
-  --profile-line-height: var(--body-line-height);
+  --profile-line-height: 1.35;
+  --list-item-gap: calc((var(--profile-line-height) - var(--list-line-height)) * 1em);
   --profile-link-font-size: 17px;
   --profile-photo-gap: 20px;
   --profile-thumbnail-height: 200px;
@@ -465,7 +479,7 @@ section.profile-slide > blockquote > ul > li + li {
 }
 
 section.profile-slide > blockquote > ul:first-of-type > li + li {
-  margin-top: 0;
+  margin-top: var(--list-item-gap);
 }
 
 section.profile-slide blockquote ul ul {
@@ -533,14 +547,21 @@ section.profile-slide > blockquote:nth-of-type(2) > p:nth-child(n + 3) img {
   margin: 0 auto;
 }
 
-/* Float the source figure so the rationale can continue beneath it. */
+/* Explain the example beside the figure, then give the reading questions full width. */
 section.selection-slide {
-  --selection-figure-width: 620px;
-  display: block;
+  --selection-figure-width: 640px;
+  --selection-content-gap: 4px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--selection-figure-width);
+  row-gap: 0;
+  column-gap: 8px;
+  align-content: start;
   letter-spacing: 0;
 }
+section.selection-slide::before,
 section.selection-slide > h2 {
-  margin: 0 0 var(--content-gap);
+  grid-column: 1 / -1;
+  margin: 0;
 }
 section.selection-slide > blockquote {
   min-width: 0;
@@ -551,28 +572,30 @@ section.selection-slide > blockquote {
   font-size: var(--body-font-size);
   line-height: var(--body-line-height);
 }
-section.selection-slide > h2 + blockquote { margin-top: 0; }
+section.selection-slide > h2 + blockquote { margin-top: var(--selection-content-gap); }
 section.selection-slide > blockquote::before,
 section.selection-slide > blockquote::after { content: none; }
-section.selection-slide > blockquote > p { margin: 0 0 var(--content-gap); }
+section.selection-slide > blockquote > p { margin: 0 0 var(--selection-content-gap); }
 section.selection-slide > blockquote > ul + p {
-  clear: right;
-  margin-top: var(--content-gap);
+  margin-top: var(--list-group-gap);
 }
 section.selection-slide > blockquote:first-of-type {
-  float: right;
-  width: var(--selection-figure-width);
-  margin: 0 0 0 var(--content-gap);
+  grid-column: 2;
+  grid-row: 3;
+  align-self: start;
+  margin-top: var(--selection-content-gap);
   font-size: var(--figure-caption-font-size);
 }
-section.selection-slide > blockquote img { width: 100%; height: auto; }
+section.selection-slide > blockquote:nth-of-type(2) { grid-column: 1; grid-row: 3; margin-top: var(--selection-content-gap); }
+section.selection-slide > blockquote:nth-of-type(3) { grid-column: 1 / -1; grid-row: 4; margin-top: var(--list-group-gap); }
+section.selection-slide > blockquote img { display: block; width: 100%; height: auto; }
 section.selection-slide > blockquote:first-of-type > p:last-child { margin-bottom: 0; }
 
 /* Keep figure captions centered with their images. */
 section > blockquote:has(> p > img) > p { text-align: center; }
 
 section.background-slide {
-  --background-figure-height: 175px;
+  --background-figure-height: 138px;
   --content-gap: 8px;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -581,27 +604,32 @@ section.background-slide {
   letter-spacing: 0;
 }
 section.background-slide::before,
-section.background-slide > :is(h2, p, ul) {
+section.background-slide > :is(h2, p) {
   grid-column: 1 / -1;
   margin: 0;
 }
-section.background-slide > :is(p, ul) { font-size: var(--body-font-size); }
-section.background-slide > h2 + p { margin-top: 0; }
 section.background-slide > blockquote {
   margin: 0;
   padding: 0;
   border: 0;
   color: var(--color-text);
-  font-size: var(--figure-caption-font-size);
   line-height: var(--body-line-height);
 }
+section.background-slide > h2 + blockquote { margin-top: 0; }
 section.background-slide > blockquote::before,
 section.background-slide > blockquote::after { content: none; }
 section.background-slide > blockquote > p { margin: 0; }
+section.background-slide > blockquote:nth-of-type(-n + 2) > p + p { margin-top: var(--content-gap); }
+section.background-slide > blockquote:nth-of-type(n + 3) {
+  font-size: var(--figure-caption-font-size);
+  text-align: center;
+}
 section.background-slide img {
+  display: block;
   height: var(--background-figure-height);
   width: auto;
   max-width: 100%;
+  margin: auto;
 }
 section.background-slide > p:has(> a) {
   text-align: center;
@@ -609,28 +637,34 @@ section.background-slide > p:has(> a) {
 }
 
 section.comparison-slide {
-  --comparison-label-width: 240px;
-  --comparison-row-height: 150px;
-  --comparison-padding: 24px;
+  --comparison-gap: 12px 24px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--comparison-gap);
+  align-content: start;
 }
+section.comparison-slide::before,
+section.comparison-slide > h2 { grid-column: 1 / -1; margin: 0; }
 section.comparison-slide > blockquote {
   box-sizing: border-box;
-  display: grid;
-  grid-template-columns: var(--comparison-label-width) minmax(0, 1fr);
-  align-items: center;
-  min-height: var(--comparison-row-height);
-  margin: var(--content-gap) 0 0;
-  padding: var(--comparison-padding);
+  min-width: 0;
+  margin: 0;
+  padding: 12px 16px;
   border: 0;
   border-left: var(--heading-separator-width) solid var(--color-heading);
   background: rgb(255 255 255 / var(--white-background-opacity));
   color: var(--color-text);
   font-size: var(--body-font-size);
+  line-height: var(--body-line-height);
 }
 section.comparison-slide > blockquote::before,
 section.comparison-slide > blockquote::after { content: none; }
-section.comparison-slide > blockquote > p { margin: 0; }
+section.comparison-slide > blockquote > p { margin: 0 0 var(--content-gap); }
 section.comparison-slide > blockquote > p:first-child { color: var(--color-heading); }
+section.comparison-slide > blockquote > p:last-child { margin-bottom: 0; }
+section.comparison-slide > blockquote:first-of-type { grid-column: 1; grid-row: 3; }
+section.comparison-slide > blockquote:nth-of-type(2) { grid-column: 2; grid-row: 3; }
+section.comparison-slide > blockquote:nth-of-type(3) { grid-column: 1 / -1; grid-row: 4; }
 
 section:is(.problem-slide, .dataset-slide, .method-slide) {
   --problem-figure-height: 250px;
@@ -659,6 +693,8 @@ section:is(.problem-slide, .dataset-slide, .method-slide) > blockquote {
 section:is(.problem-slide, .dataset-slide, .method-slide) > blockquote::before,
 section:is(.problem-slide, .dataset-slide, .method-slide) > blockquote::after { content: none; }
 section:is(.problem-slide, .dataset-slide, .method-slide) > blockquote > p { margin: 0 0 var(--content-gap); }
+/* The grid gap supplies spacing after each block. */
+section:is(.problem-slide, .dataset-slide, .method-slide) > blockquote > :last-child { margin-bottom: 0; }
 section:is(.problem-slide, .dataset-slide, .method-slide) > blockquote:first-of-type > p { margin: 0; }
 section:is(.problem-slide, .dataset-slide, .method-slide) > blockquote:first-of-type {
   text-align: center;
@@ -746,7 +782,7 @@ section:not(.first-slide, .lead, .takahashi, .title-slide-big) :is(p, ul, ol, ta
 section.debug-layout {
   --debug-color: #e53935;
   --debug-pseudo-color: #1976d2;
-  --debug-outline-opacity: 50%;
+  --debug-outline-opacity: 25%;
   --debug-outline-width: 1px;
   --debug-label-padding: 2px 4px;
   --debug-label-opacity: 40%;
@@ -792,3 +828,32 @@ section.debug-layout.paper-title > blockquote:nth-of-type(1) p:nth-of-type(2)::a
 section.debug-layout.paper-title > blockquote:nth-of-type(1) p:nth-of-type(3)::after { content: "発表者リンク用"; }
 section.debug-layout.paper-title > blockquote:nth-of-type(2) p::after { content: "注記用"; }
 section.debug-layout.paper-title > p:nth-of-type(4)::after { content: "ロゴ用"; }
+
+section.experiment-slide { grid-template-columns: 0.9fr 1.1fr; }
+section.experiment-slide > ul { grid-column: 1 / -1; }
+
+section.results-slide > :is(table, ul) { grid-column: 1 / -1; }
+section.results-slide table {
+  --results-cell-padding: 1px 12px;
+  width: 100%;
+  margin: 0;
+  font-size: var(--body-font-size);
+  line-height: var(--list-line-height);
+}
+section.results-slide :is(th, td) { padding: var(--results-cell-padding); }
+section.results-slide > p:has(> em > a) { margin: 0; text-align: center; }
+
+section.efficiency-slide {
+  --efficiency-figure-height: 340px;
+  --efficiency-cell-padding: 4px 8px;
+}
+section.efficiency-slide img { width: 100%; height: var(--efficiency-figure-height); object-fit: contain; }
+section.efficiency-slide table { width: 100%; margin: 0; font-size: var(--body-font-size); line-height: var(--list-line-height); }
+section.efficiency-slide :is(th, td) { padding: var(--efficiency-cell-padding); }
+section.efficiency-slide > blockquote > p:has(> em > a) { text-align: center; }
+
+section.case-study-slide {
+  --analysis-figure-height: 430px;
+  grid-template-columns: 0.9fr 1.3fr 1.8fr;
+}
+section.case-study-slide blockquote:has(img) a { white-space: nowrap; }
