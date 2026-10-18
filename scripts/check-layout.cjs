@@ -242,54 +242,62 @@ function inspectColumns() {
     const walker = document.createTreeWalker(block, NodeFilter.SHOW_TEXT);
     while (walker.nextNode()) {
       const node = walker.currentNode;
+      if (!node.textContent.trim()) continue;
       const range = document.createRange();
       range.selectNodeContents(node);
       const rect = [...range.getClientRects()].find(rect => rect.width && rect.height);
       if (!rect) continue;
-      const owner = node.parentElement.closest(textSelector);
-      return { top: rect.top, text: (owner?.textContent || node.textContent).trim() };
+      const owner = node.parentElement.closest(textSelector) || node.parentElement;
+      const lineHeight = parseFloat(getComputedStyle(owner).lineHeight);
+      return { top: rect.top, lineTop: Number.isFinite(lineHeight) ? rect.top + (rect.height - lineHeight) / 2 : owner.getBoundingClientRect().top, text: owner.textContent.trim(), image: false };
     }
     return null;
   };
+  const imageStart = img => {
+    const box = img.getBoundingClientRect();
+    if (!box.width || !box.height) return null;
+    const style = getComputedStyle(img);
+    const inset = side => (parseFloat(style[`border${side}Width`]) || 0) + (parseFloat(style[`padding${side}`]) || 0);
+    const width = box.width - inset('Left') - inset('Right');
+    const height = box.height - inset('Top') - inset('Bottom');
+    let top = box.top + inset('Top');
+    if (['contain', 'scale-down'].includes(style.objectFit) && img.naturalWidth && img.naturalHeight) {
+      const scale = Math.min(width / img.naturalWidth, height / img.naturalHeight, style.objectFit === 'scale-down' ? 1 : Infinity);
+      const spare = height - img.naturalHeight * scale;
+      // shortcut: only percentage/px object-position is resolved; extend when a deck uses position expressions.
+      const position = style.objectPosition.match(/^\S+\s+(-?[\d.]+)(%|px)$/);
+      if (position) top += position[2] === '%' ? spare * Number(position[1]) / 100 : Number(position[1]);
+    }
+    return { top, lineTop: top, text: img.alt || img.getAttribute('src') || 'Image', image: true };
+  };
   return [...document.querySelectorAll('section')].flatMap((slide, index) => {
+    if (slide.matches('.first-slide,.lead,.takahashi,.title-slide-big,.profile-slide,.layout-example')) return [];
     const slideTop = slide.getBoundingClientRect().top;
-    const children = [...slide.children];
-    const blocks = children.filter(block => !block.matches('header,footer') && block.textContent.trim()).map(block => {
-      const first = firstText(block);
+    const blocks = [...slide.children].filter(block => !block.matches('h1,h2,header,footer,.pagination,.page-number,.classification,.classification-badge,.background-decoration')).map(block => {
+      const starts = [firstText(block), ...[...block.querySelectorAll('img'), ...(block.matches('img') ? [block] : [])].map(imageStart)].filter(Boolean);
+      const first = starts.sort((a, b) => a.lineTop - b.lineTop)[0];
       const box = block.getBoundingClientRect();
-      const imageTops = [...block.querySelectorAll('img')].map(img => img.getBoundingClientRect()).filter(rect => rect.width && rect.height).map(rect => rect.top);
-      return first && box.width && box.height ? {
-        block,
-        box,
-        first,
-        order: children.indexOf(block),
-        imageLeading: imageTops.some(top => top <= first.top),
-        centered: getComputedStyle(block).alignSelf === 'center',
-      } : null;
+      return first && box.width && box.height ? { box, first } : null;
     }).filter(Boolean);
-    const imageLeadsColumn = item => item.imageLeading || children.slice(0, item.order).some(previous => {
-      const previousBox = previous.getBoundingClientRect();
-      const previousImages = [...previous.querySelectorAll('img')].map(img => img.getBoundingClientRect()).filter(rect => rect.width && rect.height);
-      return previousImages.length && previousBox.bottom <= item.box.top + 2 &&
-        Math.abs((previousBox.left + previousBox.right) / 2 - (item.box.left + item.box.right) / 2) <= 2;
-    });
     const pairs = [];
+    const seen = new Set();
     for (let i = 0; i < blocks.length; i++) {
       for (const right of blocks.slice(i + 1)) {
         const left = blocks[i];
         if (Math.min(left.box.bottom, right.box.bottom) <= Math.max(left.box.top, right.box.top)) continue;
         const [first, second] = left.box.left <= right.box.left ? [left, right] : [right, left];
         if (first.box.right > second.box.left) continue;
-        pairs.push({
-          slide: index + 1,
-          leftText: first.first.text,
-          rightText: second.first.text,
-          leftTop: first.first.top - slideTop,
-          rightTop: second.first.top - slideTop,
-          difference: Math.abs(first.first.top - second.first.top),
-          imageLeading: imageLeadsColumn(left) || imageLeadsColumn(right),
-          centered: left.centered || right.centered,
-        });
+        const shared = blocks.filter(item => item.box.left <= first.box.left + 2 && item.box.right >= second.box.right - 2);
+        const start = Math.max(slideTop, ...shared.filter(item => item.box.bottom <= Math.min(first.box.top, second.box.top) + 2).map(item => item.box.bottom));
+        const end = Math.min(...shared.filter(item => item.box.top >= Math.max(first.box.top, second.box.top) + 2).map(item => item.box.top));
+        const columnStart = column => blocks.filter(item => Math.abs(item.box.left - column.box.left) <= 2 && Math.abs(item.box.right - column.box.right) <= 2 && item.box.top >= start - 2 && item.box.top < end).sort((a, b) => a.first.lineTop - b.first.lineTop)[0].first;
+        const a = columnStart(first), b = columnStart(second);
+        const key = `${first.box.left}:${first.box.right}:${second.box.left}:${second.box.right}:${start}:${end}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        const leftTop = (a.image || b.image ? a.lineTop : a.top) - slideTop;
+        const rightTop = (a.image || b.image ? b.lineTop : b.top) - slideTop;
+        pairs.push({ slide: index + 1, leftText: a.text, rightText: b.text, leftTop, rightTop, difference: Math.abs(leftTop - rightTop) });
       }
     }
     return pairs;
@@ -297,7 +305,7 @@ function inspectColumns() {
 }
 
 function columnFindings(columns) {
-  return columns.filter(pair => !pair.imageLeading && !pair.centered && pair.difference > 2).map(pair => ({
+  return columns.filter(pair => pair.difference > 2).map(pair => ({
     slide: pair.slide,
     kind: 'column-alignment',
     text: `${pair.leftText} (${Math.round(pair.leftTop)}px) / ${pair.rightText} (${Math.round(pair.rightTop)}px)`,
@@ -787,8 +795,41 @@ async function main() {
       assert.deepEqual(columnFindings(await page.evaluate(inspectColumns)), []);
       await page.setContent('<section style="display:grid;grid-template-columns:1fr 1fr;width:500px;font:20px/20px monospace"><blockquote style="margin:0">Left column</blockquote><blockquote style="margin:0;align-self:center">Centered note</blockquote></section>');
       assert.deepEqual(columnFindings(await page.evaluate(inspectColumns)), []);
+      await page.evaluate(() => { document.querySelector('blockquote').style.height = '80px'; });
+      assert.equal(columnFindings(await page.evaluate(inspectColumns)).length, 1);
+      const picture = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="80" height="40"><rect width="80" height="40" fill="red"/></svg>');
+      await page.setContent(`<section style="display:grid;grid-template-columns:1fr 1fr;width:500px;font:20px/20px monospace"><blockquote style="margin:0;align-self:center"><img src="${picture}" alt="Figure" style="display:block;width:80px;height:40px"></blockquote><blockquote style="margin:0;height:100px">Right column</blockquote></section>`);
+      await page.evaluate(async () => { await document.querySelector('img').decode(); });
+      const centeredFigure = await page.evaluate(inspectColumns);
+      assert.ok(Math.abs(centeredFigure[0].difference - 30) <= 1);
+      assert.equal(columnFindings(centeredFigure).length, 1);
+      await page.evaluate(() => { document.querySelector('blockquote').style.alignSelf = 'start'; });
+      assert.deepEqual(columnFindings(await page.evaluate(inspectColumns)), []);
+      await page.evaluate(() => { Object.assign(document.querySelector('img').style, {height:'100px',objectFit:'contain'}); });
+      const containedFigure = await page.evaluate(inspectColumns);
+      assert.ok(Math.abs(containedFigure[0].difference - 30) <= 1);
+      assert.equal(columnFindings(containedFigure).length, 1);
+      await page.evaluate(() => { document.querySelector('img').style.objectPosition = '50% 0%'; });
+      assert.deepEqual(columnFindings(await page.evaluate(inspectColumns)), []);
+      await page.evaluate(() => { document.querySelector('img').style.objectPosition = '50% 30px'; });
+      assert.ok(Math.abs((await page.evaluate(inspectColumns))[0].difference - 30) <= 1);
+      await page.evaluate(() => { Object.assign(document.querySelector('img').style, {width:'160px',objectFit:'scale-down',objectPosition:'50% 50%'}); });
+      assert.equal(columnFindings(await page.evaluate(inspectColumns)).length, 1);
+      await page.evaluate(() => { document.querySelector('img').style.objectFit = 'contain'; });
+      assert.ok(Math.abs((await page.evaluate(inspectColumns))[0].difference - 10) <= 1);
+      await page.evaluate(() => { Object.assign(document.querySelector('img').style, {padding:'10px',border:'2px solid black'}); });
+      assert.ok(Math.abs((await page.evaluate(inspectColumns))[0].difference - 22) <= 1);
+      for (const className of ['first-slide', 'profile-slide', 'layout-example']) {
+        await page.evaluate(className => { document.querySelector('section').className = className; }, className);
+        assert.deepEqual(await page.evaluate(inspectColumns), []);
+      }
       await page.setContent('<section style="display:grid;grid-template-columns:1fr 1fr;width:500px;font:20px/30px monospace"><blockquote style="margin:0">Left heading</blockquote><blockquote style="margin:0">Right heading</blockquote></section>');
       assert.deepEqual(columnFindings(await page.evaluate(inspectColumns)), []);
+      await page.setContent('<section style="display:grid;grid-template-columns:1fr 1fr;width:500px;font:20px/30px monospace"><blockquote style="margin:0">First left</blockquote><blockquote style="margin:0">First right</blockquote><p style="grid-column:1 / -1;margin:0">Shared divider</p><blockquote style="margin:0">Second left<br>continues</blockquote><blockquote style="margin:10px 0 0">Second right</blockquote></section>');
+      const bands = await page.evaluate(inspectColumns);
+      assert.equal(bands.length, 2);
+      assert.equal(columnFindings(bands).length, 1);
+      assert.equal(columnFindings(bands)[0].text.startsWith('Second left'), true);
       await page.setContent('<section style="font:20px/30px monospace"><blockquote style="margin:0">One column</blockquote></section>');
       assert.deepEqual(await page.evaluate(inspectColumns), []);
       for (const text of ['関連レイヤーを見つける必要', '関連レイヤーを確認する必要']) {
