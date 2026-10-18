@@ -435,30 +435,27 @@ _[[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.T4)]: Table 4 の主
 <!-- _class: analysis-slide efficiency-slide content-slide-gray classification-public -->
 <!-- 発表目安 0:50 -->
 
-## 結果 2/2 **|** _MASON は 30%の主タスクデータでも全量 DF を上回る_
+## 結果 2/2 **|** _MASON は主タスク 30% で、全データを使う DF より高精度_
 
-> ![Figure 5: 訓練データ割合に対するDFとMASONのWeighted Accuracyと精度差](assets/beyond-atomic-datascale.svg)
+> ![Figure 5: 主タスクデータ割合に対するDFとMASONの重み付き精度と精度差](assets/beyond-atomic-datascale.svg)
 >
-> Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.F5.fig1)]: 訓練規模と精度\
-> 横軸: 主タスクの訓練データ割合（%）\
-> 左縦軸: Weighted Acc.（%）/ 右縦軸: 精度差（pt）\
+> Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.F5.fig1)]: 主タスクの訓練データ割合（横軸）、重み付き精度（左縦軸）、MASON と DF の精度差（右縦軸）\
 > 各訓練規模で MASON が DF を上回る
 
 > **使用データ量と関連要素の特定精度（%）**
 >
-> | Model     | 主タスク | Weighted Acc. | Average Acc. |
-> | :-------- | -------: | ------------: | -----------: |
-> | DF        |     100% |         88.80 |        84.30 |
-> | **MASON** |  **30%** |     **89.32** |    **86.12** |
-> | MASON     |     100% |         91.66 |        88.07 |
+> | モデル    | 主タスクデータ | 重み付き精度 |      平均 |
+> | :-------- | -------------: | -----------: | --------: |
+> | DF        |           100% |        88.80 |     84.30 |
+> | **MASON** |        **30%** |    **89.32** | **86.12** |
+> | MASON     |           100% |        91.66 |     88.07 |
 >
 > _[[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.T4)]: Table 4 を再構成_
 >
-> **「30%」は主タスクのみ**
+> **30% は主タスク QA データの割合**
 >
-> - MASON: 主タスク約 6K ＋\
->   別途、補助 QA 約 2K を追加
-> - DF: 主タスク約 20K
+> - MASON: 主タスク QA 約 6K ペア＋補助 Grounding QA 約 2K ペア
+> - DF: 主タスク QA 約 20K ペア
 
 **➜ 要素対応・構造関係の追加学習によって主タスクの必要データ量を削減**
 
