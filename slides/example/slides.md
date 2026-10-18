@@ -597,15 +597,16 @@ _[[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.T5)]: Table 5 の主
 
 > ![Figure 1(e): 見た目と関連レイヤーを理解するデザイン支援の例](assets/beyond-atomic-fig1e.png)
 >
-> Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S0.F1.sf5)]: 見た目と関連レイヤーを扱うデザイン支援
+> Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S0.F1.sf5)]: 関連レイヤーの一括編集
 
 > - **課題**: 複数レイヤーが協調するデザインでは、独立要素の位置認識だけでは不十分
 > - **CoDeLayout**: 約 20K 件のデザインで関連要素ペアとデザイン意図を評価
-> - **MASON**: MA の視覚的対応付けと\
->   SP のレイヤー関係で追加学習
+> - **MASON**: 見た目の対応付け（MA）とレイヤー間の関係（SP）で追加学習
 > - **残る論点**: Morphing の難しさ・推論時に必要な正確なメタデータ
 
-**同一 Qwen2.5-VL 7B: DF 88.80% → MASON 91.66%（+2.86 pt）**
+**同一 Qwen2.5-VL 7B・主タスク全データで比較**\
+重み付き精度: DF **88.80%** → MASON **91.66%**（+2.86 pt）\
+MASON は主タスク QA に加え、補助 QA と構造情報を利用
 
 ---
 
