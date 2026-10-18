@@ -275,6 +275,59 @@ function columnFindings(columns) {
   }));
 }
 
+function inspectBodyFill() {
+  const bottomOf = elements => Math.max(-Infinity, ...elements.flatMap(element => {
+    const images = [...element.querySelectorAll('img,mjx-container'), ...(element.matches('img,mjx-container') ? [element] : [])];
+    const bottoms = images.map(el => el.getBoundingClientRect()).filter(r => r.width && r.height).map(r => r.bottom);
+    const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+    while (walker.nextNode()) {
+      if (!walker.currentNode.textContent.trim()) continue;
+      const range = document.createRange();
+      range.selectNodeContents(walker.currentNode);
+      bottoms.push(...[...range.getClientRects()].filter(r => r.width && r.height).map(r => r.bottom));
+    }
+    return bottoms;
+  }));
+  return [...document.querySelectorAll('section')].flatMap((slide, index) => {
+    const heading = slide.querySelector(':scope > h2');
+    if (!heading) return [];
+    const bounds = slide.getBoundingClientRect();
+    const top = heading.getBoundingClientRect().bottom;
+    const bottom = bounds.bottom - (parseFloat(getComputedStyle(slide).paddingBottom) || 0);
+    const excluded = slide.matches('.first-slide,.lead,.takahashi,.title-slide-big,.layout-example');
+    const children = [...slide.children].filter(el => !el.matches('h1,h2,header,footer,.pagination,.page-number,.classification,.classification-badge,.background-decoration'));
+    const region = (scope, elements, start, end, limit) => {
+      const contentBottom = Math.max(start, bottomOf(elements));
+      return { slide: index + 1, scope, text: elements.map(el => el.textContent.trim() || el.getAttribute('alt') || '').join(' ').slice(0, 120), top: start - bounds.top, bottom: end - bounds.top, contentBottom: contentBottom - bounds.top, used: end > start ? (contentBottom - start) / (end - start) : 1, limit, excluded };
+    };
+    const regions = [region('body', children, top, bottom, 0.75)];
+    if (excluded) return regions;
+    const boxes = children.map(element => ({ element, box: element.getBoundingClientRect() })).filter(({ element, box }) => box.width && box.height && box.top >= top && (element.textContent.trim() || element.querySelector('img,mjx-container')));
+    const seen = new Set();
+    for (let i = 0; i < boxes.length; i++) {
+      for (const other of boxes.slice(i + 1)) {
+        const item = boxes[i];
+        if (Math.min(item.box.bottom, other.box.bottom) <= Math.max(item.box.top, other.box.top) || Math.min(item.box.right, other.box.right) > Math.max(item.box.left, other.box.left)) continue;
+        const shared = boxes.filter(candidate => candidate.box.left <= Math.min(item.box.left, other.box.left) + 2 && candidate.box.right >= Math.max(item.box.right, other.box.right) - 2);
+        const start = Math.max(top, ...shared.filter(candidate => candidate.box.bottom <= Math.min(item.box.top, other.box.top) + 2).map(candidate => candidate.box.bottom));
+        const end = Math.min(bottom, ...shared.filter(candidate => candidate.box.top >= Math.max(item.box.top, other.box.top) + 2).map(candidate => candidate.box.top));
+        for (const column of [item, other]) {
+          const key = `${Math.round(column.box.left)}:${Math.round(column.box.right)}:${start}:${end}`;
+          if (seen.has(key)) continue;
+          seen.add(key);
+          const elements = boxes.filter(candidate => Math.abs(candidate.box.left - column.box.left) <= 2 && Math.abs(candidate.box.right - column.box.right) <= 2 && candidate.box.top >= start - 2 && candidate.box.top < end).map(candidate => candidate.element);
+          regions.push(region('column', elements, start, end, 0.6));
+        }
+      }
+    }
+    return regions;
+  });
+}
+
+function bodyFillFindings(regions) {
+  return regions.filter(region => !region.excluded && region.used < region.limit).map(region => ({ ...region, kind: 'sparse-body', text: `${region.scope}: content reaches ${Math.round(region.used * 100)}% of the available height (minimum ${Math.round(region.limit * 100)}%); ${region.text}` }));
+}
+
 function inspectStructure() {
   return [...document.querySelectorAll('section')].flatMap((slide, index) => {
     const findings = [];
@@ -392,21 +445,6 @@ function inspectStructure() {
         if (box.width && box.height && bodyBottom >= footerTop)
           findings.push({ slide: index + 1, kind: 'footer-overflow', text: `${block.textContent.trim() || block.getAttribute('alt') || ''} (body bottom ${Math.round(bodyBottom)}px, footer top ${Math.round(footerTop)}px)`, bodyBottom, footerTop });
       }
-    }
-    const heading = slide.querySelector(':scope > h2');
-    if (heading && !slide.matches('.first-slide,.lead,.takahashi,.title-slide-big,.layout-example')) {
-      const top = heading.getBoundingClientRect().bottom;
-      const bottom = bounds.bottom - (parseFloat(getComputedStyle(slide).paddingBottom) || 0);
-      const occupied = [...slide.querySelectorAll('p,li,td,th,img')].flatMap(el => {
-        if (el.closest('header,footer')) return [];
-        const range = document.createRange();
-        range.selectNodeContents(el);
-        return [...range.getClientRects(), ...(el.matches('img') ? [el.getBoundingClientRect()] : [])]
-          .filter(r => r.width && r.height && r.top >= top).map(r => r.bottom);
-      });
-      const used = (Math.max(top, ...occupied) - top) / (bottom - top);
-      if (bottom > top && used < 0.6)
-        findings.push({ slide: index + 1, kind: 'sparse-body', text: `Content reaches only ${Math.round(used * 100)}% of the body height; redesign the page.` });
     }
     const textRuns = [];
     const textBlocks = 'h1,h2,h3,h4,h5,h6,p,li,figcaption,td,th,header,footer';
@@ -725,14 +763,38 @@ async function main() {
         assert.equal((await page.evaluate(inspectStructure)).some(f => f.kind === 'figure-caption-missing'), true);
       }
       await page.setContent('<section style="width:1280px;height:720px;padding-bottom:48px"><h2>比較</h2><p>文書・画面理解</p><p>デザイン生成</p><p id="last">本研究</p></section>');
-      assert.equal((await page.evaluate(inspectStructure)).some(f => f.kind === 'sparse-body'), true);
+      assert.ok(bodyFillFindings(await page.evaluate(inspectBodyFill)).length);
       // A tall empty wrapper must not disguise sparse text.
       await page.addStyleTag({ content: 'p {height:100px}' });
-      assert.equal((await page.evaluate(inspectStructure)).some(f => f.kind === 'sparse-body'), true);
-      await page.addStyleTag({ content: '#last {margin-top:200px}' });
-      assert.equal((await page.evaluate(inspectStructure)).some(f => f.kind === 'sparse-body'), false);
+      assert.ok(bodyFillFindings(await page.evaluate(inspectBodyFill)).length);
+      await page.addStyleTag({ content: '#last {margin-top:300px}' });
+      assert.deepEqual(bodyFillFindings(await page.evaluate(inspectBodyFill)), []);
       await page.setContent('<section class="layout-example" style="height:720px"><h2>背景の見本</h2><p>クラス名</p></section>');
-      assert.equal((await page.evaluate(inspectStructure)).some(f => f.kind === 'sparse-body'), false);
+      assert.deepEqual(bodyFillFindings(await page.evaluate(inspectBodyFill)), []);
+      for (const className of ['first-slide', 'lead', 'takahashi', 'title-slide-big']) {
+        await page.setContent(`<section class="${className}" style="height:720px"><h2>Title</h2><p>Short</p></section>`);
+        assert.deepEqual(bodyFillFindings(await page.evaluate(inspectBodyFill)), []);
+      }
+      await page.setContent('<section style="position:relative;width:1000px;height:700px;font:20px/20px monospace"><h2 style="height:50px;margin:0">Comparison</h2><blockquote style="position:absolute;left:0;top:60px;width:400px;height:600px;margin:0"><p style="margin:500px 0 0">Tall figure caption</p></blockquote><blockquote style="position:absolute;left:500px;top:60px;width:400px;height:600px;margin:0"><p style="margin:0">Short text</p></blockquote></section>');
+      const emptyColumn = bodyFillFindings(await page.evaluate(inspectBodyFill));
+      assert.equal(emptyColumn.length, 1);
+      assert.equal(emptyColumn[0].scope, 'column');
+      assert.ok(emptyColumn[0].text.includes('Short text'));
+      await page.evaluate(() => { document.querySelectorAll('blockquote p')[1].style.marginTop = '500px'; });
+      assert.deepEqual(bodyFillFindings(await page.evaluate(inspectBodyFill)), []);
+      await page.setContent('<section style="position:relative;width:1000px;height:700px;font:20px/20px monospace"><h2 style="height:50px;margin:0">Shared formula below columns</h2><blockquote style="position:absolute;left:0;top:60px;width:400px;height:200px;margin:0"><p style="margin:150px 0 0">Left</p></blockquote><blockquote style="position:absolute;left:500px;top:60px;width:400px;height:200px;margin:0"><p style="margin:150px 0 0">Right</p></blockquote><p style="position:absolute;left:0;top:300px;width:1000px;margin:0"><mjx-container style="display:block;width:1000px;height:300px"></mjx-container></p></section>');
+      const sharedFormula = await page.evaluate(inspectBodyFill);
+      assert.equal(sharedFormula.filter(r => r.scope === 'column').length, 2);
+      assert.ok(sharedFormula.filter(r => r.scope === 'column').every(r => r.bottom === 300));
+      assert.deepEqual(bodyFillFindings(sharedFormula), []);
+      await page.setContent('<section style="position:relative;width:1000px;height:700px;font:20px/20px monospace"><h2 style="height:50px;margin:0">Stacked left column</h2><blockquote style="position:absolute;left:0;top:60px;width:400px;height:200px;margin:0"><p style="margin:0">Figure above</p></blockquote><blockquote style="position:absolute;left:0;top:300px;width:400px;height:300px;margin:0"><p style="margin:250px 0 0">Explanation below</p></blockquote><blockquote style="position:absolute;left:500px;top:60px;width:400px;height:600px;margin:0"><p style="margin:500px 0 0">Right column</p></blockquote></section>');
+      const stackedColumn = await page.evaluate(inspectBodyFill);
+      assert.equal(stackedColumn.filter(r => r.scope === 'column').length, 2);
+      assert.deepEqual(bodyFillFindings(stackedColumn), []);
+      await page.setContent('<section style="position:relative;height:700px;font:20px/20px monospace"><h2 style="height:50px;margin:0">Background</h2><p style="position:absolute;top:480px;margin:0">Content at 69 percent</p></section>');
+      assert.equal(bodyFillFindings(await page.evaluate(inspectBodyFill))[0].scope, 'body');
+      await page.evaluate(() => { document.querySelector('p').style.top = '550px'; });
+      assert.deepEqual(bodyFillFindings(await page.evaluate(inspectBodyFill)), []);
       await page.setContent('<section style="width:300px;height:100px"><blockquote style="height:160px">枠のはみ出し</blockquote></section>');
       assert.equal((await page.evaluate(inspectStructure)).some(f => f.kind === 'box-overflow'), true);
       await page.setContent('<section style="position:relative;width:300px;height:120px;padding-bottom:20px"><p style="position:absolute;top:105px;margin:0"><mjx-container class="MathJax" display="true" style="display:block;height:30px"></mjx-container></p></section>');
@@ -795,10 +857,11 @@ async function main() {
       const terms = fs.existsSync(termsPath) ? JSON.parse(fs.readFileSync(termsPath, 'utf8')) : {};
       const columns = await page.evaluate(inspectColumns);
       const groupGaps = await page.evaluate(inspectGroupGaps);
-      const structure = [...await page.evaluate(inspectStructure), ...await page.evaluate(inspectTypography), ...await page.evaluate(inspectTerms, terms), ...await page.evaluate(inspectMidwordWraps), ...titleFindings, ...headingFindings, ...columnFindings(columns), ...groupGapFindings(groupGaps)];
+      const bodyFill = await page.evaluate(inspectBodyFill);
+      const structure = [...await page.evaluate(inspectStructure), ...await page.evaluate(inspectTypography), ...await page.evaluate(inspectTerms, terms), ...await page.evaluate(inspectMidwordWraps), ...titleFindings, ...headingFindings, ...columnFindings(columns), ...groupGapFindings(groupGaps), ...bodyFillFindings(bodyFill)];
       structuralErrors += structure.length + candidates.length;
       candidateCount += candidates.length + structure.length;
-      fs.writeFileSync(path.join(output, 'lines.json'), JSON.stringify({ input, browser: await browser.version(), blocks, columnPairs: columns, groupGaps, structure }, null, 2));
+      fs.writeFileSync(path.join(output, 'lines.json'), JSON.stringify({ input, browser: await browser.version(), blocks, columnPairs: columns, groupGaps, bodyFill, structure }, null, 2));
       await page.evaluate(() => document.querySelectorAll('.debug-layout').forEach(e => e.classList.remove('debug-layout')));
       const sections = await page.$$('section');
       if (!sections.length) throw new Error(`No slides rendered: ${input}`);
