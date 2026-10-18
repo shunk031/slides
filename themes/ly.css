@@ -168,6 +168,8 @@ section:not(.first-slide, .lead, .takahashi, .title-slide-big) {
 
 section :is(p, li) > strong { font-size: inherit; }
 
+section table { font-size: var(--nested-list-font-size); }
+
 section:not(.first-slide, .lead, .takahashi) > h2 {
   font-size: var(--heading-font-size);
 }
@@ -755,7 +757,6 @@ section.sp-slide th:nth-child(3) { width: 36%; }
 section:is(.dataset-slide, .sp-slide) table {
   width: 100%;
   margin: var(--content-gap) 0;
-  font-size: var(--body-font-size);
 }
 section:is(.dataset-slide, .sp-slide) :is(th, td) { padding: var(--dataset-table-padding); }
 
@@ -861,7 +862,6 @@ section.results-slide table {
   --results-cell-padding: 1px 12px;
   width: 100%;
   margin: 0;
-  font-size: var(--body-font-size);
   line-height: var(--list-line-height);
 }
 section.results-slide :is(th, td) { padding: var(--results-cell-padding); }
@@ -872,7 +872,7 @@ section.efficiency-slide {
   --efficiency-cell-padding: 4px 8px;
 }
 section.efficiency-slide img { width: 100%; height: var(--efficiency-figure-height); object-fit: contain; }
-section.efficiency-slide table { width: 100%; margin: 0; font-size: var(--body-font-size); line-height: var(--list-line-height); }
+section.efficiency-slide table { width: 100%; margin: 0; line-height: var(--list-line-height); }
 section.efficiency-slide :is(th, td) { padding: var(--efficiency-cell-padding); }
 section.efficiency-slide > blockquote > p:has(> em > a) { text-align: center; }
 section.qualitative-slide {
