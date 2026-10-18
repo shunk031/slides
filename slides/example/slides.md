@@ -188,7 +188,7 @@ Multimodal Alignment and Structural perceptiON
 > **入力: 完成画像 + 各レイヤーのメタデータ**
 >
 > $$
-> \mathcal{L}=(\underbrace{\colorbox{#E2F0D9}{$\mathcal{I}$}}_{\mathclap{\text{完成画像}}},\quad\underbrace{\colorbox{#DBEAFE}{$\mathcal{M}$}}_{\mathclap{\text{メタデータ}}}),\,
+> \mathcal{L}=(\underbrace{\colorbox{#E2F0D9}{$\vphantom{\mathcal{IM}}\mathcal{I}$}}_{\mathclap{\text{完成画像}}},\quad\underbrace{\colorbox{#DBEAFE}{$\vphantom{\mathcal{IM}}\mathcal{M}$}}_{\mathclap{\text{メタデータ}}}),\,
 > \mathcal{M}=\{\mathcal{M}_{e_1},\ldots,\mathcal{M}_{e_n}\}
 > $$
 >
