@@ -73,11 +73,13 @@ _Project page: [hukcc.github.io/Beyond-Atomic-Layouts/](https://hukcc.github.io/
 
 > ![Figure 1(e): 関連レイヤーを理解する design assistant の例](assets/beyond-atomic-fig1e.png)
 >
-> **Figure 1(e)** デザイン支援の例 _[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S0.F1.sf5)_
+> Figure from [[Huang+ ECCV’26]](https://arxiv.org/html/2608.26716v1#S0.F1.sf5): デザイン支援の例
 
 > **デザインを「作る」だけでなく「意図どおりに直す」ことが難しい**
 >
-> - 文字を人物の背後に差し込む、文字の一部を図形へ置き換えるなど、複数のレイヤーで 1 つの視覚効果を表現
+> - 文字を人物の背後に差し込む、\
+>   文字の一部を図形へ置き換えるなど、\
+>   複数のレイヤーで 1 つの視覚効果を表現
 >   - 関連レイヤーをまとめて特定してから編集
 > - 画像として見えている領域と、編集すべきレイヤーの単位が一致しない場合がある _[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S1)_
 >
@@ -98,7 +100,7 @@ _Project page: [hukcc.github.io/Beyond-Atomic-Layouts/](https://hukcc.github.io/
 
 > ![Figure 1(a): Clipping](assets/beyond-atomic-clipping.png)
 >
-> **(a) Clipping**: 元画像の切り抜きを前面に置き、間に別要素を挿入
+> **(a) Clipping**: 切り抜きを前面に置き、間に別要素を挿入
 
 > ![Figure 1(b): Blending](assets/beyond-atomic-blending.png)
 >
@@ -112,13 +114,43 @@ _Project page: [hukcc.github.io/Beyond-Atomic-Layouts/](https://hukcc.github.io/
 >
 > **(d) Morphing**: 文字の一部を図形・画像へ置換
 
+Figure from [[Huang+ ECCV’26]](https://arxiv.org/html/2608.26716v1#S0.F1)
+
 **既存研究との違い**
 
 - **文書・画面理解**: LayoutLMv3 _[Huang+ MM’22](https://arxiv.org/html/2608.26716v1#bib.bib17)_ / ScreenQA _[Hsiao+ NAACL’25](https://arxiv.org/html/2608.26716v1#bib.bib24)_ は、主に個別要素を理解
 - **デザイン生成**: COLE _[Jia+ arXiv’23](https://arxiv.org/html/2608.26716v1#bib.bib30)_ / ART _[Pu+ CVPR’25](https://arxiv.org/html/2608.26716v1#bib.bib31)_ は、複数レイヤーからなる編集可能なデザインを生成
 - **本研究**: どのレイヤー同士が結びつき、どのデザイン意図を実現しているかを問う
 
-出典: [Huang+ ECCV’26, Sec. 1–2, Fig. 1(a–d), Table 1](https://arxiv.org/html/2608.26716v1#S0.F1)
+---
+
+<!-- _class: problem-slide content-slide-gray classification-public debug-layout -->
+<!-- 発表目安 1:00 -->
+
+## 問題設定 **|** _指定レイヤーと合成関係にある要素を特定・意図を説明_
+
+> ![Figure 2: 完成画像・レイヤーのメタデータ・質問・回答の対応](assets/beyond-atomic-fig2.png)
+>
+> Figure from [[Huang+ ECCV’26]](https://arxiv.org/html/2608.26716v1#S3.F2): 画像・メタデータ・質問・回答の対応
+
+> **入力: 完成画像 + 各レイヤーのメタデータ**
+>
+> $$
+> \mathcal{L}=(\mathcal{I},\mathcal{M}),\quad
+> \mathcal{M}=\{\mathcal{M}_{e_1},\ldots,\mathcal{M}_{e_n}\}
+> $$
+>
+> - $\mathcal{I}$: すべてのレイヤーを合成した完成画像
+> - $\mathcal{M}_{e_i}$: 要素識別子（ID）・種類・位置・\
+>   不透明度・重なり順などの属性
+> - 質問 $Q(e^q)$: 注目する要素 $e^q$ を指定
+
+> **出力: 関連要素の ID とデザイン意図**
+>
+> - 対応する要素 $e^{comp}$ を同定
+> - 2 つの要素が構成する視覚効果を自然言語で説明
+> - 単純な重なり・距離ではなく、\
+>   合成関係の認識が目的
 
 ---
 

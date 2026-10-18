@@ -49,6 +49,8 @@ Chrome で実際に描画し、フォントと画像の読み込み後に各行�
 引用リンク内に複数の `Author+` 表記がある場合と、文字が本文ボックス・スライド外へ出る場合はエラーにします。画像より広いグリッドのキャプションは、そのキャプション自身のボックスで検査します。
 隣り合う本文の段落・リスト間に、指定マージンに加えて 1 行分を超える空白がある場合も確認候補にします。図のキャプション間隔はこの検査の対象外です。
 `mise run pdf` はこの検査を先に実行します。引用の意味上の対応、要素同士の重なり、画像内部の文字は自動判定できないため、原典と画像の確認が必要です。
+同じ資料の本文ページ間で、見出し・説明見出し・本文・入れ子・図キャプション・図の出典・引用・情報区分・ページ番号の実際の文字サイズを比較し、不一致をエラーにします。表紙・高橋メソッドのページやプロフィールの人名・連絡先は別の役割として対象外です。
+引用図のブロックには `Figure from [引用]`（任意で `: 説明`）を要求します。複数パネルの図では共通の出典行も使えます。出典行と最も近い図の距離が出典の 2 行分を超える場合、および `出典:` / `Source:` の独立行はエラーにします。プロフィールの写真・サムネイルは引用図として扱いません。
 フォント・画像の読み込み失敗や実行エラーは非ゼロで終了します。Google Chrome の位置は必要に応じて `CHROME_PATH` で指定できます。
 Marp CLI に同梱された Puppeteer を使うため、追加インストールは不要です。Marp 更新時は `mise run test-layout` で検査自体も確認します。
 
@@ -128,9 +130,20 @@ CSS の `grid-template-areas` では、それぞれを `paper-title`・`authors`
 
 ### 引用を小さく表示する
 
-段落や箇条書きでは、`_[Author+ ConfName'YY](URL)_` のようにリンクを `_` で囲むと、斜体にせず周囲の文字サイズの 75% で表示します。比率は `--citation-font-size` で調整できます。通常のリンクは元のサイズのままです。
+段落や箇条書きでは、`_[Author+ ConfName'YY](URL)_` のようにリンクを `_` で囲むと、斜体にせず共通の 18px で表示します。`--citation-font-size` で調整できます。通常のリンクは元のサイズのままです。
 
 複数研究を並べる例: `LayoutLMv3 _[Huang+ MM’22](文献URL)_ / ScreenQA _[Hsiao+ NAACL’25](文献URL)_`。リンク先はそれぞれの論文または対応する参考文献項目です。
+
+### 図とキャプション
+
+```markdown
+> ![Figure 2: 入出力の対応](assets/figure.png)
+>
+> Figure from [[Huang+ ECCV’26]](https://arxiv.org/html/2608.26716v1#S3.F2): 画像・メタデータ・質問・回答の対応
+```
+
+内側の角括弧は表示用です。図の出典・説明は共通の `--figure-caption-font-size`（20px）で中央揃えにします。本文は `--body-font-size`（24px）、入れ子はその 90%を使います。
+図の出典表記は [既存資料の 15 ページ](https://speakerdeck.com/shunk031/from-fragment-to-one-piece-a-survey-on-ai-driven-graphic-design?slide=15)・[30 ページ](https://speakerdeck.com/shunk031/from-fragment-to-one-piece-a-survey-on-ai-driven-graphic-design?slide=30)の `Figure from [引用]` を基にしています。
 
 ### 情報分類を表示する
 

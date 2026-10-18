@@ -29,13 +29,13 @@
   --classification-font-size: 11px;
   --classification-letter-spacing: 0;
   --classification-font-weight: 400;
-  --pagination-font-size: 50%;
+  --pagination-font-size: 14px;
   --footer-bottom: 24px;
   --footer-font-size: 10px;
   --footer-line-height: 1.3;
 
   /* Body slides */
-  --body-font-size: 28px;
+  --body-font-size: 24px;
   --body-line-height: 1.45;
   --heading-font-size: 48px;
   --heading-description-ratio: calc(15 / 28);
@@ -44,8 +44,9 @@
   --heading-separator-width: 4px;
   --heading-separator-height: calc(var(--heading-font-size) * 0.9);
   --list-indent: 1.6em;
-  --nested-list-font-size: 0.9em;
-  --citation-font-size: 0.75em;
+  --nested-list-font-size: calc(var(--body-font-size) * 0.9);
+  --citation-font-size: 18px;
+  --figure-caption-font-size: 20px;
 
   padding: var(--slide-padding-block) var(--slide-padding);
   font-family: var(--slide-font-family);
@@ -159,6 +160,8 @@ section:not(.first-slide, .lead, .takahashi, .title-slide-big) {
   font-size: var(--body-font-size);
   line-height: var(--body-line-height);
 }
+
+section :is(p, li) > strong { font-size: inherit; }
 
 section:not(.first-slide, .lead, .takahashi) > h2 {
   font-size: var(--heading-font-size);
@@ -372,8 +375,6 @@ section.profile-slide {
   --profile-sidebar-width: 320px;
   --profile-column-gap: 28px;
   --profile-section-gap: 22px;
-  --profile-font-size: 27px;
-  --profile-detail-font-size: 22px;
   --profile-name-ratio: 0.68;
   --profile-line-height: 1.35;
   --profile-link-font-size: 17px;
@@ -414,7 +415,7 @@ section.profile-slide > blockquote {
   padding: 0;
   border: 0;
   color: var(--color-text);
-  font-size: var(--profile-font-size);
+  font-size: var(--body-font-size);
   line-height: var(--profile-line-height);
 }
 
@@ -442,7 +443,7 @@ section.profile-slide > blockquote > ul:first-of-type > li + li {
 }
 
 section.profile-slide blockquote ul ul {
-  font-size: var(--profile-detail-font-size);
+  font-size: var(--nested-list-font-size);
 }
 
 section.profile-slide blockquote li:has(> strong) {
@@ -455,7 +456,7 @@ section.profile-slide blockquote li > ul {
 
 section.profile-slide > blockquote:nth-of-type(2) {
   grid-area: sidebar;
-  font-size: var(--profile-detail-font-size);
+  font-size: var(--nested-list-font-size);
 }
 
 section.profile-slide > blockquote:nth-of-type(2) > p:nth-child(-n + 2) {
@@ -509,8 +510,6 @@ section.profile-slide > blockquote:nth-of-type(2) > p:nth-child(n + 3) img {
 /* Float the source figure so the rationale can continue beneath it. */
 section.selection-slide {
   --selection-figure-width: 600px;
-  --selection-font-size: 24px;
-  --selection-caption-font-size: 20px;
   display: block;
   letter-spacing: 0;
 }
@@ -523,7 +522,7 @@ section.selection-slide > blockquote {
   padding: 0;
   border: 0;
   color: var(--color-text);
-  font-size: var(--selection-font-size);
+  font-size: var(--body-font-size);
   line-height: var(--body-line-height);
 }
 section.selection-slide > h2 + blockquote { margin-top: 0; }
@@ -538,7 +537,7 @@ section.selection-slide > blockquote:first-of-type {
   float: right;
   width: var(--selection-figure-width);
   margin: 0 0 0 var(--content-gap);
-  font-size: var(--selection-caption-font-size);
+  font-size: var(--figure-caption-font-size);
 }
 section.selection-slide > blockquote img { width: 100%; height: auto; }
 section.selection-slide > blockquote:first-of-type > p:last-child { margin-bottom: 0; }
@@ -548,8 +547,6 @@ section > blockquote:has(> p > img) > p { text-align: center; }
 
 section.background-slide {
   --background-figure-height: 120px;
-  --background-font-size: 24px;
-  --background-caption-font-size: 18px;
   --content-gap: 8px;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -562,14 +559,14 @@ section.background-slide > :is(h2, p, ul) {
   grid-column: 1 / -1;
   margin: 0;
 }
-section.background-slide > :is(p, ul) { font-size: var(--background-font-size); }
+section.background-slide > :is(p, ul) { font-size: var(--body-font-size); }
 section.background-slide > h2 + p { margin-top: 0; }
 section.background-slide > blockquote {
   margin: 0;
   padding: 0;
   border: 0;
   color: var(--color-text);
-  font-size: var(--background-caption-font-size);
+  font-size: var(--figure-caption-font-size);
   line-height: var(--body-line-height);
 }
 section.background-slide > blockquote::before,
@@ -580,9 +577,46 @@ section.background-slide img {
   width: auto;
   max-width: 100%;
 }
-section.background-slide > p:last-of-type {
+section.background-slide > p:has(> a) {
   text-align: center;
-  font-size: var(--background-caption-font-size);
+  font-size: var(--figure-caption-font-size);
+}
+
+section.problem-slide {
+  --problem-figure-height: 220px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--content-gap);
+  align-content: start;
+  letter-spacing: 0;
+}
+section.problem-slide::before,
+section.problem-slide > :is(h2, p),
+section.problem-slide > blockquote:first-of-type {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+section.problem-slide > blockquote {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: var(--color-text);
+  font-size: var(--body-font-size);
+  line-height: var(--body-line-height);
+}
+section.problem-slide > blockquote::before,
+section.problem-slide > blockquote::after { content: none; }
+section.problem-slide > blockquote > p { margin: 0 0 var(--content-gap); }
+section.problem-slide > blockquote:first-of-type > p { margin: 0; }
+section.problem-slide > blockquote:first-of-type {
+  text-align: center;
+  font-size: var(--figure-caption-font-size);
+}
+section.problem-slide img {
+  height: var(--problem-figure-height);
+  max-width: 100%;
+  object-fit: contain;
 }
 
 /* Opt-in layout diagnostics */
