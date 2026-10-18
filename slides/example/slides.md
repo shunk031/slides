@@ -10,7 +10,10 @@ paginate: true
 _paginate: false
 ---
 
-# _Beyond Atomic Layouts: Compositional Design Understanding with Vision‑Language Models_
+_Beyond Atomic Layouts:\
+Compositional Design Understanding\
+with Vision‑Language Models_
+===
 
 _Yiyang Huang¹˒²\*, Zhaowen Wang²†, Simon Jenni², Jing Shi²,
 Yitian Zhang¹, Yizhou Wang¹, and Yun Fu¹_
