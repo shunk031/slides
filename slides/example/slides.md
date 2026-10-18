@@ -127,29 +127,24 @@ Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S0.F1)]: Com
 ---
 
 <!-- _class: content-slide-gray classification-public -->
-<!-- 発表目安 1:25 -->
+<!-- 発表目安 0:55。代表研究のみ口頭説明、全研究名を読み上げない -->
 
-## 関連研究 **|** _個別要素の理解と複数レイヤーの生成は進展・合成関係の理解は未整備_
+## 関連研究 **|** _個別要素の理解・レイヤー生成だけでは、合成関係を説明できない_
 
-**文書・画面の理解: 個別要素の認識・質問応答が中心**
+- **レイアウトの理解: 個別要素の位置・意味を認識**
+  - LayoutLMv3 _[[Huang+ MM’22](https://arxiv.org/abs/2204.08387)]_: 文書の文字・画像・位置を統合
+  - ScreenQA _[[Hsiao+ NAACL’25](https://arxiv.org/abs/2209.08199)]_ / CogAgent _[[Hong+ CVPR’24](https://openaccess.thecvf.com/content/CVPR2024/html/Hong_CogAgent_A_Visual_Language_Model_for_GUI_Agents_CVPR_2024_paper.html)]_:\
+    画面の質問応答や操作対象の認識
+  - InfographicVQA _[[Mathew+ WACV’22](https://openaccess.thecvf.com/content/WACV2022/html/Mathew_InfographicVQA_WACV_2022_paper.html)]_: 図表と文字を組み合わせた意味理解を評価
+- **デザインの生成: 要素の配置・編集可能なレイヤーを出力**
+  - LayoutDM _[[Inoue+ CVPR’23](https://openaccess.thecvf.com/content/CVPR2023/html/Inoue_LayoutDM_Discrete_Diffusion_Model_for_Controllable_Layout_Generation_CVPR_2023_paper.html)]_: 要素の位置・種類を生成
+  - COLE _[[Jia+ arXiv’23](https://arxiv.org/abs/2311.16974)]_ / ART _[[Pu+ CVPR’25](https://openaccess.thecvf.com/content/CVPR2025/html/Pu_ART_Anonymous_Region_Transformer_for_Variable_Multi-Layer_Transparent_Image_Generation_CVPR_2025_paper.html)]_: 複数レイヤーからなるデザインを生成
+- **本論文との差分**
+  - PubLayNet _[[Zhong+ ICDAR’19](https://arxiv.org/abs/1908.07836)]_ / DocLayNet _[[Pfitzmann+ arXiv’22](https://arxiv.org/abs/2206.01062)]_ は個別領域、\
+    Crello _[[Suzuki+ ICCV’25](https://openaccess.thecvf.com/content/ICCV2025/html/Suzuki_LayerD_Decomposing_Raster_Graphic_Designs_into_Layers_ICCV_2025_paper.html)]_ / MLTD _[[Pu+ CVPR’25](https://openaccess.thecvf.com/content/CVPR2025/html/Pu_ART_Anonymous_Region_Transformer_for_Variable_Multi-Layer_Transparent_Image_Generation_CVPR_2025_paper.html)]_ はレイヤー構造を提供
+    - 合成要素ペアとデザイン意図の明示的注釈はない _[[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S3.T1)]_
 
-- LayoutLMv3 _[[Huang+ MM’22](https://arxiv.org/abs/2204.08387)]_: テキスト・画像・2 次元位置を統合し、文書の領域や内容を理解
-  - 文書レイアウト解析や文書への質問応答を対象・編集レイヤーの合成関係は対象外
-- ScreenQA _[[Hsiao+ NAACL’25](https://arxiv.org/abs/2209.08199)]_: モバイルアプリ画面への質問応答と、回答箇所の特定を扱う
-  - 画面内の個別要素を扱う・複数レイヤーが作る視覚効果の意図は問わない
-
-**グラフィックデザインの生成: 複数レイヤーを扱うが関係の注釈はない**
-
-- COLE _[[Jia+ arXiv’23](https://arxiv.org/abs/2311.16974)]_: デザイン意図を分解し、レイアウト計画とレイヤー単位の生成を組み合わせる
-  - 編集可能な複数レイヤーの生成が目的
-- Anonymous Region Transformer (ART) _[[Pu+ CVPR’25](https://openaccess.thecvf.com/content/CVPR2025/html/Pu_ART_Anonymous_Region_Transformer_for_Variable_Multi-Layer_Transparent_Image_Generation_CVPR_2025_paper.html)]_: 領域配置とテキスト指示から透明レイヤーを生成
-  - 可変レイヤー数に対応・50 層以上の生成も扱う
-
-**本論文との違い**
-
-- 既存の理解系: Atomic な要素の認識が中心
-- 既存の生成系: レイヤー構造はあるが、どの要素同士が、何の意図で組み合わされるかは明示的に注釈されない
-- CoDeLayout _[[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S3.T1)]_: 合成関係にある要素ペアとデザイン意図を質問応答として注釈
+<!-- Table 1 は比較の典拠として参照。大きな表画像は1枚に併置しない -->
 
 ---
 
