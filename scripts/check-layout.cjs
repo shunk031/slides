@@ -626,7 +626,8 @@ async function main() {
     for (const input of files) {
       const relative = path.relative(path.resolve('slides'), path.dirname(path.resolve(input)));
       if (relative.startsWith('..') || path.isAbsolute(relative)) throw new Error('Input must be under slides/');
-      const output = path.resolve('dist', relative, `${path.parse(input).name}-review`);
+      // LAYOUT_OUT lets parallel editors render into separate directories.
+      const output = path.resolve(process.env.LAYOUT_OUT ?? 'dist', relative, `${path.parse(input).name}-review`);
       fs.mkdirSync(output, { recursive: true });
       const html = execFileSync('marp', ['--template', 'bare', input, '-o', '-'], { encoding: 'utf8', maxBuffer: 20 * 1024 * 1024 });
       // Resolve assets exactly as in the input Markdown, not relative to dist/.
