@@ -552,7 +552,7 @@ section.profile-slide > blockquote:nth-of-type(2) > p:nth-child(n + 3) img {
 
 /* Explain the example beside the figure, then give the reading questions full width. */
 section.selection-slide {
-  --selection-figure-width: 640px;
+  --selection-figure-width: 680px;
   --selection-content-gap: 4px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) var(--selection-figure-width);
