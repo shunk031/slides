@@ -530,21 +530,25 @@ section.selection-slide > h2 + blockquote { margin-top: 0; }
 section.selection-slide > blockquote::before,
 section.selection-slide > blockquote::after { content: none; }
 section.selection-slide > blockquote > p { margin: 0 0 var(--content-gap); }
-section.selection-slide > blockquote > ul + p { margin-top: var(--content-gap); }
+section.selection-slide > blockquote > ul + p {
+  clear: right;
+  margin-top: var(--content-gap);
+}
 section.selection-slide > blockquote:first-of-type {
   float: right;
   width: var(--selection-figure-width);
-  margin: 0 0 var(--content-gap) var(--content-gap);
+  margin: 0 0 0 var(--content-gap);
   font-size: var(--selection-caption-font-size);
 }
 section.selection-slide > blockquote img { width: 100%; height: auto; }
+section.selection-slide > blockquote:first-of-type > p:last-child { margin-bottom: 0; }
 
 /* Keep figure captions centered with their images. */
 section > blockquote:has(> p > img) > p { text-align: center; }
 
 section.background-slide {
   --background-figure-height: 120px;
-  --background-font-size: 20px;
+  --background-font-size: 24px;
   --background-caption-font-size: 18px;
   --content-gap: 8px;
   display: grid;
@@ -588,6 +592,7 @@ section.debug-layout {
   --debug-outline-opacity: 50%;
   --debug-outline-width: 1px;
   --debug-label-padding: 2px 4px;
+  --debug-label-opacity: 40%;
   --debug-label-font-size: 14px;
   --debug-label-line-height: 1.2;
 }
@@ -606,7 +611,7 @@ section.debug-layout :is(h1, h2, h3, h4, h5, h6, p, code)::after {
   top: 100%;
   right: 0;
   padding: var(--debug-label-padding);
-  background: var(--debug-color);
+  background: color-mix(in srgb, var(--debug-color) var(--debug-label-opacity), transparent);
   color: var(--color-label-text);
   font: var(--debug-label-font-size)/var(--debug-label-line-height) var(--slide-font-family);
   letter-spacing: 0;

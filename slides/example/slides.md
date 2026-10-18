@@ -116,7 +116,7 @@ _Project page: [hukcc.github.io/Beyond-Atomic-Layouts/](https://hukcc.github.io/
 
 **既存研究との違い**
 
-- **文書・画面理解**: LayoutLMv3 / ScreenQA は、主に文書や画面の個別要素を理解 _[Huang+ MM’22 / Hsiao+ NAACL’25](https://arxiv.org/html/2608.26716v1#S2.SS3)_
+- **文書・画面理解**: LayoutLMv3 / ScreenQA は、主に個別要素を理解 _[Huang+ MM’22 / Hsiao+ NAACL’25](https://arxiv.org/html/2608.26716v1#S2.SS3)_
 - **デザイン生成**: COLE / ART は、複数レイヤーからなる編集可能なデザインを生成 _[Jia+ arXiv’23 / Pu+ CVPR’25](https://arxiv.org/html/2608.26716v1#S2.SS2)_
 - **本研究**: どのレイヤー同士が結びつき、どのデザイン意図を実現しているかを問う
 
