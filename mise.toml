@@ -20,5 +20,5 @@ description = "改行・引用・空白・文字のはみ出しを検査し、�
 run = "node scripts/check-layout.cjs"
 
 [tasks.test-layout]
-description = "改行検査が短い最終行・入れ子リスト・引用を扱えるか確認"
+description = "改行検査が短い途中・最終行、入れ子リスト、引用を扱えるか確認"
 run = "node scripts/check-layout.cjs --self-test"
