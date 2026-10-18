@@ -203,6 +203,8 @@ section:not(.first-slide, .lead, .takahashi) ul ul ul {
   font-size: var(--deep-list-font-size);
 }
 
+section li:has(> .conclusion) { list-style: none; }
+
 section:not(.first-slide, .lead, .takahashi) li:has(> ul) + li {
   margin-top: var(--list-group-gap);
 }

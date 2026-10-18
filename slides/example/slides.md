@@ -170,7 +170,7 @@ Multimodal Alignment and Structural perceptiON
 - **本論文との差分**
   - PubLayNet _[[Zhong+ ICDAR’19](https://arxiv.org/abs/1908.07836)]_ / DocLayNet _[[Pfitzmann+ KDD’22](https://arxiv.org/abs/2206.01062)]_: 個別領域を提供
   - Crello _[[Yamaguchi ICCV’21](https://arxiv.org/abs/2108.01249)]_ / MLTD _[[Pu+ CVPR’25](https://openaccess.thecvf.com/content/CVPR2025/html/Pu_ART_Anonymous_Region_Transformer_for_Variable_Multi-Layer_Transparent_Image_Generation_CVPR_2025_paper.html)]_: レイヤー構造を提供
-  - ➜ 合成要素ペアとデザイン意図の明示的注釈はない _[[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S3.T1)]_
+  - <span class="conclusion">➜ 合成要素ペアとデザイン意図の明示的注釈はない</span>
 
 <!-- Table 1 は比較の典拠として参照。大きな表画像は1枚に併置しない -->
 
@@ -239,7 +239,7 @@ Multimodal Alignment and Structural perceptiON
 
 訓練は自然な偏りを維持 ／ テストは Morphing を増やして種類別評価
 
-_データ作成: 種類別ルールでペア抽出 → GPT-4 / GPT-4o で QA・意図生成 → テストは 3 人全員一致 [[Huang+ ECCV’26 Supp.](https://hukcc.github.io/Beyond-Atomic-Layouts/assets/paper/beyond-atomic-layouts-supplementary.pdf)]_\
+_データ作成: 種類別ルールでペア抽出 → GPT-4 / GPT-4o で QA・意図生成 → テストは 3 人全員一致_\
 _なお、元のデザインの出どころは論文本体・補足資料ともに記載なし_
 
 ---
