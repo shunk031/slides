@@ -265,6 +265,8 @@ section.paper-title {
   --paper-note-width: 300px;
   --paper-note-font-size: 16px;
   --paper-logo-width: 160px;
+  --paper-banner-width: 360px;
+  --paper-banner-inset: var(--paper-padding-inline);
 
   display: grid;
   grid-template-columns: var(--paper-presenter-width) 1fr;
@@ -361,6 +363,19 @@ section.paper-title > p:nth-of-type(4) {
 
 section.paper-title > p:nth-of-type(4) img {
   width: var(--paper-logo-width);
+  height: auto;
+}
+
+section.paper-title > p:nth-of-type(5) {
+  position: absolute;
+  right: var(--paper-banner-inset);
+  bottom: var(--paper-banner-inset);
+  width: var(--paper-banner-width);
+  line-height: 0;
+}
+
+section.paper-title > p:nth-of-type(5) img {
+  width: 100%;
   height: auto;
 }
 

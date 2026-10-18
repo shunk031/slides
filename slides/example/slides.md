@@ -33,6 +33,8 @@ _Project page: [hukcc.github.io/Beyond-Atomic-Layouts/](https://hukcc.github.io/
 
 ![LINEヤフー](../../themes/assets/ly/logo.svg)
 
+[![ECCV 2026](assets/eccv-2026-banner.jpg)](https://pbs.twimg.com/profile_banners/1217810344355205125/1779129355/1500x500)
+
 ---
 
 <!-- _class: profile-slide content-slide-gray classification-public debug-layout -->
