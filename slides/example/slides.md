@@ -188,7 +188,7 @@ Multimodal Alignment and Structural perceptiON
 > **入力: 完成画像 + 各レイヤーのメタデータ**
 >
 > $$
-> \mathcal{L}=(\underbrace{\colorbox{#E2F0D9}{$\mathcal{I}$}}_{\mathclap{\text{完成画像}}}\quad,\underbrace{\colorbox{#DBEAFE}{$\mathcal{M}$}}_{\mathclap{\text{メタデータ}}}),\,
+> \mathcal{L}=(\underbrace{\colorbox{#E2F0D9}{$\mathcal{I}$}}_{\mathclap{\text{完成画像}}},\quad\underbrace{\colorbox{#DBEAFE}{$\mathcal{M}$}}_{\mathclap{\text{メタデータ}}}),\,
 > \mathcal{M}=\{\mathcal{M}_{e_1},\ldots,\mathcal{M}_{e_n}\}
 > $$
 >
@@ -196,12 +196,12 @@ Multimodal Alignment and Structural perceptiON
 >   不透明度・重なり順などの属性
 > - 質問 $Q(e^q)$: 注目する要素 $e^q$ を指定
 
-> **出力: 関連要素の ID とデザイン意図**
+> **主タスク: 関連要素の特定と意図説明**
 >
-> - 対応する要素 $e^{comp}$ を同定
+> - $e^{comp}$: 質問対象 $e^q$ と合成関係にある要素
+>   - この要素の ID を回答
 > - 2 つの要素が構成する視覚効果を自然言語で説明
-> - 単純な重なり・距離ではなく、\
->   合成関係の認識が目的
+> - 重なり・距離だけで合成関係は決まらない
 
 ---
 

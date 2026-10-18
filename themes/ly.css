@@ -706,6 +706,7 @@ section:is(.problem-slide, .dataset-slide, .method-slide) img {
   max-width: 100%;
   object-fit: contain;
 }
+section.problem-slide { --problem-figure-height: 175px; }
 
 section.method-slide {
   --problem-figure-height: 260px;
