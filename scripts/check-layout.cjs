@@ -12,9 +12,14 @@ function inspectLines() {
     [...slide.querySelectorAll(selector)].flatMap((block) => {
       const regions = new Map();
       const separateItems = /^(inline-)?(flex|grid)$/.test(getComputedStyle(block).display);
-      const walker = document.createTreeWalker(block, NodeFilter.SHOW_TEXT);
+      let explicitLine = 0;
+      const walker = document.createTreeWalker(block, NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT);
       while (walker.nextNode()) {
         const node = walker.currentNode;
+        if (node.nodeType === Node.ELEMENT_NODE) {
+          if (node.matches('br') && node.closest(selector) === block) explicitLine++;
+          continue;
+        }
         if (node.parentElement.closest(selector) !== block) continue;
         let region = node.parentElement;
         while (region !== block && region.parentElement !== block) region = region.parentElement;
@@ -32,12 +37,13 @@ function inspectLines() {
           if (!rect.width || !rect.height) continue;
           let line = lines.find((l) => Math.min(l.bottom, rect.bottom) - Math.max(l.top, rect.top) > Math.min(l.bottom - l.top, rect.height) / 2);
           if (!line) {
-            line = { top: rect.top, bottom: rect.bottom, left: rect.left, right: rect.right, text: '' };
+            line = { top: rect.top, bottom: rect.bottom, left: rect.left, right: rect.right, text: '', explicitLines: new Set() };
             lines.push(line);
           }
           line.left = Math.min(line.left, rect.left);
           line.right = Math.max(line.right, rect.right);
           line.text += char;
+          line.explicitLines.add(explicitLine);
         }
       }
       return [...regions.values()].filter(lines => lines.length).map(lines => {
@@ -47,7 +53,11 @@ function inspectLines() {
         const ratio = width(shortest) / Math.max(...lines.map(width));
         const heading = /^H[1-6]$/.test(block.tagName);
         const limit = heading ? 0.6 : 0.25;
-        return { slide: index + 1, element: block.tagName.toLowerCase(), text: block.textContent.trim(), lines: lines.map(l => l.text), multiLineTitle: block.tagName === 'H2' && block.parentElement === slide && lines.length > 1, shortLine: shortest.text, shortLineRatio: Number(ratio.toFixed(3)), limit, suspect: ratio < limit };
+        const explicitLines = lines.flatMap(line => [...line.explicitLines]);
+        const softWrap = new Set(explicitLines).size < explicitLines.length;
+        const boldHeading = block.tagName === 'P' && block.children.length === 1 && block.firstElementChild.matches('strong') && block.textContent.trim() === block.firstElementChild.textContent.trim();
+        const headingWrap = block.tagName === 'TH' && lines.length > 1 ? 'table-header-wrap' : boldHeading && softWrap ? 'heading-soft-wrap' : null;
+        return { slide: index + 1, element: block.tagName.toLowerCase(), text: block.textContent.trim(), lines: lines.map(l => l.text), headingWrap, multiLineTitle: block.tagName === 'H2' && block.parentElement === slide && lines.length > 1, shortLine: shortest.text, shortLineRatio: Number(ratio.toFixed(3)), limit, suspect: ratio < limit };
       });
     }).filter(block => block.lines.length));
 }
@@ -546,6 +556,14 @@ async function main() {
       assert.equal((await page.evaluate(inspectLines)).some(r => r.multiLineTitle), true);
       await page.setContent('<section><h2 style="white-space:nowrap">A deliberately long heading that stays on one line</h2></section>');
       assert.equal((await page.evaluate(inspectLines)).some(r => r.multiLineTitle), false);
+      for (const content of ['<p><strong>Heading wraps</strong></p>', '<p><strong>First<br>Heading wraps</strong></p>', '<table><tr><th>Heading wraps</th></tr></table>', '<table><tr><th>A<br>B</th></tr></table>']) {
+        await page.setContent(`<section style="width:90px;font:20px/30px monospace">${content}</section>`);
+        assert.ok((await page.evaluate(inspectLines)).some(r => r.headingWrap));
+      }
+      for (const content of ['<p><strong>First<br>Second</strong></p>', '<p><strong>Heading</strong></p>', '<table><tr><th>Header</th></tr></table>', '<p>Heading wraps</p>']) {
+        await page.setContent(`<section style="width:90px;font:20px/30px monospace">${content}</section>`);
+        assert.equal((await page.evaluate(inspectLines)).some(r => r.headingWrap), false);
+      }
       await page.setContent('<section><h2 style="display:flex;align-items:center;font:48px monospace">Title <em style="font:20px monospace">ABCDEFGHIJKL<br>ABCDEFGHIJ</em></h2></section>');
       assert.equal((await page.evaluate(inspectLines)).some(r => r.suspect), false);
       await page.setContent('<section><h2 style="display:flex;align-items:center;font:48px monospace">Title <em id="subtitle" style="font:20px monospace;min-width:0;flex:none;word-break:break-all">ABCDEFGHIJKLMNOPQRSTUVWX</em></h2></section>');
@@ -772,11 +790,12 @@ async function main() {
       const blocks = await page.evaluate(inspectLines);
       const candidates = blocks.filter(b => b.suspect);
       const titleFindings = blocks.filter(b => b.multiLineTitle).map(b => ({ slide: b.slide, kind: 'title-wrap', text: `${b.text} (${b.lines.length} lines)` }));
+      const headingFindings = blocks.filter(b => b.headingWrap).map(b => ({ slide: b.slide, kind: b.headingWrap, text: `${b.text} (${b.lines.length} lines)` }));
       const termsPath = path.join(path.dirname(input), 'terms.json');
       const terms = fs.existsSync(termsPath) ? JSON.parse(fs.readFileSync(termsPath, 'utf8')) : {};
       const columns = await page.evaluate(inspectColumns);
       const groupGaps = await page.evaluate(inspectGroupGaps);
-      const structure = [...await page.evaluate(inspectStructure), ...await page.evaluate(inspectTypography), ...await page.evaluate(inspectTerms, terms), ...await page.evaluate(inspectMidwordWraps), ...titleFindings, ...columnFindings(columns), ...groupGapFindings(groupGaps)];
+      const structure = [...await page.evaluate(inspectStructure), ...await page.evaluate(inspectTypography), ...await page.evaluate(inspectTerms, terms), ...await page.evaluate(inspectMidwordWraps), ...titleFindings, ...headingFindings, ...columnFindings(columns), ...groupGapFindings(groupGaps)];
       structuralErrors += structure.length + candidates.length;
       candidateCount += candidates.length + structure.length;
       fs.writeFileSync(path.join(output, 'lines.json'), JSON.stringify({ input, browser: await browser.version(), blocks, columnPairs: columns, groupGaps, structure }, null, 2));
