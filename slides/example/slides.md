@@ -171,8 +171,8 @@ Multimodal Alignment and Structural perceptiON
 - Multimodal Alignment（MA）: 完成画像と各レイヤーの対応付けを学習
 - Structural Perception（SP）: レイヤー間の位置・重なり・前後関係を明示
 
-**主な結果: 同一ベースモデル（Qwen2.5-VL 7B）**\
-関連要素特定精度 88.80% → 91.66%（+2.86 pt） _[[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.T4)]_
+**主な結果: 同一ベースモデル（Qwen2.5-VL 7B）の関連要素特定精度** _[[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.T4)]_\
+主タスク QA のみで微調整 88.80% → MASON 91.66%（+2.86 pt）
 
 ---
 
