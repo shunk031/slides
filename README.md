@@ -133,7 +133,7 @@ CSS の `grid-template-areas` では、それぞれを `paper-title`・`authors`
 
 ### 引用を小さく表示する
 
-段落や箇条書きでは、`_[[Author+ ConfName'YY](URL)]_` のようにリンクを `_` で囲むと、斜体にせず共通の 18px で表示します。`--citation-font-size` で調整できます。通常のリンクは元のサイズのままです。
+段落や箇条書きでは、`_[[Author+ ConfName'YY](URL)]_` のようにリンクを `_` で囲むと、斜体にせず共通の 20px で表示します。`--citation-font-size` で調整できます。通常のリンクは元のサイズのままです。
 
 複数研究を並べる例: `LayoutLMv3 _[[Huang+ MM’22](文献URL)]_ / ScreenQA _[[Hsiao+ NAACL’25](文献URL)]_`。リンク先はそれぞれの論文または対応する参考文献項目です。
 
@@ -147,7 +147,7 @@ CSS の `grid-template-areas` では、それぞれを `paper-title`・`authors`
 > Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S3.F2)]: 画像・メタデータ・質問・回答の対応
 ```
 
-外側の角括弧は表示用で、リンクには含めません。図の出典・説明は共通の `--figure-caption-font-size`（20px）で中央揃えにします。本文は `--body-font-size`（24px）、入れ子はその 90%を使います。
+外側の角括弧は表示用で、リンクには含めません。図の出典・説明は共通の `--figure-caption-font-size`（20px）で中央揃えにします。本文は `--body-font-size`（30px）、2階層目は `--nested-list-font-size`（26.25px）、3階層目以降は `--deep-list-font-size`（22.5px）を使います。入れ子のインデントは `--nested-list-indent`、自己紹介の研究分野間の余白は `--profile-list-gap` で調整できます。
 切り出した画像の右端を背景へなじませる場合は、画像パスに `#crop-right` を付けます。フェード幅は `--crop-feather-width`（16px）で調整します。元画像は残し、切り出す範囲と境界の処理を別に確認してください。
 
 図の出典表記は [既存資料の 15 ページ](https://speakerdeck.com/shunk031/from-fragment-to-one-piece-a-survey-on-ai-driven-graphic-design?slide=15)・[30 ページ](https://speakerdeck.com/shunk031/from-fragment-to-one-piece-a-survey-on-ai-driven-graphic-design?slide=30)の `Figure from [引用]` を基にしています。
