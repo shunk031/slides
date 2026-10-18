@@ -270,6 +270,50 @@ Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S0.F1)]: 4�
 
 ---
 
+<!-- _class: method-slide ma-slide content-slide-gray classification-public -->
+<!-- 発表目安 1:00 -->
+
+## MASON 2/3 **|** _MA: 要素IDと完成画像中の見た目を対応付けて学習_
+
+> ![Figure 4 の MA Module: 要素画像とメタデータから Grounding QA を生成](assets/beyond-atomic-ma.png#crop-right)
+>
+> Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S3.F4)]:\
+> 補助QAの生成
+
+> **Grounding QA（要素の対応付け問題）を生成**
+>
+> - 入力: 完成画像・対象要素の切り出し画像\
+>   対象要素のメタデータ・質問
+> - 出力: 対象要素の視覚的特徴と位置を記述した回答
+> - 完成画像と切り出し画像の対応から、\
+>   重なって認識しにくい要素の対応付けを学習
+>
+> **GPT-4o は学習用の補助QAを生成**
+>
+> - $Q^g(e_i)$: 要素 $e_i$ を特定・説明する質問
+> - $A^g(e_i)$: MASON の学習に使う回答
+> - MASON の推論時に GPT-4o を呼ぶわけではない
+
+> **[質問例（Table 2、日本語訳）](https://arxiv.org/html/2608.26716v1#S4.T2)**
+>
+> 「要素ID {element_id} は何で、\
+> 完成画像のどこにありますか？」
+
+$$
+\underbrace{A^g(e_i)}_{\text{学習用の回答}} =
+\underbrace{\mathcal{G}}_{\text{GPT-4o}}\!\Bigl(
+\underbrace{\mathcal{P}_{\mathrm{ground}}}_{\text{生成用プロンプト}}\Bigl(
+\underbrace{\mathcal{L}}_{\text{完成画像＋メタデータ}},
+\underbrace{\mathcal{I}_{e_i}}_{\text{切り出し画像}},
+\underbrace{\mathcal{M}_{e_i}}_{\text{対象要素の属性}},
+\underbrace{Q^g(e_i)}_{\text{質問}}
+\Bigr)\Bigr)
+$$
+
+**➜ 関連要素を探す前提となる、要素単位の視覚と言語の対応を強化**
+
+---
+
 <!-- _class: title-slide-big classification-public debug-layout -->
 
 # 表紙用の背景
