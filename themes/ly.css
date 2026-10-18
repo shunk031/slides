@@ -406,6 +406,19 @@ section :is(p, li) > em:has(> a) {
   font-style: normal;
 }
 
+section.floating-footnote { --footer-bottom: 0px; }
+section.floating-footnote > p:last-of-type {
+  position: absolute;
+  grid-area: auto;
+  right: var(--slide-padding);
+  bottom: var(--footer-bottom);
+  left: var(--slide-padding);
+  margin: 0;
+  font-size: var(--citation-font-size);
+  line-height: 1.15;
+  text-align: right;
+}
+
 /* Self-introduction: biography on the left, portraits and links on the right. */
 section.profile-slide {
   --profile-sidebar-width: 320px;
@@ -726,14 +739,12 @@ section:is(.ma-slide, .sp-slide) > blockquote:nth-of-type(3) { grid-column: 1; g
 
 section.dataset-slide {
   --dataset-column-gap: 24px;
-  --problem-figure-height: 100px;
-  --content-gap: var(--list-group-gap);
-  grid-template-columns: 5.1fr 6.9fr;
+  grid-template-columns: 1.4fr 1fr;
   column-gap: var(--dataset-column-gap);
 }
 section.dataset-slide > blockquote:first-of-type { grid-column: 1; grid-row: 3; }
-section.dataset-slide > blockquote:nth-of-type(2) { grid-column: 2; grid-row: 3 / span 2; }
-section.dataset-slide > blockquote:nth-of-type(3) { grid-column: 1; grid-row: 4; }
+section.dataset-slide > blockquote:nth-of-type(2) { grid-column: 1; grid-row: 4; }
+section.dataset-slide > blockquote:nth-of-type(3) { grid-column: 2; grid-row: 3 / span 2; }
 section:is(.dataset-slide, .sp-slide) { --dataset-table-padding: 4px 12px; }
 section.dataset-slide { --dataset-table-padding: 2px 12px; }
 section.sp-slide th:nth-child(1) { width: 20%; }
