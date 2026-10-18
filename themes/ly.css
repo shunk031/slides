@@ -20,8 +20,8 @@
   --slide-top: var(--slide-padding);
   --top-row-height: 24px;
   --content-gap: 16px;
-  --paragraph-gap: var(--content-gap);
-  --list-group-gap: var(--content-gap);
+  --paragraph-gap: 16px;
+  --list-group-gap: var(--paragraph-gap);
 
   /* Classification, pagination, and footer */
   --classification-padding-inline: 11px;
@@ -721,6 +721,7 @@ section.ma-slide {
   --crop-feather-width: 160px;
   --problem-figure-height: 200px;
 }
+section.sp-slide { --problem-figure-height: 260px; }
 section:is(.ma-slide, .sp-slide) > blockquote:first-of-type { grid-column: 1; grid-row: 3; }
 section:is(.ma-slide, .sp-slide) > blockquote:nth-of-type(2) { grid-column: 2; grid-row: 3 / span 2; }
 section:is(.ma-slide, .sp-slide) > blockquote:nth-of-type(3) { grid-column: 1; grid-row: 4; }
@@ -784,7 +785,7 @@ section.analysis-slide img { width: 100%; height: var(--analysis-figure-height);
 section.failure-analysis-slide { --analysis-figure-height: 175px; }
 
 /* Separate later list introductions without moving the first one. */
-section:not(.first-slide, .lead, .takahashi, .title-slide-big) :is(p, ul, ol, table) ~ p:has(+ :is(ul, ol)) {
+section:not(.first-slide, .lead, .takahashi, .title-slide-big) :is(p, ul, ol, table) ~ p:has(+ :is(ul, ol, table)) {
   margin-top: var(--paragraph-gap);
 }
 
