@@ -208,6 +208,34 @@ function groupGapFindings({ themeGap, groups }) {
   });
 }
 
+function inspectItemGaps() {
+  const sections = [...document.querySelectorAll('section')];
+  const body = sections.filter(s => !s.matches('.profile-slide,.first-slide,.lead,.takahashi,.title-slide-big,.layout-example'));
+  const themeGaps = body.flatMap(slide => {
+    if (!getComputedStyle(slide).getPropertyValue('--list-item-gap').trim()) return [];
+    // Resolve calc()/em through CSS instead of parsing the custom-property token string.
+    const probe = document.createElement('div');
+    probe.style.cssText = 'position:absolute;visibility:hidden;height:var(--list-item-gap);width:0;margin:0;padding:0;border:0';
+    slide.append(probe);
+    const gap = parseFloat(getComputedStyle(probe).height);
+    probe.remove();
+    return Number.isFinite(gap) ? [gap] : [];
+  });
+  if (!themeGaps.length) return [];
+  const limit = 2 * Math.min(...themeGaps);
+  return body.flatMap(slide => [...slide.querySelectorAll('li + li,p + p')].flatMap(current => {
+    const previous = current.previousElementSibling;
+    if (current.closest('header,footer,blockquote:has(img)') || current.matches('section.floating-footnote > p:last-of-type') || current.querySelector('img') || previous.querySelector('img')) return [];
+    const strong = current.querySelector(':scope > strong, :scope > a > strong');
+    const label = [...current.childNodes].filter(node => !node.matches?.('ul,ol')).map(node => node.textContent).join('').trim();
+    if (strong && strong.textContent.trim() === label && (current.tagName === 'P' ? current.nextElementSibling?.matches('p,ul,ol,table') : current.querySelector(':scope > ul,:scope > ol'))) return [];
+    const before = previous.getBoundingClientRect(), after = current.getBoundingClientRect();
+    if (!before.width || !before.height || !after.width || !after.height || Math.min(before.right, after.right) <= Math.max(before.left, after.left)) return [];
+    const gap = after.top - before.bottom;
+    return gap > limit + 2 ? [{ slide: sections.indexOf(slide) + 1, kind: 'list-item-gap', gap, limit, text: current.textContent.trim() }] : [];
+  }));
+}
+
 function inspectColumns() {
   const textSelector = 'h1,h2,h3,h4,h5,h6,p,li,figcaption,td,th';
   const firstText = block => {
@@ -633,6 +661,29 @@ async function main() {
       assert.ok((await page.evaluate(inspectMidwordWraps)).some(r => r.word === 'ABCDEFGHIJKL'));
       await page.setContent('<section lang="ja" style="font:20px/30px sans-serif;word-break:auto-phrase;text-wrap:pretty"><p style="margin:0">デザインを「作る」だけでなく<br>「意図どおりに直す」ことが難しい</p></section>');
       assert.deepEqual(await page.evaluate(inspectMidwordWraps), []);
+      await page.setContent('<section style="font:30px/20px monospace;--list-item-gap:calc(.25 * 1em)"><ul style="display:flex;flex-direction:column;justify-content:space-between;height:200px;margin:0"><li>First</li><li>Second</li></ul></section>');
+      const spreadItems = await page.evaluate(inspectItemGaps);
+      assert.equal(spreadItems.length, 1);
+      assert.equal(spreadItems[0].gap, 160);
+      assert.equal(spreadItems[0].limit, 15);
+      await page.evaluate(() => { document.querySelector('ul').style.justifyContent = 'flex-start'; document.querySelector('li + li').style.marginTop = 'var(--list-item-gap)'; });
+      assert.deepEqual(await page.evaluate(inspectItemGaps), []);
+      await page.evaluate(() => { document.querySelector('li + li').style.marginTop = '17px'; });
+      assert.deepEqual(await page.evaluate(inspectItemGaps), []);
+      await page.evaluate(() => { document.querySelector('li + li').style.marginTop = '18px'; });
+      assert.equal((await page.evaluate(inspectItemGaps)).length, 1);
+      for (const heading of ['<strong>Group</strong>', '<a><strong>Group</strong></a>']) {
+        await page.setContent(`<section style="font:30px/20px monospace;--list-item-gap:7.5px"><p style="margin:0">Previous</p><p style="margin:24px 0 0">${heading}</p><ul><li>Next group</li></ul></section>`);
+        assert.deepEqual(await page.evaluate(inspectItemGaps), []);
+      }
+      await page.setContent('<section style="font:30px/20px monospace;--list-item-gap:7.5px"><ul><li>Previous</li><li style="margin-top:24px"><strong>Group</strong><ul><li>Next group</li></ul></li></ul></section>');
+      assert.deepEqual(await page.evaluate(inspectItemGaps), []);
+      await page.setContent('<section style="font:30px/20px monospace;--list-item-gap:7.5px"><p style="margin:0">First</p><p style="margin:80px 0 0">Second</p></section>');
+      assert.equal((await page.evaluate(inspectItemGaps)).length, 1);
+      await page.evaluate(() => { document.querySelector('p + p').style.marginTop = '16px'; });
+      assert.deepEqual(await page.evaluate(inspectItemGaps), []);
+      await page.evaluate(() => { document.body.insertAdjacentHTML('beforeend', '<section style="--list-item-gap:100px"></section>'); document.querySelector('p + p').style.marginTop = '80px'; });
+      assert.equal((await page.evaluate(inspectItemGaps)).length, 1);
       await page.setContent('<section style="font:20px/20px monospace;--list-group-gap:16px"><blockquote style="position:absolute;top:20px;left:0;margin:0"><ul style="margin:0;padding:0"><li style="margin:0;list-style:none">Previous</li></ul></blockquote><blockquote style="position:absolute;top:44px;left:0;margin:0"><p style="margin:0"><strong>Group</strong></p><ul style="margin:0;padding:0"><li style="margin:0;list-style:none">Next</li></ul></blockquote></section>');
       const shortGroupGap = groupGapFindings(await page.evaluate(inspectGroupGaps));
       assert.ok(shortGroupGap.some(f => f.kind === 'group-gap' && f.gap === 4));
@@ -903,7 +954,7 @@ async function main() {
       const columns = await page.evaluate(inspectColumns);
       const groupGaps = await page.evaluate(inspectGroupGaps);
       const bodyFill = await page.evaluate(inspectBodyFill);
-      const structure = [...await page.evaluate(inspectStructure), ...await page.evaluate(inspectTypography), ...await page.evaluate(inspectTerms, terms), ...await page.evaluate(inspectMidwordWraps), ...titleFindings, ...headingFindings, ...columnFindings(columns), ...groupGapFindings(groupGaps), ...bodyFillFindings(bodyFill)];
+      const structure = [...await page.evaluate(inspectStructure), ...await page.evaluate(inspectTypography), ...await page.evaluate(inspectTerms, terms), ...await page.evaluate(inspectMidwordWraps), ...await page.evaluate(inspectItemGaps), ...titleFindings, ...headingFindings, ...columnFindings(columns), ...groupGapFindings(groupGaps), ...bodyFillFindings(bodyFill)];
       structuralErrors += structure.length + candidates.length;
       candidateCount += candidates.length + structure.length;
       fs.writeFileSync(path.join(output, 'lines.json'), JSON.stringify({ input, browser: await browser.version(), blocks, columnPairs: columns, groupGaps, bodyFill, structure }, null, 2));
