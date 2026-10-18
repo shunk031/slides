@@ -431,8 +431,9 @@ _[[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.T4)]: Table 4 の主
 
 > ![Figure 5: 主タスクデータ割合に対するDFとMASONの重み付き精度と精度差](assets/beyond-atomic-datascale.svg)
 >
-> Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.F5.fig1)]: 主タスクの訓練データ割合（横軸）、重み付き精度（左縦軸）、MASON と DF の精度差（右縦軸）\
-> 各訓練規模で MASON が DF を上回る
+> Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.F5.fig1)]: 訓練データ量と精度\
+> 横軸: 主タスクの訓練データ割合\
+> 左縦軸: 重み付き精度／右縦軸: MASON と DF の精度差
 
 > **重み付き精度と種類別の平均精度（%）**
 >
