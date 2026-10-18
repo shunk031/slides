@@ -12,7 +12,7 @@ mise install
 ```
 
 Node.js と Marp CLI のバージョンは `mise.toml` で管理します。
-`ly` テーマは [Google Fonts の LINE Seed JP](https://fonts.google.com/specimen/LINE+Seed+JP) を読み込みます。フォントのインストールは不要ですが、プレビューと PDF 変換にはネット接続が必要です。
+`ly` テーマは同梱の LINE Seed JP を読み込みます。このフォントのインストールや取得用のネット接続は不要です。入手元とライセンスは [themes/assets/ly/fonts/README.md](themes/assets/ly/fonts/README.md) と [OFL.txt](themes/assets/ly/fonts/OFL.txt) にあります。
 
 ## サンプルを表示する
 
