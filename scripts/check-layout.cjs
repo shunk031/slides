@@ -324,6 +324,164 @@ function columnFindings(columns) {
   }));
 }
 
+function inspectSpaces() {
+  const cell = 8;
+  return [...document.querySelectorAll('section')].map((slide, index) => {
+    const bounds = slide.getBoundingClientRect(), style = getComputedStyle(slide);
+    const headings = [...slide.querySelectorAll(':scope > h1,:scope > h2')];
+    const footer = slide.querySelector(':scope > footer');
+    const body = {
+      left: bounds.left + (parseFloat(style.paddingLeft) || 0),
+      right: bounds.right - (parseFloat(style.paddingRight) || 0),
+      top: Math.max(bounds.top + (parseFloat(style.paddingTop) || 0), ...headings.map(h => h.getBoundingClientRect().bottom)),
+      bottom: Math.min(bounds.bottom - (parseFloat(style.paddingBottom) || 0), footer?.getBoundingClientRect().top ?? bounds.bottom),
+    };
+    const local = r => ({ x: r.left - bounds.left, y: r.top - bounds.top, width: r.right - r.left, height: r.bottom - r.top });
+    const label = el => el.textContent.trim().replace(/\s+/g, ' ').slice(0, 120) || el.getAttribute('alt') || el.tagName.toLowerCase();
+    const excluded = el => el.closest('header,footer,h1,h2,.pagination,.page-number,.classification,.classification-badge,.background-decoration,[data-space-overlay]') || getComputedStyle(el).visibility === 'hidden';
+    const ink = [];
+    const add = (r, el) => {
+      const clipped = {left:Math.max(body.left,r.left),right:Math.min(body.right,r.right),top:Math.max(body.top,r.top),bottom:Math.min(body.bottom,r.bottom)};
+      if (clipped.right > clipped.left && clipped.bottom > clipped.top) ink.push({...clipped,element:el,label:label(el)});
+    };
+    const paintedImage = img => {
+      const r = img.getBoundingClientRect(), css = getComputedStyle(img);
+      const inset = side => (parseFloat(css[`border${side}Width`]) || 0) + (parseFloat(css[`padding${side}`]) || 0);
+      let width = r.width - inset('Left') - inset('Right'), height = r.height - inset('Top') - inset('Bottom');
+      let left = r.left + inset('Left'), top = r.top + inset('Top');
+      if (['contain','scale-down'].includes(css.objectFit) && img.naturalWidth && img.naturalHeight) {
+        const scale = Math.min(width/img.naturalWidth,height/img.naturalHeight,css.objectFit === 'scale-down' ? 1 : Infinity);
+        // shortcut: resolve percentage/px positions; extend when a deck uses position expressions.
+        const position = css.objectPosition.match(/^(-?[\d.]+)(%|px)\s+(-?[\d.]+)(%|px)$/);
+        if (position) {
+          left += position[2] === '%' ? (width-img.naturalWidth*scale)*Number(position[1])/100 : Number(position[1]);
+          top += position[4] === '%' ? (height-img.naturalHeight*scale)*Number(position[3])/100 : Number(position[3]);
+        }
+        width = img.naturalWidth*scale; height = img.naturalHeight*scale;
+      }
+      return {left,top,right:left+width,bottom:top+height};
+    };
+    for (const el of slide.querySelectorAll('img,table,mjx-container,svg')) {
+      if (excluded(el) || el.closest('mjx-container') && !el.matches('mjx-container')) continue;
+      add(el.matches('img') ? paintedImage(el) : el.getBoundingClientRect(), el);
+    }
+    const walker = document.createTreeWalker(slide, NodeFilter.SHOW_TEXT);
+    while (walker.nextNode()) {
+      const node = walker.currentNode, el = node.parentElement;
+      if (!node.textContent.trim() || excluded(el) || (el.closest('table,mjx-container,script,style') || slide.contains(el.closest('svg')))) continue;
+      const range = document.createRange(); range.selectNodeContents(node);
+      for (const r of range.getClientRects()) if (r.width && r.height) add(r, el.closest('p,li,figcaption,h3,h4,h5,h6') || el);
+    }
+    body.bottom = Math.max(body.top, body.bottom);
+    const width = Math.max(0,body.right-body.left), height = body.bottom-body.top;
+    const cols = Math.ceil(width/cell), rows = Math.ceil(height/cell);
+    const occupied = Array.from({length:rows},()=>new Uint8Array(cols));
+    for (const r of ink) for(let y=Math.floor((r.top-body.top)/cell);y<Math.ceil((r.bottom-body.top)/cell);y++)
+      for(let x=Math.floor((r.left-body.left)/cell);x<Math.ceil((r.right-body.left)/cell);x++) if(occupied[y]&&x<cols) occupied[y][x]=1;
+    // Empty-cell histograms enumerate rectangles; containment pruning retains maximal candidates.
+    const heights = new Array(cols).fill(0), rectangles=[];
+    for(let y=0;y<rows;y++) {
+      for(let x=0;x<cols;x++) heights[x]=occupied[y][x]?0:heights[x]+1;
+      const stack=[];
+      for(let x=0;x<=cols;x++) {
+        const h=x<cols?heights[x]:0; let start=x;
+        while(stack.length&&stack.at(-1).height>h) {
+          const item=stack.pop(); start=item.start;
+          const r={left:body.left+start*cell,right:Math.min(body.right,body.left+x*cell),top:body.top+(y+1-item.height)*cell,bottom:Math.min(body.bottom,body.top+(y+1)*cell)};
+          const w=r.right-r.left, rh=r.bottom-r.top;
+          if((w>=160&&rh>=48)||w*rh>=width*height*0.015) rectangles.push(r);
+        }
+        if(h&&(!stack.length||stack.at(-1).height<h)) stack.push({start,height:h});
+      }
+    }
+    rectangles.sort((a,b)=>(b.right-b.left)*(b.bottom-b.top)-(a.right-a.left)*(a.bottom-a.top));
+    const maximal=[];
+    for(const r of rectangles) if(!maximal.some(m=>m.left<=r.left&&m.right>=r.right&&m.top<=r.top&&m.bottom>=r.bottom)) maximal.push(r);
+    const nearest = (r, side) => {
+      const choices=ink.filter(b=>side==='above'||side==='below' ? b.left<r.right&&b.right>r.left&&(side==='above'?b.bottom<=r.top+cell:b.top>=r.bottom-cell) : b.top<r.bottom&&b.bottom>r.top&&(side==='left'?b.right<=r.left+cell:b.left>=r.right-cell));
+      const distance=b=>side==='above'?Math.abs(r.top-b.bottom):side==='below'?Math.abs(b.top-r.bottom):side==='left'?Math.abs(r.left-b.right):Math.abs(b.left-r.right);
+      choices.sort((a,b)=>distance(a)-distance(b));
+      return choices[0]?.label || `body ${side==='above'?'top':side==='below'?'bottom':side} edge`;
+    };
+    const regions=maximal.map((r,i)=>({id:`S${i+1}`,...local(r),area:(r.right-r.left)*(r.bottom-r.top),neighbours:Object.fromEntries(['above','below','left','right'].map(side=>[side,nearest(r,side)]))}));
+    const children=[...slide.children].filter(el=>!excluded(el));
+    const blocks=children.map(el=>({el,box:el.getBoundingClientRect(),content:ink.filter(b=>el===b.element||el.contains(b.element))})).filter(b=>b.box.width&&b.box.height&&b.content.length);
+    const columns=[],seen=new Set();
+    for(let i=0;i<blocks.length;i++) for(const other of blocks.slice(i+1)) {
+      const [a,b]=blocks[i].box.left<=other.box.left?[blocks[i],other]:[other,blocks[i]];
+      if(a.box.right>b.box.left||Math.min(a.box.bottom,b.box.bottom)<=Math.max(a.box.top,b.box.top)) continue;
+      const shared=blocks.filter(c=>c.box.left<=a.box.left+2&&c.box.right>=b.box.right-2);
+      const start=Math.max(body.top,...shared.filter(c=>c.box.bottom<=Math.min(a.box.top,b.box.top)+2).map(c=>c.box.bottom));
+      const end=Math.min(body.bottom,...shared.filter(c=>c.box.top>=Math.max(a.box.top,b.box.top)+2).map(c=>c.box.top));
+      const key=`${a.box.left}:${a.box.right}:${b.box.left}:${b.box.right}:${start}:${end}`;
+      if(seen.has(key)) continue; seen.add(key);
+      const column=c=>{
+        const items=blocks.filter(d=>Math.abs(d.box.left-c.box.left)<=2&&Math.abs(d.box.right-c.box.right)<=2&&d.box.bottom>start&&d.box.top<end);
+        const content=items.flatMap(d=>d.content);
+        return {text:items.map(d=>label(d.el)).join(' ').slice(0,120),top:Math.min(...content.map(r=>r.top))-bounds.top,bottom:Math.max(...content.map(r=>r.bottom))-bounds.top};
+      };
+      const left=column(a),right=column(b);
+      columns.push({left,right,topDifference:Math.abs(left.top-right.top),bottomDifference:Math.abs(left.bottom-right.bottom)});
+    }
+    const gaps={};
+    for(const name of ['--content-gap','--list-item-gap','--list-group-gap']) {
+      const probe=document.createElement('div');probe.style.cssText=`position:absolute;visibility:hidden;height:var(${name},0px);width:0`;slide.append(probe);
+      gaps[name]=probe.getBoundingClientRect().height;probe.remove();
+    }
+    const blockGaps=[...slide.querySelectorAll('p,li,ul,ol,table,blockquote,h3,h4,h5,h6')].flatMap(el=>{
+      const next=el.nextElementSibling;
+      if(!next||excluded(el)||excluded(next))return [];
+      const a=el.getBoundingClientRect(),b=next.getBoundingClientRect();
+      if(Math.min(a.right,b.right)<=Math.max(a.left,b.left)||b.top<a.top||!a.width||!a.height||!b.width||!b.height)return [];
+      const variable=next.matches('li')?'--list-item-gap':next.matches('p')&&next.querySelector('strong')?.textContent.trim()===next.textContent.trim()?'--list-group-gap':'--content-gap';
+      return [{before:label(el),after:label(next),gap:b.top-a.bottom,variable,expected:gaps[variable]}];
+    });
+    const captions=[...slide.querySelectorAll('p')].filter(p=>/^Figure from\b/.test(p.textContent.trim())).flatMap(caption=>{
+      const figure=caption.closest('blockquote'),images=[...(figure||slide).querySelectorAll('img')];
+      const c=caption.getBoundingClientRect();
+      return images.map(img=>{const r=paintedImage(img),dx=Math.max(r.left-c.right,c.left-r.right,0),dy=Math.max(r.top-c.bottom,c.top-r.bottom,0);return {caption:label(caption),image:img.alt||img.getAttribute('src'),distance:Math.hypot(dx,dy),verticalGap:c.top-r.bottom};});
+    });
+    return {slide:index+1,title:headings.map(h=>label(h)).join(' | '),body:local(body),cell,threshold:{height:48,width:160,areaRatio:0.015},regions,columns,sharedGaps:gaps,blockGaps,captions};
+  });
+}
+
+function drawSpaceOverlay(record) {
+  const slide = document.querySelectorAll('section')[record.slide - 1];
+  const bounds = slide.getBoundingClientRect();
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.dataset.spaceOverlay = '';
+  svg.setAttribute('viewBox', `0 0 ${bounds.width} ${bounds.height}`);
+  for (const [property, value] of Object.entries({ position: 'absolute', left: '0', top: '0', width: '100%', height: '100%', margin: '0', padding: '0', border: '0', 'grid-area': 'auto', 'z-index': '2147483647', 'pointer-events': 'none' })) svg.style.setProperty(property, value, 'important');
+  slide.append(svg);
+  const labels = [];
+  for (const [index, region] of record.regions.entries()) {
+    const color = ['#e63946', '#2166ac', '#008060'][index % 3];
+    const rect = document.createElementNS(svg.namespaceURI, 'rect');
+    for (const [key, value] of Object.entries({ x: region.x, y: region.y, width: region.width, height: region.height, fill: color, 'fill-opacity': '.12', stroke: color, 'stroke-width': '1' })) rect.setAttribute(key, value);
+    const label = document.createElementNS(svg.namespaceURI, 'text');
+    label.style.cssText = 'font:12px sans-serif;fill:#111;stroke:white;stroke-width:3px;paint-order:stroke';
+    label.textContent = `${region.id} ${Math.round(region.width)}×${Math.round(region.height)}`;
+    svg.append(rect, label);
+    const width = label.getBBox().width + 6, height = 16;
+    const clampX = x => Math.max(record.body.x, Math.min(x, record.body.x + record.body.width - width));
+    const available = box => !labels.some(other => box.x < other.x + other.width && box.x + width > other.x && box.y < other.y + height && box.y + height > other.y);
+    let position;
+    for (let y = region.y; y <= region.y + region.height - height && !position; y += height) {
+      position = [region.x + 3, region.x + region.width - width].map(x => ({ x: clampX(x), y })).find(available);
+    }
+    // Narrow overlapping rectangles may need their label outside their own area.
+    for (let y = record.body.y; y <= record.body.y + record.body.height - height && !position; y += height) {
+      for (let x = record.body.x; x <= record.body.x + record.body.width - width && !position; x += width) {
+        if (available({ x, y })) position = { x, y };
+      }
+    }
+    position ??= { x: clampX(region.x + 3), y: region.y };
+    label.setAttribute('x', position.x);
+    label.setAttribute('y', position.y + 12);
+    labels.push({ ...position, width, height });
+  }
+}
+
 function inspectBodyFill() {
   const bottomOf = elements => Math.max(-Infinity, ...elements.flatMap(element => {
     const images = [...element.querySelectorAll('img,mjx-container'), ...(element.matches('img,mjx-container') ? [element] : [])];
@@ -990,6 +1148,39 @@ async function main() {
         await page.setContent(`<section><p>${citation}</p></section>`);
         assert.equal((await page.evaluate(inspectStructure)).some(f => f.kind === 'unbracketed-citation'), true);
       }
+      const spaceImage = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="480" height="120"><rect width="480" height="120"/></svg>');
+      await page.setContent(`<style>body{margin:0}section{position:relative;box-sizing:border-box;width:600px;height:400px;padding:20px;font:20px/20px monospace}h2{height:60px;margin:0}blockquote,p,h3{position:absolute;margin:0}footer{position:absolute;left:20px;top:360px}</style><section style="--content-gap:16px;--list-item-gap:8px;--list-group-gap:24px"><h2>Title excluded</h2><blockquote style="left:20px;top:80px;width:240px;height:140px"><img src="${spaceImage}" style="display:block;width:240px;height:120px"><p style="top:120px">Figure from: example</p></blockquote><blockquote style="left:300px;top:80px;width:280px;height:220px"><table style="width:280px;height:220px"><tr><td>Sibling text</td></tr></table></blockquote><h3 style="left:20px;top:300px;width:560px">Next full-width group</h3><footer>Footer excluded</footer></section>`);
+      await page.evaluate(async () => { await document.images[0].decode(); });
+      const [blankBand] = await page.evaluate(inspectSpaces);
+      assert.ok(blankBand.regions.some(r => r.neighbours.above.includes('Figure from') && r.neighbours.below.includes('Next full-width group')));
+      assert.deepEqual(blankBand.body, { x: 20, y: 80, width: 560, height: 280 });
+      assert.ok(blankBand.regions.every(r => r.x >= 20 && r.y >= 80 && r.x + r.width <= 580 && r.y + r.height <= 360));
+      assert.ok(blankBand.columns.some(c => c.bottomDifference > 16));
+      assert.equal(blankBand.captions.length, 1);
+      assert.equal(blankBand.captions[0].distance, 0);
+      assert.deepEqual(blankBand.sharedGaps, { '--content-gap': 16, '--list-item-gap': 8, '--list-group-gap': 24 });
+      const beforeOverlay = await page.evaluate(() => [...document.querySelectorAll('section,blockquote,h3')].map(el => el.getBoundingClientRect().toJSON()));
+      await page.evaluate(drawSpaceOverlay, blankBand);
+      assert.equal(await page.$$eval('[data-space-overlay] rect', rects => rects.length), blankBand.regions.length);
+      assert.equal(await page.$$eval('[data-space-overlay] text', elements => {
+        const boxes = elements.map(el => el.getBoundingClientRect());
+        return boxes.some((a, i) => boxes.slice(i + 1).some(b => Math.min(a.right, b.right) > Math.max(a.left, b.left) && Math.min(a.bottom, b.bottom) > Math.max(a.top, b.top)));
+      }), false);
+      assert.deepEqual(await page.evaluate(() => [...document.querySelectorAll('section,blockquote,h3')].map(el => el.getBoundingClientRect().toJSON())), beforeOverlay);
+      assert.deepEqual(await page.evaluate(inspectSpaces), [blankBand]);
+      await page.evaluate(() => document.querySelector('[data-space-overlay]').remove());
+      await page.setContent(`<style>body{margin:0}section{position:relative;box-sizing:border-box;width:600px;height:400px;padding:20px}h2{height:60px;margin:0}footer{position:absolute;top:360px}img{display:block;width:560px;height:280px}</style><section><h2>Title excluded</h2><img src="${spaceImage}"><footer>Footer excluded</footer></section>`);
+      await page.evaluate(async () => { await document.images[0].decode(); });
+      assert.deepEqual((await page.evaluate(inspectSpaces))[0].regions, []);
+      // Marpit's outer SVG must not hide the section's HTML text from measurement.
+      await page.setContent(`<style>body{margin:0}section{width:470px;height:160px;font:20px/20px monospace}p{margin:0}</style><svg width="600" height="400"><foreignObject width="600" height="400"><section xmlns="http://www.w3.org/1999/xhtml"><p>${Array(8).fill('X'.repeat(39)).join('<br>')}</p></section></foreignObject></svg>`);
+      const [wrappedTextSpaces] = await page.evaluate(inspectSpaces);
+      assert.ok(wrappedTextSpaces.regions.every(r => r.width < wrappedTextSpaces.body.width / 2));
+      await page.setContent(`<style>body{margin:0}section{width:480px;height:240px}img{width:480px;height:240px;object-fit:contain}</style><section><img src="${spaceImage}"></section>`);
+      await page.evaluate(async () => { await document.images[0].decode(); });
+      const [containedSpaces] = await page.evaluate(inspectSpaces);
+      assert.ok(containedSpaces.regions.some(r => r.y === 0 && r.height >= 48 && r.width === 480));
+      assert.ok(containedSpaces.regions.some(r => r.y >= 180 && r.height >= 48 && r.width === 480));
       console.log('Layout inspection self-test passed');
       return;
     }
@@ -1026,6 +1217,8 @@ async function main() {
       const columns = await page.evaluate(inspectColumns);
       const groupGaps = await page.evaluate(inspectGroupGaps);
       const bodyFill = await page.evaluate(inspectBodyFill);
+      const spaces = await page.evaluate(inspectSpaces);
+      fs.writeFileSync(path.join(output, 'spaces.json'), JSON.stringify({ input, browser: await browser.version(), slides: spaces }, null, 2));
       const structure = [...await page.evaluate(inspectStructure), ...await page.evaluate(inspectTypography), ...await page.evaluate(inspectTerms, terms), ...await page.evaluate(inspectMidwordWraps), ...await page.evaluate(inspectItemGaps), ...titleFindings, ...headingFindings, ...columnFindings(columns), ...groupGapFindings(groupGaps), ...bodyFillFindings(bodyFill)];
       structuralErrors += structure.length + candidates.length;
       candidateCount += candidates.length + structure.length;
@@ -1033,7 +1226,7 @@ async function main() {
       await page.evaluate(() => document.querySelectorAll('.debug-layout').forEach(e => e.classList.remove('debug-layout')));
       const sections = await page.$$('section');
       if (!sections.length) throw new Error(`No slides rendered: ${input}`);
-      const report = [`# Layout review: ${input}`, '', `${candidates.length} line-balance errors; ${structure.length} structure/typography findings. Review each image at full size; zero findings does not mean good layout.`, ''];
+      const report = [`# Layout review: ${input}`, '', `${candidates.length} line-balance errors; ${structure.length} structure/typography findings; ${spaces.reduce((sum, slide) => sum + slide.regions.length, 0)} review-only space candidates. Review each image at full size; zero findings does not mean good layout.`, ''];
       for (const finding of structure.filter(f => f.slide === 0)) {
         report.push(`Error ${finding.kind}: ${finding.text}`, '');
         console.log(`${input} ERROR ${finding.kind}: ${finding.text}`);
@@ -1042,6 +1235,26 @@ async function main() {
         const filename = `slide-${i + 1}.png`;
         await sections[i].screenshot({ path: path.join(output, filename) });
         report.push(`## Slide ${i + 1}`, '', `![Slide ${i + 1}](${filename})`, '');
+        const space = spaces[i];
+        const overlay = `slide-${i + 1}-space.png`;
+        await page.evaluate(drawSpaceOverlay, space);
+        try {
+          await sections[i].screenshot({ path: path.join(output, overlay) });
+        } finally {
+          await page.evaluate(() => document.querySelectorAll('[data-space-overlay]').forEach(el => el.remove()));
+        }
+        const px = value => `${Number(value.toFixed(1))}px`;
+        report.push('### Space review', '', `${space.regions.length} empty-region candidates (review only; not errors). Coordinates are relative to the slide top left.`, '', `![Space review ${i + 1}](${overlay})`, '');
+        for (const region of space.regions) {
+          report.push(`- ${region.id}: (${px(region.x)}, ${px(region.y)}), ${px(region.width)} × ${px(region.height)}; ${Object.entries(region.neighbours).map(([side, text]) => `${side}: ${JSON.stringify(text)}`).join('; ')}`);
+        }
+        report.push('', 'Column content edges (painted bounds):', '');
+        for (const pair of space.columns) report.push(`- ${JSON.stringify(pair.left.text)} / ${JSON.stringify(pair.right.text)}: top ${px(pair.left.top)} / ${px(pair.right.top)} (difference ${px(pair.topDifference)}); bottom ${px(pair.left.bottom)} / ${px(pair.right.bottom)} (difference ${px(pair.bottomDifference)}).`);
+        report.push('', `Shared gaps: ${Object.entries(space.sharedGaps).map(([name, value]) => `${name}=${px(value)}`).join(', ')}.`, '', 'Consecutive block gaps:', '');
+        for (const gap of space.blockGaps) report.push(`- ${JSON.stringify(gap.before)} → ${JSON.stringify(gap.after)}: ${px(gap.gap)}; ${gap.variable}=${px(gap.expected)} (difference ${px(gap.gap - gap.expected)}).`);
+        report.push('', 'Figure-to-caption distances:', '');
+        for (const caption of space.captions) report.push(`- ${JSON.stringify(caption.image)} → ${JSON.stringify(caption.caption)}: distance ${px(caption.distance)}, vertical gap ${px(caption.verticalGap)}.`);
+        report.push('');
         for (const candidate of candidates.filter(c => c.slide === i + 1)) {
           report.push(`Error ${candidate.element}: shortest non-first line is ${Math.round(candidate.shortLineRatio * 100)}% of the longest line.`, '', '```text', ...candidate.lines, '```', '');
           console.log(`${input}:${i + 1} ERROR unbalanced-lines: ${candidate.shortLine}`);
@@ -1055,7 +1268,7 @@ async function main() {
       fs.writeFileSync(path.join(output, 'review.md'), report.join('\n'));
       console.log(`${sections.length} slides saved: ${path.join(output, 'review.md')}`);
     }
-    console.log(`${candidateCount} layout errors; all findings fail the check.`);
+    console.log(`${candidateCount} layout errors; space-review candidates do not fail the check.`);
     if (structuralErrors) throw new Error(`${structuralErrors} layout errors: see review.md.`);
   } finally {
     await browser.close();
