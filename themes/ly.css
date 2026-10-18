@@ -875,6 +875,8 @@ section.efficiency-slide img { width: 100%; height: var(--efficiency-figure-heig
 section.efficiency-slide table { width: 100%; margin: 0; line-height: var(--list-line-height); }
 section.efficiency-slide :is(th, td) { padding: var(--efficiency-cell-padding); }
 section.efficiency-slide > blockquote > p:has(> em > a) { text-align: center; }
+section.summary-slide > blockquote:has(img) { align-self: start; }
+section.summary-slide img { height: auto; }
 section.qualitative-slide {
   --efficiency-figure-height: 310px;
   grid-template-columns: 180px minmax(0, 1fr) 280px minmax(0, 1fr);

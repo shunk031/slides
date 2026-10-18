@@ -583,7 +583,7 @@ _[[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.T5)]: Table 5 の主
 
 ---
 
-<!-- _class: analysis-slide efficiency-slide content-slide-gray classification-public -->
+<!-- _class: analysis-slide efficiency-slide summary-slide content-slide-gray classification-public -->
 <!-- 発表目安 0:20 -->
 <!-- 主結果: https://arxiv.org/html/2608.26716v1#S5.T4 -->
 
