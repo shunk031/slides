@@ -733,6 +733,7 @@ section.method-slide {
   --problem-figure-height: 260px;
   --content-gap: 8px;
 }
+section.mason-overview-slide { --problem-figure-height: 150px; }
 
 section:is(.ma-slide, .sp-slide) {
   --problem-figure-height: 230px;

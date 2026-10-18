@@ -302,10 +302,10 @@ GPT-4o のレイヤー間の位置関係を読み取る能力を測定
 
 ---
 
-<!-- _class: method-slide content-slide-gray classification-public -->
+<!-- _class: method-slide mason-overview-slide content-slide-gray classification-public -->
 <!-- 発表目安 0:45 -->
 
-## MASON 1/3 **|** _2 つの失敗要因へ別々の学習支援を追加_
+## MASON 1/3 **|** _学習データと入力を拡張し、2 つの失敗要因に対処_
 
 > ![Figure 4: 左の MA Module は要素対応付け、中央の SP Module は空間関係、右は VLM の追加学習](assets/beyond-atomic-pipeline.png)
 >
@@ -313,15 +313,23 @@ GPT-4o のレイヤー間の位置関係を読み取る能力を測定
 
 > **Multimodal Alignment（MA）**
 >
-> - 対処する失敗要因: Semantic drift
-> - 方針: ID と見た目の対応を質問応答に含める
+> - 追加: ID と見た目を結ぶ補助 QA
+>   - 質問: ID が $i$ の要素の見た目と位置
+>   - 回答: GPT-4o が生成
+> - 学習: 本来のタスクと混ぜて使用
+>   - 推論時: 補助 QA は不使用
+> - ➜ Semantic drift を軽減
 
 > **Structural Perception（SP）**
 >
-> - 対処する失敗要因: Structural ambiguity
-> - 方針: 質問対象との空間関係をメタデータに含める
+> - 追加: 質問対象と各候補の空間関係
+>   - 重なり・包含・距離・上下左右・前後
+>   - メタデータから計算
+> - 入力: `spatialRelationship` に追記
+>   - 学習時・推論時の両方で使用
+> - ➜ Structural ambiguity を軽減
 
-Qwen2.5-VL 7B _[[Bai+ arXiv’25](https://arxiv.org/abs/2502.13923)]_ を追加学習：入力・教師データ拡張、モデル構造は不変
+Qwen2.5-VL 7B _[[Bai+ arXiv’25](https://arxiv.org/abs/2502.13923)]_ のモデル構造は変えず、学習データ（MA）と入力（SP）を拡張
 
 ---
 
@@ -335,7 +343,7 @@ Qwen2.5-VL 7B _[[Bai+ arXiv’25](https://arxiv.org/abs/2502.13923)]_ を追加�
 > Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S3.F4)]:\
 > 補助 QA の生成
 
-> **Grounding QA（要素の対応付け問題）を生成**
+> **補助 QA（Grounding QA）を生成**
 >
 > - 入力: レイアウト $\mathcal{L}$（完成画像＋メタデータ）\
 >   対象要素の切り出し画像・メタデータ・質問
