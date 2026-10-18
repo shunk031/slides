@@ -418,6 +418,7 @@ $$
 
 _[[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.T4)]: Table 4 の主要列を再構成。重み付き精度はテストデータの構成比で重み付け_
 
+- Max-Overlap: 質問対象との重なり率（IoU）が最大の要素を選ぶ規則ベースの手法
 - Clipping: DF 83.33 → MASON 90.91（+7.58 pt）/ Morphing は 70.21%に留まる
 - GPT-o3 比: +11.98 pt（79.68 → 91.66）
 
