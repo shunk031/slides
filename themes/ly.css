@@ -751,7 +751,10 @@ section img[src$="#crop-right"] {
 }
 section.sp-slide img[src$="#crop-left"] {
   --crop-feather-width: 160px;
-  mask-image: linear-gradient(to right, transparent, black var(--crop-feather-width), black calc(100% - var(--content-gap) * 2), transparent calc(100% - var(--content-gap)));
+  mask-image: linear-gradient(to right, transparent, black var(--crop-feather-width), black calc(100% - var(--crop-feather-width)), transparent), linear-gradient(to right, transparent, black var(--crop-feather-width));
+  mask-size: 100% calc(var(--content-gap) * 3), 100% calc(100% - var(--content-gap) * 3);
+  mask-position: top, bottom;
+  mask-repeat: no-repeat;
 }
 
 section.analysis-slide {
