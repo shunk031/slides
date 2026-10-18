@@ -515,7 +515,7 @@ _[[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.T5)]: Table 5 の主
 
 ## 定性結果 1/2 **|** _Clipping で正しい切り抜き先を特定_
 
-> ![Figure 6(c): Clippingの完成画像・質問対象・DFとMASONの対応先](assets/beyond-atomic-case-clipping.png)
+> ![h:460 Figure 6(c): Clippingの完成画像・質問対象・DFとMASONの対応先](assets/beyond-atomic-case-clipping.png)
 >
 > Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.F6.sf3)]:\
 > Clipping の完成画像・質問対象と両モデルの対応先
