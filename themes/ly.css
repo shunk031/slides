@@ -622,7 +622,7 @@ section.comparison-slide > blockquote::after { content: none; }
 section.comparison-slide > blockquote > p { margin: 0; }
 section.comparison-slide > blockquote > p:first-child { color: var(--color-heading); }
 
-section:is(.problem-slide, .dataset-slide) {
+section:is(.problem-slide, .dataset-slide, .method-slide) {
   --problem-figure-height: 250px;
   --content-gap: 12px;
   display: grid;
@@ -631,13 +631,13 @@ section:is(.problem-slide, .dataset-slide) {
   align-content: start;
   letter-spacing: 0;
 }
-section:is(.problem-slide, .dataset-slide)::before,
-section:is(.problem-slide, .dataset-slide) > :is(h2, p),
-section:is(.problem-slide, .dataset-slide) > blockquote:first-of-type {
+section:is(.problem-slide, .dataset-slide, .method-slide)::before,
+section:is(.problem-slide, .dataset-slide, .method-slide) > :is(h2, p),
+section:is(.problem-slide, .dataset-slide, .method-slide) > blockquote:first-of-type {
   grid-column: 1 / -1;
   margin: 0;
 }
-section:is(.problem-slide, .dataset-slide) > blockquote {
+section:is(.problem-slide, .dataset-slide, .method-slide) > blockquote {
   min-width: 0;
   margin: 0;
   padding: 0;
@@ -646,18 +646,23 @@ section:is(.problem-slide, .dataset-slide) > blockquote {
   font-size: var(--body-font-size);
   line-height: var(--body-line-height);
 }
-section:is(.problem-slide, .dataset-slide) > blockquote::before,
-section:is(.problem-slide, .dataset-slide) > blockquote::after { content: none; }
-section:is(.problem-slide, .dataset-slide) > blockquote > p { margin: 0 0 var(--content-gap); }
-section:is(.problem-slide, .dataset-slide) > blockquote:first-of-type > p { margin: 0; }
-section:is(.problem-slide, .dataset-slide) > blockquote:first-of-type {
+section:is(.problem-slide, .dataset-slide, .method-slide) > blockquote::before,
+section:is(.problem-slide, .dataset-slide, .method-slide) > blockquote::after { content: none; }
+section:is(.problem-slide, .dataset-slide, .method-slide) > blockquote > p { margin: 0 0 var(--content-gap); }
+section:is(.problem-slide, .dataset-slide, .method-slide) > blockquote:first-of-type > p { margin: 0; }
+section:is(.problem-slide, .dataset-slide, .method-slide) > blockquote:first-of-type {
   text-align: center;
   font-size: var(--figure-caption-font-size);
 }
-section:is(.problem-slide, .dataset-slide) img {
+section:is(.problem-slide, .dataset-slide, .method-slide) img {
   height: var(--problem-figure-height);
   max-width: 100%;
   object-fit: contain;
+}
+
+section.method-slide {
+  --problem-figure-height: 260px;
+  --content-gap: 8px;
 }
 
 section.dataset-slide {

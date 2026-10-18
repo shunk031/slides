@@ -244,6 +244,32 @@ Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S0.F1)]: 4�
 
 ---
 
+<!-- _class: method-slide content-slide-gray classification-public -->
+<!-- 発表目安 0:45 -->
+
+## MASON 1/3 **|** _2つの失敗要因へ別々の学習支援を追加_
+
+> ![Figure 4: 左の MA Module は要素対応付け、中央の SP Module は空間関係、右は VLM の追加学習](assets/beyond-atomic-pipeline.png)
+>
+> Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S3.F4)]: MA・SP を組み込む追加学習の全体像
+
+> **図左: Multimodal Alignment（MA）**
+>
+> - Semantic drift: メタデータと見た目の不一致
+> - 指定レイヤーと画像中の要素の対応を学習
+>   - 要素の見た目・位置を答える教師データを追加
+
+> **図中央: Structural Perception（SP）**
+>
+> - Structural ambiguity: レイヤー間の曖昧な関係
+> - 前後・重なり・包含を明示的な関係として付与
+>   - 入力メタデータへ空間関係を追加
+
+**MASON: 既存の VLM を追加学習する枠組み**\
+ベース: Qwen2.5-VL 7B _[[Bai+ arXiv’25](https://arxiv.org/abs/2502.13923)]_ ／ ネットワークの新設ではなく、教師データと入力表現を拡張
+
+---
+
 <!-- _class: title-slide-big classification-public debug-layout -->
 
 # 表紙用の背景
