@@ -443,6 +443,7 @@ function inspectStructure() {
       const footerTop = footer.getBoundingClientRect().top - slideTop;
       for (const block of slide.querySelectorAll('h1,h2,h3,h4,h5,h6,p,li,figcaption,td,th,img')) {
         if (block.closest('header,footer,.pagination,.page-number,.classification,.classification-badge,.background-decoration')) continue;
+        if (block.matches('section.floating-footnote > p:last-of-type')) continue;
         const box = block.getBoundingClientRect();
         const bodyBottom = box.bottom - slideTop;
         if (box.width && box.height && bodyBottom >= footerTop)
@@ -549,7 +550,7 @@ function inspectTypography() {
       if (el.querySelector('img,code') || el.closest('.profile-slide > blockquote:nth-of-type(2)')) continue;
       const figure = el.closest('blockquote:has(> p > img)');
       const nested = el.closest('li')?.parentElement.closest('li');
-      const role = /^(Figure from|出典:)/.test(el.textContent.trim()) ? 'figure-source' : figure ? 'figure-caption' : nested ? 'nested-body' : 'body';
+      const role = el.matches('section.floating-footnote > p:last-of-type') ? 'citation' : /^(Figure from|出典:)/.test(el.textContent.trim()) ? 'figure-source' : figure ? 'figure-caption' : nested ? 'nested-body' : 'body';
       record(role, el, index + 1);
       for (const inline of el.querySelectorAll(':scope > strong, :scope > a')) record(role, inline, index + 1);
     }
@@ -693,6 +694,20 @@ async function main() {
       assert.equal(footerTouch.footerTop, 260);
       await page.evaluate(() => { document.querySelector('p').style.top = '239px'; });
       assert.equal((await page.evaluate(inspectStructure)).some(f => f.kind === 'footer-overflow'), false);
+      await page.setContent('<section class="floating-footnote" style="position:relative;width:500px;height:300px;font:20px/20px monospace"><p id="body" style="position:absolute;top:20px;margin:0">Body</p><p id="note" style="position:absolute;top:260px;left:160px;margin:0">Note</p><footer style="position:absolute;top:260px;left:0;width:500px;height:40px">Copyright</footer></section>');
+      assert.deepEqual((await page.evaluate(inspectStructure)).filter(f => ['footer-overflow', 'text-overflow', 'text-overlap'].includes(f.kind)), []);
+      await page.evaluate(() => { document.querySelector('#note').style.left = '0'; });
+      const overlappingFootnote = await page.evaluate(inspectStructure);
+      assert.ok(overlappingFootnote.some(f => f.kind === 'text-overlap' && f.text === 'Note'));
+      assert.ok(overlappingFootnote.some(f => f.kind === 'text-overlap' && f.text === 'Copyright'));
+      await page.evaluate(() => { Object.assign(document.querySelector('#note').style, {left:'160px',top:'290px'}); });
+      assert.ok((await page.evaluate(inspectStructure)).some(f => f.kind === 'text-overflow' && f.text === 'Note'));
+      await page.evaluate(() => { document.querySelector('#note').style.top = '260px'; document.querySelector('#body').style.top = '260px'; });
+      const bodyBesideFootnote = await page.evaluate(inspectStructure);
+      assert.ok(bodyBesideFootnote.some(f => f.kind === 'footer-overflow' && f.text.startsWith('Body')));
+      assert.equal(bodyBesideFootnote.some(f => f.kind === 'footer-overflow' && f.text.startsWith('Note')), false);
+      await page.evaluate(() => { document.querySelector('section').classList.remove('floating-footnote'); });
+      assert.ok((await page.evaluate(inspectStructure)).some(f => f.kind === 'footer-overflow' && f.text.startsWith('Note')));
       await page.setContent('<section class="paired-definitions" style="display:grid;grid-template-columns:1fr 1fr;font:20px/30px sans-serif"><blockquote style="margin:0"><p style="margin:0">Atomic<br>layout<br>definition</p></blockquote><blockquote style="margin:0"><p style="margin:0">Compositional<br>layout</p></blockquote></section>');
       assert.equal((await page.evaluate(inspectStructure)).some(f => f.kind === 'paired-definition-alignment'), true);
       await page.setContent('<section class="paired-definitions" style="display:grid;grid-template-columns:1fr 1fr;font:20px/30px sans-serif"><blockquote style="margin:8px 0 0"><p style="margin:0">Atomic<br>layout</p></blockquote><blockquote style="margin:0"><p style="margin:0">Compositional<br>layout</p></blockquote></section>');
@@ -773,6 +788,15 @@ async function main() {
       assert.deepEqual((await page.evaluate(inspectTypography)).map(f => f.slide), [1, 2]);
       await page.addStyleTag({ content: 'blockquote p {font-size:20px!important}' });
       assert.deepEqual(await page.evaluate(inspectTypography), []);
+      await page.setContent('<section style="font-size:30px"><p>Body <em><a style="font-size:20px">Citation</a></em></p></section><section class="floating-footnote" style="font-size:30px"><p>Body</p><p id="note" style="font-size:20px"><strong><a>Note</a></strong></p></section>');
+      assert.deepEqual(await page.evaluate(inspectTypography), []);
+      await page.evaluate(() => { document.querySelector('#note').style.fontSize = '22px'; });
+      const footnoteTypography = await page.evaluate(inspectTypography);
+      assert.ok(footnoteTypography.some(f => f.text.startsWith('citation: 22px')));
+      assert.ok(footnoteTypography.some(f => f.text.startsWith('citation: 20px')));
+      assert.equal(footnoteTypography.some(f => f.text.startsWith('body:')), false);
+      await page.evaluate(() => { document.querySelector('#note').style.fontSize = '20px'; document.querySelector('section.floating-footnote > p:first-of-type').style.fontSize = '20px'; });
+      assert.ok((await page.evaluate(inspectTypography)).some(f => f.text.startsWith('body:')));
       await page.setContent('<section class="profile-slide"><blockquote><p>経歴</p></blockquote><blockquote><p><img></p><p><a>連絡先</a></p></blockquote></section>');
       assert.deepEqual(await page.evaluate(inspectStructure), []);
       await page.setContent('<section style="font:20px/30px sans-serif"><blockquote><p><img style="width:80px;height:40px"></p><p id="source" style="margin-top:90px">Figure from [<a>Huang+ ECCV’26</a>]: 説明</p></blockquote><p id="footer">出典: Huang+ ECCV’26</p></section>');
