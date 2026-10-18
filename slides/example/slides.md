@@ -337,8 +337,8 @@ Qwen2.5-VL 7B _[[Bai+ arXiv’25](https://arxiv.org/abs/2502.13923)]_ を追加�
 
 > **Grounding QA（要素の対応付け問題）を生成**
 >
-> - 入力: 完成画像・対象要素の切り出し画像\
->   対象要素のメタデータ・質問
+> - 入力: レイアウト $\mathcal{L}$（完成画像＋メタデータ）\
+>   対象要素の切り出し画像・メタデータ・質問
 > - $Q^g(e_i)$: 要素 $e_i$ の見た目と位置を問う質問
 >   - [Table 2（和訳）](https://arxiv.org/html/2608.26716v1#S4.T2): 「ID が $i$ の要素は何か。\
 >     完成画像のどこにあるか」
@@ -348,11 +348,11 @@ Qwen2.5-VL 7B _[[Bai+ arXiv’25](https://arxiv.org/abs/2502.13923)]_ を追加�
 
 $$
 \underbrace{\vphantom{A^g(e_i)\mathcal{P}_{\mathrm{ground}}}A^g(e_i)}_{\mathclap{\text{回答}}} =
-\underbrace{\vphantom{A^g(e_i)\mathcal{P}_{\mathrm{ground}}}\mathcal{G}}_{\mathclap{\vphantom{\text{回答}}\text{GPT-4o}}}\;\,\Bigl(
-\underbrace{\vphantom{A^g(e_i)\mathcal{P}_{\mathrm{ground}}}\mathcal{P}_{\mathrm{ground}}}_{\mathclap{\text{プロンプト}}}\qquad\Bigl(
-\underbrace{\vphantom{A^g(e_i)\mathcal{P}_{\mathrm{ground}}}\mathcal{L}}_{\mathclap{\text{画像＋メタデータ}}},\qquad\;
-\underbrace{\vphantom{A^g(e_i)\mathcal{P}_{\mathrm{ground}}}\mathcal{I}_{e_i}}_{\mathclap{\text{要素画像}}},\,
-\underbrace{\vphantom{A^g(e_i)\mathcal{P}_{\mathrm{ground}}}\mathcal{M}_{e_i}}_{\mathclap{\text{属性}}},\,
+\underbrace{\vphantom{A^g(e_i)\mathcal{P}_{\mathrm{ground}}}\mathcal{G}}_{\mathclap{\vphantom{\text{回答}}\text{GPT-4o}}}\quad\Bigl(
+\underbrace{\vphantom{A^g(e_i)\mathcal{P}_{\mathrm{ground}}}\mathcal{P}_{\mathrm{ground}}}_{\mathclap{\text{プロンプト}}}\quad\Bigl(
+\underbrace{\vphantom{A^g(e_i)\mathcal{P}_{\mathrm{ground}}}\mathcal{L}}_{\mathclap{\text{レイアウト}}},\quad\;
+\underbrace{\vphantom{A^g(e_i)\mathcal{P}_{\mathrm{ground}}}\mathcal{I}_{e_i}}_{\mathclap{\text{要素画像}}},\quad
+\underbrace{\vphantom{A^g(e_i)\mathcal{P}_{\mathrm{ground}}}\mathcal{M}_{e_i}}_{\mathclap{\text{属性}}},\quad\;
 \underbrace{\vphantom{A^g(e_i)\mathcal{P}_{\mathrm{ground}}}Q^g(e_i)}_{\mathclap{\text{質問}}}
 \Bigr)\Bigr)
 $$
