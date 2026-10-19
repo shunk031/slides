@@ -911,6 +911,42 @@ function inspectTypography() {
   return samples.filter(s => mismatched.has(s.role)).map(s => ({ slide: s.slide, kind: 'font-size-mismatch', text: `${s.role}: ${s.size} (${s.text})` }));
 }
 
+function inspectPseudoLists(terms = {}) {
+  const findings = [];
+  const prose = element => {
+    const copy=element.cloneNode(true);
+    copy.querySelectorAll('code,pre,mjx-container,math,.katex,svg').forEach(el=>el.remove());
+    return copy;
+  };
+  const boldOnly = element => {
+    const strong=[...element.querySelectorAll('strong')];
+    return strong.length && element.textContent.trim() === strong.map(s=>s.textContent).join('').trim();
+  };
+  [...document.querySelectorAll('section')].forEach((slide,index)=>{
+    if (slide.matches('.first-slide,.paper-title,.title-slide-big,.lead,.takahashi')) return;
+    for (const p of slide.querySelectorAll('p')) {
+      if (p.closest('header,footer,code,pre') || p.closest('blockquote')?.querySelector('img') || p.closest('li')?.querySelector('img') || /^Figure from\b/.test(p.textContent.trim())) continue;
+      const copy=prose(p),text=copy.textContent.trim().replace(/\s+/g,' ');
+      if (!text) continue;
+      if (p.closest('blockquote') && Object.keys(terms).some(term=>text.startsWith(`${term}:`) || text.startsWith(`${term}：`) || text.startsWith(`${term} (`) || text.startsWith('解決する問題:') && text.includes(term))) continue;
+      const breaks=copy.querySelectorAll('br');
+      if (!breaks.length) continue;
+      const first=document.createElement('span');
+      const range=document.createRange();range.setStart(copy,0);range.setEndBefore(breaks[0]);first.append(range.cloneContents());
+      const after=copy.textContent.slice(first.textContent.length).trim();
+      if (breaks.length>=2 || after && boldOnly(first)) findings.push({slide:index+1,kind:'pseudo-list',variant:'paragraph-breaks',review:true,text:`${text}: ${breaks.length} explicit breaks${boldOnly(first)?', bold-only first line':''}`});
+    }
+    for (const list of slide.querySelectorAll('ul,ol')) {
+      if (list.parentElement.closest('ul,ol') || list.closest('header,footer,code,pre')) continue;
+      const items=[...list.children].filter(el=>el.matches('li'));
+      if (items.length!==1 || !items[0].querySelector(':scope > ul,:scope > ol')) continue;
+      const copy=prose(items[0]);copy.querySelectorAll('ul,ol').forEach(el=>el.remove());
+      if (boldOnly(copy)) findings.push({slide:index+1,kind:'pseudo-list',variant:'heading-list',text:`${copy.textContent.trim()}: single bold-only parent item holding child bullets`});
+    }
+  });
+  return findings;
+}
+
 function inspectMathLabels() {
   const formulas = [];
   [...document.querySelectorAll('section')].forEach((slide, index) => {
@@ -1587,6 +1623,25 @@ async function main() {
       const parser = new (marpRequire('@marp-team/marp-core').Marp)();
       const sources = parser.markdown.parse('```tex\n$$x\\quad y$$\n```\n\n<!-- $$z$$ -->\n\n$$\nx+y\n$$',{}).filter(t=>t.type==='marp_math_block').map(t=>t.content);
       assert.deepEqual(sources, ['x+y\n']);
+      for (const content of ['<p>First<br>Second<br>Third</p>','<p><strong>Heading</strong><br>Body line</p>','<p><strong>Approved lead<br>Continued emphasis</strong></p>']) {
+        await page.setContent(`<section>${content}</section>`);
+        const findings=await page.evaluate(inspectPseudoLists);
+        assert.equal(findings.length,1); assert.equal(findings[0].review,true);
+      }
+      for (const content of ['<p>One sentence<br>continued normally</p>','<p><strong>Heading</strong></p><ul><li>Body</li></ul>','<blockquote><p><img src="x"></p><p><strong>Caption</strong><br>First<br>Second</p></blockquote>','<ul><li><p><strong>Panel</strong><br>Caption</p><img src="x"></li></ul>','<p><code>A<br>B<br>C</code></p>','<p><mjx-container>A<br>B<br>C</mjx-container></p>']) {
+        await page.setContent(`<section>${content}</section>`);
+        assert.deepEqual(await page.evaluate(inspectPseudoLists),[]);
+      }
+      await page.setContent('<section class="first-slide"><p>Title<br>Authors<br>Affiliation</p></section><section><blockquote><p><strong>Semantic drift:</strong><br>Metadata<br>Appearance</p></blockquote></section>');
+      assert.deepEqual(await page.evaluate(inspectPseudoLists,{'Semantic drift':'Metadata Appearance'}),[]);
+      for (const heading of ['<strong>Clipping</strong>','<a><strong>Clipping</strong></a>']) {
+        await page.setContent(`<section><ul><li>${heading}<ul><li>Result</li></ul></li></ul></section>`);
+        const findings=await page.evaluate(inspectPseudoLists);
+        assert.equal(findings.length,1); assert.equal(findings[0].variant,'heading-list'); assert.equal(findings[0].review,undefined);
+      }
+      for (const content of ['<ul><li>Ordinary parent<ul><li>Child</li></ul></li></ul>','<ul><li><strong>First</strong><ul><li>Child</li></ul></li><li><strong>Second</strong><ul><li>Child</li></ul></li></ul>','<ul><li>Parent<ul><li><strong>Nested</strong><ul><li>Child</li></ul></li></ul></li></ul>']) {
+        await page.setContent(`<section>${content}</section>`); assert.deepEqual(await page.evaluate(inspectPseudoLists),[]);
+      }
       console.log('Layout inspection self-test passed');
       return;
     }
@@ -1629,18 +1684,20 @@ async function main() {
       const spaces = await page.evaluate(inspectSpaces);
       const textConventions = await page.evaluate(inspectTextConventions, terms);
       const languageReview = textConventions.filter(f => f.review);
+      const pseudoLists = await page.evaluate(inspectPseudoLists, terms);
+      const pseudoReview = pseudoLists.filter(f => f.review);
       const math = await page.evaluate(inspectMathLabels);
       const mathSources = new (marpRequire('@marp-team/marp-core').Marp)().markdown.parse(fs.readFileSync(input, 'utf8'), {}).filter(t => t.type === 'marp_math_block').map(t => t.content);
       const mathReview = mathSpacingFindings(math, mathSources);
       fs.writeFileSync(path.join(output, 'spaces.json'), JSON.stringify({ input, browser: await browser.version(), slides: spaces }, null, 2));
-      const structure = [...(input === files[0] ? layoutCoverage.findings : []), ...await page.evaluate(inspectStructure), ...math.flatMap(f => f.findings), ...textConventions.filter(f => !f.review), ...await page.evaluate(inspectTypography), ...await page.evaluate(inspectTerms, terms), ...await page.evaluate(inspectMidwordWraps), ...await page.evaluate(inspectItemGaps), ...titleFindings, ...headingFindings, ...columnFindings(columns), ...groupGapFindings(groupGaps), ...bodyFillFindings(bodyFill)];
+      const structure = [...(input === files[0] ? layoutCoverage.findings : []), ...await page.evaluate(inspectStructure), ...math.flatMap(f => f.findings), ...textConventions.filter(f => !f.review), ...pseudoLists.filter(f => !f.review), ...await page.evaluate(inspectTypography), ...await page.evaluate(inspectTerms, terms), ...await page.evaluate(inspectMidwordWraps), ...await page.evaluate(inspectItemGaps), ...titleFindings, ...headingFindings, ...columnFindings(columns), ...groupGapFindings(groupGaps), ...bodyFillFindings(bodyFill)];
       structuralErrors += structure.length + candidates.length;
       candidateCount += candidates.length + structure.length;
-      fs.writeFileSync(path.join(output, 'lines.json'), JSON.stringify({ input, browser: await browser.version(), blocks, columnPairs: columns, groupGaps, bodyFill, structure, languageReview, mathReview, math }, null, 2));
+      fs.writeFileSync(path.join(output, 'lines.json'), JSON.stringify({ input, browser: await browser.version(), blocks, columnPairs: columns, groupGaps, bodyFill, structure, languageReview, pseudoReview, mathReview, math }, null, 2));
       await page.evaluate(() => document.querySelectorAll('.debug-layout').forEach(e => e.classList.remove('debug-layout')));
       const sections = await page.$$('section');
       if (!sections.length) throw new Error(`No slides rendered: ${input}`);
-      const report = [`# Layout review: ${input}`, '', `${candidates.length} line-balance errors; ${structure.length} structure/typography findings; ${spaces.reduce((sum, slide) => sum + slide.regions.length, 0)} review-only space candidates; ${languageReview.length} review-only demonstrative candidates; ${mathReview.length} review-only formula-spacing candidates. Review each image at full size; zero findings does not mean good layout.`, ''];
+      const report = [`# Layout review: ${input}`, '', `${candidates.length} line-balance errors; ${structure.length} structure/typography findings; ${spaces.reduce((sum, slide) => sum + slide.regions.length, 0)} review-only space candidates; ${languageReview.length} review-only demonstrative candidates; ${pseudoReview.length} review-only pseudo-list candidates; ${mathReview.length} review-only formula-spacing candidates. Review each image at full size; zero findings does not mean good layout.`, ''];
       for (const finding of structure.filter(f => f.slide === 0)) {
         report.push(`Error ${finding.kind}: ${finding.text}`, '');
         console.log(`${input} ERROR ${finding.kind}: ${finding.text}`);
@@ -1649,7 +1706,7 @@ async function main() {
         const filename = `slide-${i + 1}.png`;
         await sections[i].screenshot({ path: path.join(output, filename) });
         report.push(`## Slide ${i + 1}`, '', `![Slide ${i + 1}](${filename})`, '');
-        for (const finding of [...languageReview, ...mathReview].filter(f => f.slide === i + 1)) {
+        for (const finding of [...languageReview, ...pseudoReview, ...mathReview].filter(f => f.slide === i + 1)) {
           report.push(`Review ${finding.kind}: ${finding.text}`, '');
           console.log(`${input}:${i + 1} REVIEW ${finding.kind}: ${finding.text}`);
         }
