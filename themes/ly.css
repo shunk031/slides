@@ -427,6 +427,8 @@ section.paper-title > p:nth-of-type(5) img {
   height: auto;
 }
 
+section .paren { font-size: var(--citation-font-size); }
+
 /* Inline annotations and citations share the same size. */
 section:not(.paper-title) :is(p, li) > em,
 section :is(p, li) > em:has(> a) {

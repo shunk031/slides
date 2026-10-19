@@ -923,6 +923,40 @@ function inspectTypography() {
   return samples.filter(s => mismatched.has(s.role)).map(s => ({ slide: s.slide, kind: 'font-size-mismatch', text: `${s.role}: ${s.size} (${s.text})` }));
 }
 
+function inspectParenthesisSize(audit = false) {
+  const result=[],selector='h1,h2,h3,h4,h5,h6,p,li,td,th,figcaption';
+  [...document.querySelectorAll('section')].forEach((slide,index)=>{
+    const expected=parseFloat(getComputedStyle(slide).getPropertyValue('--citation-font-size'));
+    for (const block of slide.querySelectorAll(selector)) {
+      const chars=[],walker=document.createTreeWalker(block,NodeFilter.SHOW_TEXT);
+      while(walker.nextNode()) {
+        const node=walker.currentNode,parent=node.parentElement;
+        if(parent.closest(selector)!==block||parent.closest('code,pre,mjx-container,math,.katex,svg:not([data-marpit-svg])')) continue;
+        for(const char of node.textContent) chars.push({char,node});
+      }
+      const text=chars.map(c=>c.char).join(''),urls=[...text.matchAll(/(?:[a-z][a-z\d+.-]*:\/\/|www\.)\S+/gi)];
+      let depth=0,start=0;
+      for(let i=0;i<chars.length;i++) {
+        if(chars[i].char==='('&&depth++===0) start=i;
+        if(chars[i].char!==')'||depth===0||--depth!==0) continue;
+        const run=chars.slice(start,i+1),nodes=[...new Set(run.map(c=>c.node))],link=nodes[0].parentElement.closest('a');
+        let reason=slide.matches('.first-slide,.paper-title,.title-slide-big,.lead,.takahashi')?'title-page':block.matches('h1,h2')?'slide-title':block.closest('header,footer')?'header/footer':null;
+        if(run.some(c=>!/[()\s]/.test(c.char))&&run.every((c,j)=>/[()\s]/.test(c.char)||urls.some(u=>start+j>=u.index&&start+j<u.index+u[0].length))) reason||='url';
+        if(link&&nodes.every(n=>link.contains(n))&&/\+.*[’']\d{2}/.test(link.textContent)) reason||='citation-link';
+        const wrapped=nodes[0].parentElement.closest('.paren');
+        const cross=nodes.length>1&&(!wrapped||nodes.some(n=>!wrapped.contains(n)));
+        if(!reason&&cross) reason='cross-inline';
+        const sizes=[...new Set(nodes.map(n=>parseFloat(getComputedStyle(n.parentElement).fontSize)))];
+        const record={slide:index+1,kind:'parenthesis-size',text:text.slice(start,i+1),sizes,expected,reason};
+        if(audit) result.push(record);
+        else if(reason==='cross-inline') result.push({...record,review:true,text:`${record.text}: crosses inline elements; automatic wrapping skipped`});
+        else if(!reason&&(!Number.isFinite(expected)||sizes.some(size=>Math.abs(size-expected)>0.1))) result.push({...record,text:`${record.text}: ${sizes.join('/')}px, citation ${expected}px`});
+      }
+    }
+  });
+  return result;
+}
+
 function inspectPseudoLists(terms = {}) {
   const findings = [];
   const prose = element => {
@@ -1354,6 +1388,40 @@ async function main() {
       }
       const { Marp } = marpRequire('@marp-team/marp-core');
       const math = new Marp().use(require('./check-math.cjs'));
+      const parenPlugin = require('./parenthesis-supplements.cjs');
+      const parenMarp = new Marp().use(parenPlugin);
+      for (const [source, wrapped, review] of [
+        ['Body (DF) and (outer (inner)) and ()', 3, 0],
+        ['- Item (DF)\n  - Nested (VL)', 2, 0],
+        ['| Box (DF) | Cell |\n|---|---|\n| Text | (VL) |', 2, 0],
+        ['> Caption (DF)\n\n**Box (VL)**', 2, 0],
+        ['**(DF)** and [(VL)](https://example.test/a(b))', 2, 0],
+        ['## Title (DF)\n\nBody (VL)', 1, 0],
+        ['<!-- _class: first-slide -->\n# Cover (DF)\n\nBody (VL)', 0, 0],
+        ['`code(x)` and $Q(e^q)$\n\n$$\nA^g(e_i)\n$$', 0, 0],
+        ['```text\ncode(x)\n```\n\n<!-- note (DF) -->', 0, 0],
+        ['https://example.test/a(b) and (https://example.test/x)', 0, 0],
+        ["[[Author+ Conf’26 (Sup)](https://example.test/a(b))]", 0, 0],
+        ['Body (bold **part**) and (code `part`)', 0, 2],
+        ['Body (first<br>second)', 0, 1],
+      ]) {
+        await page.setContent('<style>section{font:30px/1.5 sans-serif;--citation-font-size:20px}.paren{font-size:var(--citation-font-size)}</style>'+parenMarp.render(source).html);
+        assert.equal(await page.$$eval('.paren', spans=>spans.length), wrapped, source);
+        const findings=await page.evaluate(inspectParenthesisSize);
+        assert.equal(findings.filter(f=>f.review).length, review, source);
+        assert.deepEqual(findings.filter(f=>!f.review), [], source);
+      }
+      await page.setContent('<svg data-marpit-svg><foreignObject><section style="font-size:30px;--citation-font-size:20px"><p>Body (DF)</p></section></foreignObject></svg>');
+      assert.equal((await page.evaluate(inspectParenthesisSize)).filter(f=>!f.review).length, 1, 'Marp outer SVG must not hide body');
+      await page.setContent('<section style="font-size:30px;--citation-font-size:20px"><p>Body <span class="paren" style="font-size:20px">(DF)</span></p></section>');
+      assert.deepEqual(await page.evaluate(inspectParenthesisSize), []);
+      await page.$eval('.paren',el=>el.style.fontSize='21px');
+      assert.equal((await page.evaluate(inspectParenthesisSize))[0].kind,'parenthesis-size');
+      await page.setContent('<section style="font-size:30px;--citation-font-size:20px"><p>(https://example.test/x) <code>(DF)</code></p></section>');
+      assert.deepEqual(await page.evaluate(inspectParenthesisSize), []);
+      await page.setContent('<section style="font-size:30px;--citation-font-size:20px"><p>()</p></section>');
+      assert.equal((await page.evaluate(inspectParenthesisSize)).length, 1, 'empty pair is not a URL');
+
       for (const [source, count] of [
         ['その図 この図 それを選ぶ これを選ぶ あの図 あれを選ぶ 当該資料', 7],
         ['その他 その他の条件', 0],
@@ -1720,20 +1788,22 @@ async function main() {
       const spaces = await page.evaluate(inspectSpaces);
       const textConventions = await page.evaluate(inspectTextConventions, terms);
       const languageReview = textConventions.filter(f => f.review);
+      const parentheses = await page.evaluate(inspectParenthesisSize);
+      const parenthesisReview = parentheses.filter(f => f.review);
       const pseudoLists = await page.evaluate(inspectPseudoLists, terms);
       const pseudoReview = pseudoLists.filter(f => f.review);
       const math = await page.evaluate(inspectMathLabels);
       const mathSources = new (marpRequire('@marp-team/marp-core').Marp)().markdown.parse(fs.readFileSync(input, 'utf8'), {}).filter(t => t.type === 'marp_math_block').map(t => t.content);
       const mathReview = mathSpacingFindings(math, mathSources);
       fs.writeFileSync(path.join(output, 'spaces.json'), JSON.stringify({ input, browser: await browser.version(), slides: spaces }, null, 2));
-      const structure = [...(input === files[0] ? layoutCoverage.findings : []), ...await page.evaluate(inspectStructure), ...math.flatMap(f => f.findings), ...textConventions.filter(f => !f.review), ...pseudoLists.filter(f => !f.review), ...await page.evaluate(inspectTypography), ...await page.evaluate(inspectTerms, terms), ...await page.evaluate(inspectMidwordWraps), ...await page.evaluate(inspectItemGaps), ...titleFindings, ...headingFindings, ...columnFindings(columns), ...groupGapFindings(groupGaps), ...bodyFillFindings(bodyFill)];
+      const structure = [...(input === files[0] ? layoutCoverage.findings : []), ...await page.evaluate(inspectStructure), ...math.flatMap(f => f.findings), ...textConventions.filter(f => !f.review), ...pseudoLists.filter(f => !f.review), ...parentheses.filter(f => !f.review), ...await page.evaluate(inspectTypography), ...await page.evaluate(inspectTerms, terms), ...await page.evaluate(inspectMidwordWraps), ...await page.evaluate(inspectItemGaps), ...titleFindings, ...headingFindings, ...columnFindings(columns), ...groupGapFindings(groupGaps), ...bodyFillFindings(bodyFill)];
       structuralErrors += structure.length + candidates.length;
       candidateCount += candidates.length + structure.length;
-      fs.writeFileSync(path.join(output, 'lines.json'), JSON.stringify({ input, browser: await browser.version(), blocks, columnPairs: columns, groupGaps, bodyFill, structure, languageReview, pseudoReview, mathReview, math }, null, 2));
+      fs.writeFileSync(path.join(output, 'lines.json'), JSON.stringify({ input, browser: await browser.version(), blocks, columnPairs: columns, groupGaps, bodyFill, structure, languageReview, pseudoReview, parenthesisReview, mathReview, math }, null, 2));
       await page.evaluate(() => document.querySelectorAll('.debug-layout').forEach(e => e.classList.remove('debug-layout')));
       const sections = await page.$$('section');
       if (!sections.length) throw new Error(`No slides rendered: ${input}`);
-      const report = [`# Layout review: ${input}`, '', `${candidates.length} line-balance errors; ${structure.length} structure/typography findings; ${spaces.reduce((sum, slide) => sum + slide.regions.length, 0)} review-only space candidates; ${languageReview.length} review-only demonstrative candidates; ${pseudoReview.length} review-only pseudo-list candidates; ${mathReview.length} review-only formula-spacing candidates. Review each image at full size; zero findings does not mean good layout.`, ''];
+      const report = [`# Layout review: ${input}`, '', `${candidates.length} line-balance errors; ${structure.length} structure/typography findings; ${spaces.reduce((sum, slide) => sum + slide.regions.length, 0)} review-only space candidates; ${languageReview.length} review-only demonstrative candidates; ${pseudoReview.length} review-only pseudo-list candidates; ${mathReview.length} review-only formula-spacing candidates; ${parenthesisReview.length} review-only parenthesis candidates. Review each image at full size; zero findings does not mean good layout.`, ''];
       for (const finding of structure.filter(f => f.slide === 0)) {
         report.push(`Error ${finding.kind}: ${finding.text}`, '');
         console.log(`${input} ERROR ${finding.kind}: ${finding.text}`);
@@ -1742,7 +1812,7 @@ async function main() {
         const filename = `slide-${i + 1}.png`;
         await sections[i].screenshot({ path: path.join(output, filename) });
         report.push(`## Slide ${i + 1}`, '', `![Slide ${i + 1}](${filename})`, '');
-        for (const finding of [...languageReview, ...pseudoReview, ...mathReview].filter(f => f.slide === i + 1)) {
+        for (const finding of [...languageReview, ...pseudoReview, ...parenthesisReview, ...mathReview].filter(f => f.slide === i + 1)) {
           report.push(`Review ${finding.kind}: ${finding.text}`, '');
           console.log(`${input}:${i + 1} REVIEW ${finding.kind}: ${finding.text}`);
         }
