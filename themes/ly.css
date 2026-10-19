@@ -1,5 +1,13 @@
 /* @theme ly */
 
+/* @layouts:
+   analysis-slide background-slide case-study-slide comparison-slide dataset-slide
+   efficiency-slide experiment-slide failure-analysis-slide ma-slide mason-overview-slide
+   method-slide paper-title problem-slide profile-slide qualitative-slide results-slide
+   selection-slide sp-slide summary-slide takahashi title-slide-big
+*/
+/* @utility-classes: classification-* content-slide-gray debug-layout first-slide lead */
+
 @import "gaia";
 
 /* Keep normal punctuation widths; the deck uses ASCII parentheses. */

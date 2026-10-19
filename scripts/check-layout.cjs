@@ -5,6 +5,52 @@ const { createRequire } = require('node:module');
 const { execFileSync } = require('node:child_process');
 const { pathToFileURL } = require('node:url');
 
+function inspectLayoutCoverage(css) {
+  const sheet = new CSSStyleSheet();
+  sheet.replaceSync(css);
+  const classes = new Set();
+  // shortcut: ASCII class names only; tokenize CSS escapes if the theme starts using them.
+  const visit = rules => {
+    for (const rule of rules) {
+      if (rule.cssRules) visit(rule.cssRules);
+      for (const anchor of (rule.selectorText || '').matchAll(/\bsection\b|:root\b/g)) {
+        const selector = rule.selectorText.slice(anchor.index + anchor[0].length);
+        const functions = [];
+        for (let i = 0; i < selector.length; i++) {
+          const char = selector[i];
+          if (!functions.length && /[\s>+~,]/.test(char)) break;
+          if (char === '[') {
+            // Attribute values can contain dots or selector-looking text.
+            const attribute = selector.slice(i).match(/^\[(?:"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|[^\]"'])*\]/);
+            if (attribute) i += attribute[0].length - 1;
+          } else if (char === '(') {
+            const name = selector.slice(0, i).match(/:([\w-]+)$/)?.[1];
+            functions.push(functions.includes(false) ? false : ['is', 'where', 'not'].includes(name));
+          } else if (char === ')') functions.pop();
+          else if (char === '.' && !functions.includes(false)) {
+            const name = selector.slice(i + 1).match(/^[\w-]+/)?.[0];
+            if (name) { classes.add(name); i += name.length; }
+          }
+        }
+      }
+    }
+  };
+  visit(sheet.cssRules);
+  const declared = key => (css.match(new RegExp(`/\\*\\s*@${key}:([\\s\\S]*?)\\*/`))?.[1] || '').trim().split(/\s+/).filter(Boolean);
+  const layouts = declared('layouts'), utilities = declared('utility-classes');
+  const matches = (pattern, name) => pattern.endsWith('*') ? name.startsWith(pattern.slice(0, -1)) : name === pattern;
+  const used = new Set([...document.querySelectorAll('section')].flatMap(slide => [...slide.classList]));
+  const findings = [];
+  const add = (kind, text) => findings.push({ slide: 0, kind, text });
+  for (const name of classes) if (![...layouts, ...utilities].some(pattern => matches(pattern, name))) add('layout-class-unregistered', name);
+  for (const name of layouts) {
+    if (!/^[a-z][\w-]*$/.test(name) || !classes.has(name)) add('layout-class-stale', `@layouts: ${name}`);
+    else if (!used.has(name)) add('layout-sample-missing', `${name}: add a sample to slides/example/slides.md`);
+  }
+  for (const name of utilities) if (!/^[a-z][\w-]*\*?$/.test(name) || ![...classes].some(value => matches(name, value))) add('layout-class-stale', `@utility-classes: ${name}`);
+  return { classes: [...classes].sort(), layouts, utilities, findings };
+}
+
 // Measure rendered glyphs: nested lists and smaller inline citations have their own geometry.
 function inspectLines() {
   const selector = 'h1,h2,h3,h4,h5,h6,p,li,figcaption,td,th';
@@ -856,6 +902,19 @@ async function main() {
     const page = await browser.newPage();
     await page.setViewport({ width: 1280, height: 720, deviceScaleFactor: 1 });
     if (process.argv.includes('--self-test')) {
+      await page.setContent('<section class="sample"></section>');
+      const coverageCSS = '/* @layouts: sample */ /* @utility-classes: classification-* */ section.sample {} :root.classification-public {}';
+      assert.deepEqual((await page.evaluate(inspectLayoutCoverage, coverageCSS)).findings, []);
+      await page.setContent('<section></section>');
+      assert.deepEqual((await page.evaluate(inspectLayoutCoverage, coverageCSS)).findings.map(f => f.kind), ['layout-sample-missing']);
+      await page.setContent('<section class="sample"></section>');
+      assert.deepEqual((await page.evaluate(inspectLayoutCoverage, coverageCSS + 'section.new-layout {}')).findings.map(f => f.kind), ['layout-class-unregistered']);
+      assert.deepEqual((await page.evaluate(inspectLayoutCoverage, coverageCSS.replace('sample */', 'sample obsolete */'))).findings.map(f => f.kind), ['layout-class-stale']);
+      assert.deepEqual((await page.evaluate(inspectLayoutCoverage, coverageCSS.replace('classification-*', 'unused-*'))).findings.map(f => f.kind).sort(), ['layout-class-stale', 'layout-class-unregistered']);
+      assert.ok((await page.evaluate(inspectLayoutCoverage, coverageCSS.replace('sample */', 'sam* */'))).findings.some(f => f.kind === 'layout-class-stale'));
+      const nestedCoverage = await page.evaluate(inspectLayoutCoverage, '/* @layouts: sample */ /* @utility-classes: gray debug lead classification-* */ @media screen { section:is(.sample, .gray):not(.lead).debug:has(.child) > p.descendant {} } :root.classification-public {} section[data-name=".attribute"] {}');
+      assert.deepEqual(nestedCoverage.classes, ['classification-public', 'debug', 'gray', 'lead', 'sample']);
+      assert.deepEqual(nestedCoverage.findings, []);
       const terms = { 'Semantic drift': 'メタデータと画像中の見た目の不一致' };
       for (const text of ['Semantic drift: 要素対応のずれ', 'Semantic drift（メタデータと画像の見た目のずれ）', '解決する問題: 要素の取り違え（Semantic drift）']) {
         await page.setContent(`<section><p>${text}</p></section>`);
@@ -1313,6 +1372,9 @@ async function main() {
     const files = process.argv.slice(2);
     if (!files.length) files.push(...fs.readdirSync('slides', { recursive: true }).filter(p => p.endsWith('.md')).map(p => path.join('slides', p)));
     if (!files.length) throw new Error('No Markdown slides found under slides/');
+    const sampleHTML = execFileSync('marp', ['--template', 'bare', 'slides/example/slides.md', '-o', '-'], { encoding: 'utf8', maxBuffer: 20 * 1024 * 1024 });
+    await page.setContent(sampleHTML);
+    const layoutCoverage = await page.evaluate(inspectLayoutCoverage, fs.readFileSync('themes/ly.css', 'utf8'));
     let candidateCount = 0;
     let structuralErrors = 0;
     for (const input of files) {
@@ -1345,7 +1407,7 @@ async function main() {
       const bodyFill = await page.evaluate(inspectBodyFill);
       const spaces = await page.evaluate(inspectSpaces);
       fs.writeFileSync(path.join(output, 'spaces.json'), JSON.stringify({ input, browser: await browser.version(), slides: spaces }, null, 2));
-      const structure = [...await page.evaluate(inspectStructure), ...await page.evaluate(inspectParentheses), ...await page.evaluate(inspectTypography), ...await page.evaluate(inspectTerms, terms), ...await page.evaluate(inspectMidwordWraps), ...await page.evaluate(inspectItemGaps), ...titleFindings, ...headingFindings, ...columnFindings(columns), ...groupGapFindings(groupGaps), ...bodyFillFindings(bodyFill)];
+      const structure = [...(input === files[0] ? layoutCoverage.findings : []), ...await page.evaluate(inspectStructure), ...await page.evaluate(inspectParentheses), ...await page.evaluate(inspectTypography), ...await page.evaluate(inspectTerms, terms), ...await page.evaluate(inspectMidwordWraps), ...await page.evaluate(inspectItemGaps), ...titleFindings, ...headingFindings, ...columnFindings(columns), ...groupGapFindings(groupGaps), ...bodyFillFindings(bodyFill)];
       structuralErrors += structure.length + candidates.length;
       candidateCount += candidates.length + structure.length;
       fs.writeFileSync(path.join(output, 'lines.json'), JSON.stringify({ input, browser: await browser.version(), blocks, columnPairs: columns, groupGaps, bodyFill, structure }, null, 2));
