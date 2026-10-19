@@ -195,7 +195,8 @@ Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S0.F1)]: Com
 >
 > - $\bbox[0px,#DBEAFE]{\mathcal{M}_{e_i}}$: 要素識別子 (ID)・種類・位置・\
 >   不透明度・重なり順などの属性
-> - 質問 $\bbox[0px,#FFF2CC]{Q(e^q)}$: 注目する要素 $e^q$ を指定
+> - 主タスクの質問 $\bbox[0px,#FFF2CC]{Q(e^q)}$:\
+>   注目する要素 $e^q$ を指定
 
 > **主タスク: 関連要素の特定と意図説明**
 >
@@ -349,11 +350,10 @@ Qwen2.5-VL 7B _[[Bai+ arXiv’25](https://arxiv.org/abs/2502.13923)]_ の構造�
 >
 > - 入力: レイアウト $\bbox[0px,#E7E6E6]{\mathcal{L}}$ ($\bbox[0px,#E2F0D9]{\text{完成画像}}$＋$\bbox[0px,#DBEAFE]{\text{メタデータ}}$)\
 >   対象要素の$\bbox[0px,#E2F0D9]{\text{切り出し画像}}$・$\bbox[0px,#DBEAFE]{\text{メタデータ}}$・$\bbox[0px,#FFF2CC]{\text{質問}}$
-> - $\bbox[0px,#FFF2CC]{Q^g(e_i)}$: 要素 $e_i$ の見た目と位置を問う質問
+> - 補助質問 $\bbox[0px,#FFF2CC]{Q^g(e_i)}$: 要素 $e_i$ の見た目と位置を問う
 >   - 例: 「ID が $i$ の要素は何か・完成画像のどこにあるか」
 > - 出力 $\bbox[0px,#FCE4D6]{A^g(e_i)}$: 要素の視覚的特徴と位置を記述した回答
->   - GPT-4o が生成し、MASON の学習に使用
-> - 推論時には GPT-4o を使用しない
+>   - GPT-4o は学習データ作成のみ・推論は Qwen2.5-VL 7B 単体
 
 $$
 \underbrace{\vphantom{A^g(e_i)\mathcal{P}_{\mathrm{ground}}}\bbox[0px,#FCE4D6]{A^g(e_i)}}_{\mathclap{\bbox[0px,#FCE4D6]{\text{回答}}}}
@@ -410,10 +410,13 @@ $$
 ## 実験設定 **|** _主タスクだけで微調整した DF と比べ、MA・SP の効果を評価_
 
 $$
-\underbrace{\vphantom{\hat A\mathcal M'Q}\bbox[0px,#FCE4D6]{\hat A}}_{\mathclap{\bbox[0px,#FCE4D6]{\text{回答}}}}
-=\operatorname{VLM}\Bigl((\underbrace{\vphantom{\hat A\mathcal M'Q}\bbox[0px,#E2F0D9]{\mathcal I}}_{\mathclap{\bbox[0px,#E2F0D9]{\text{完成画像}}}},\qquad
-\underbrace{\vphantom{\hat A\mathcal M'Q}\bbox[0px,#DBEAFE]{\mathcal M'}}_{\mathclap{\bbox[0px,#DBEAFE]{\text{拡張メタデータ}}}}),\qquad\,
-\underbrace{\vphantom{\hat A\mathcal M'Q}\bbox[0px,#FFF2CC]{Q}}_{\mathclap{\bbox[0px,#FFF2CC]{\text{2 種類の質問}}}}\Bigr)
+\underbrace{\vphantom{\hat A\mathcal L'\mathcal M'Q^g(e_i)}\bbox[0px,#FCE4D6]{\hat A}}_{\mathclap{\bbox[0px,#FCE4D6]{\text{回答}}}}
+=\operatorname{VLM}\Bigl(\bbox[0px,#E7E6E6]{\mathcal L'},
+\underbrace{\vphantom{\hat A\mathcal L'\mathcal M'Q^g(e_i)}\bbox[0px,#FFF2CC]{Q}}_{\mathclap{\bbox[0px,#FFF2CC]{\text{質問}}}}\Bigr),\quad
+\underbrace{\vphantom{\hat A\mathcal L'\mathcal M'Q^g(e_i)}\bbox[0px,#E7E6E6]{\mathcal L'}}_{\mathclap{\bbox[0px,#E7E6E6]{\text{拡張レイアウト}}}}
+=\Bigl(
+\underbrace{\vphantom{\hat A\mathcal L'\mathcal M'Q^g(e_i)}\bbox[0px,#E2F0D9]{\mathcal I}}_{\mathclap{\hphantom{\text{完成}}\bbox[0px,#E2F0D9]{\text{完成画像}}}},
+\underbrace{\vphantom{\hat A\mathcal L'\mathcal M'Q^g(e_i)}\bbox[0px,#DBEAFE]{\mathcal M'}}_{\mathclap{\hphantom{\text{拡張メタデータと}}\bbox[0px,#DBEAFE]{\text{拡張メタデータ}}}}\Bigr),\quad \bbox[0px,#FFF2CC]{Q}\in\{\underbrace{\vphantom{\hat A\mathcal L'\mathcal M'Q^g(e_i)}\bbox[0px,#FFF2CC]{Q(e^q)}}_{\mathclap{\hphantom{\text{主タスク}i}\bbox[0px,#FFF2CC]{\text{主タスクの質問}}}},\underbrace{\vphantom{\hat A\mathcal L'\mathcal M'Q^g(e_i)}\bbox[0px,#FFF2CC]{Q^g(e_i)}}_{\mathclap{\hphantom{\text{補助質問のラベル}}\bbox[0px,#FFF2CC]{\text{補助質問}}}}\}
 $$
 
 > **学習条件の比較**
