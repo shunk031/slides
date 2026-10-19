@@ -66,7 +66,7 @@ function inspectLines() {
           if (node.matches('br') && node.closest(selector) === block) explicitLine++;
           continue;
         }
-        if (node.parentElement.closest(selector) !== block) continue;
+        if (node.parentElement.closest(selector) !== block || node.parentElement.closest('mjx-container,math,.katex')) continue;
         let region = node.parentElement;
         while (region !== block && region.parentElement !== block) region = region.parentElement;
         if (!separateItems) region = block;
@@ -956,6 +956,8 @@ async function main() {
       assert.equal((await page.evaluate(inspectLines)).some(r => r.multiLineTitle), true);
       await page.setContent('<section><h2 style="white-space:nowrap">A deliberately long heading that stays on one line</h2></section>');
       assert.equal((await page.evaluate(inspectLines)).some(r => r.multiLineTitle), false);
+      await page.setContent('<section><p><mjx-container><mtext>Long formula explanation<br>A</mtext></mjx-container></p><p>Normal prose</p></section>');
+      assert.deepEqual((await page.evaluate(inspectLines)).map(b => b.lines), [['Normalprose']]);
       for (const content of ['<p><strong>Heading wraps</strong></p>', '<p><strong>First<br>Heading wraps</strong></p>', '<table><tr><th>Heading wraps</th></tr></table>', '<table><tr><th>A<br>B</th></tr></table>']) {
         await page.setContent(`<section style="width:90px;font:20px/30px monospace">${content}</section>`);
         assert.ok((await page.evaluate(inspectLines)).some(r => r.headingWrap));
