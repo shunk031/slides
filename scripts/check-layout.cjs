@@ -253,6 +253,22 @@ function inspectColumns() {
     }
     return null;
   };
+  const lastLineBottom = block => {
+    const walker = document.createTreeWalker(block, NodeFilter.SHOW_TEXT);
+    let bottom = -Infinity;
+    while (walker.nextNode()) {
+      const node = walker.currentNode;
+      if (!node.textContent.trim()) continue;
+      const range = document.createRange();
+      range.selectNodeContents(node);
+      const owner = node.parentElement.closest(textSelector) || node.parentElement;
+      const lineHeight = parseFloat(getComputedStyle(owner).lineHeight);
+      for (const rect of range.getClientRects()) {
+        if (rect.width && rect.height) bottom = Math.max(bottom, Number.isFinite(lineHeight) ? rect.bottom + (lineHeight - rect.height) / 2 : owner.getBoundingClientRect().bottom);
+      }
+    }
+    return bottom;
+  };
   const imageStart = img => {
     const box = img.getBoundingClientRect();
     if (!box.width || !box.height) return null;
@@ -261,23 +277,26 @@ function inspectColumns() {
     const width = box.width - inset('Left') - inset('Right');
     const height = box.height - inset('Top') - inset('Bottom');
     let top = box.top + inset('Top');
+    let paintedHeight = height;
     if (['contain', 'scale-down'].includes(style.objectFit) && img.naturalWidth && img.naturalHeight) {
       const scale = Math.min(width / img.naturalWidth, height / img.naturalHeight, style.objectFit === 'scale-down' ? 1 : Infinity);
-      const spare = height - img.naturalHeight * scale;
+      paintedHeight = img.naturalHeight * scale;
+      const spare = height - paintedHeight;
       // shortcut: only percentage/px object-position is resolved; extend when a deck uses position expressions.
       const position = style.objectPosition.match(/^\S+\s+(-?[\d.]+)(%|px)$/);
       if (position) top += position[2] === '%' ? spare * Number(position[1]) / 100 : Number(position[1]);
     }
-    return { top, lineTop: top, text: img.alt || img.getAttribute('src') || 'Image', image: true };
+    return { top, bottom: top + paintedHeight, lineTop: top, text: img.alt || img.getAttribute('src') || 'Image', image: true };
   };
   return [...document.querySelectorAll('section')].flatMap((slide, index) => {
     if (slide.matches('.first-slide,.lead,.takahashi,.title-slide-big,.profile-slide,.layout-example')) return [];
     const slideTop = slide.getBoundingClientRect().top;
     const blocks = [...slide.children].filter(block => !block.matches('h1,h2,header,footer,.pagination,.page-number,.classification,.classification-badge,.background-decoration')).map(block => {
-      const starts = [firstText(block), ...[...block.querySelectorAll('img'), ...(block.matches('img') ? [block] : [])].map(imageStart)].filter(Boolean);
+      const images = [...block.querySelectorAll('img'), ...(block.matches('img') ? [block] : [])].map(imageStart).filter(Boolean);
+      const starts = [firstText(block), ...images].filter(Boolean);
       const first = starts.sort((a, b) => a.lineTop - b.lineTop)[0];
       const box = block.getBoundingClientRect();
-      return first && box.width && box.height ? { box, first } : null;
+      return first && box.width && box.height ? { box, first, images, textBottom: lastLineBottom(block) } : null;
     }).filter(Boolean);
     const pairs = [];
     const seen = new Set();
@@ -290,14 +309,22 @@ function inspectColumns() {
         const shared = blocks.filter(item => item.box.left <= first.box.left + 2 && item.box.right >= second.box.right - 2);
         const start = Math.max(slideTop, ...shared.filter(item => item.box.bottom <= Math.min(first.box.top, second.box.top) + 2).map(item => item.box.bottom));
         const end = Math.min(...shared.filter(item => item.box.top >= Math.max(first.box.top, second.box.top) + 2).map(item => item.box.top));
-        const columnStart = column => blocks.filter(item => Math.abs(item.box.left - column.box.left) <= 2 && Math.abs(item.box.right - column.box.right) <= 2 && item.box.top >= start - 2 && item.box.top < end).sort((a, b) => a.first.lineTop - b.first.lineTop)[0].first;
-        const a = columnStart(first), b = columnStart(second);
+        const columnBlocks = column => blocks.filter(item => Math.abs(item.box.left - column.box.left) <= 2 && Math.abs(item.box.right - column.box.right) <= 2 && item.box.top >= start - 2 && item.box.top < end).sort((a, b) => a.first.lineTop - b.first.lineTop);
+        const leftColumn = columnBlocks(first), rightColumn = columnBlocks(second);
+        const a = leftColumn[0].first, b = rightColumn[0].first;
         const key = `${first.box.left}:${first.box.right}:${second.box.left}:${second.box.right}:${start}:${end}`;
         if (seen.has(key)) continue;
         seen.add(key);
         const leftTop = (a.image || b.image ? a.lineTop : a.top) - slideTop;
         const rightTop = (a.image || b.image ? b.lineTop : b.top) - slideTop;
-        pairs.push({ slide: index + 1, leftText: a.text, rightText: b.text, leftTop, rightTop, difference: Math.abs(leftTop - rightTop) });
+        const figureColumn = a.image && !b.image ? leftColumn : b.image && !a.image ? rightColumn : [];
+        const textColumn = figureColumn === leftColumn ? rightColumn : leftColumn;
+        const images = figureColumn.flatMap(item => item.images);
+        const textBottom = Math.max(...textColumn.map(item => item.textBottom));
+        const imageBottom = images.length === 1 && !textColumn.some(item => item.images.length) ? images[0].bottom : null;
+        const bottomDifference = imageBottom === null ? null : Math.abs(imageBottom - textBottom);
+        const bottomAlignedFigure = bottomDifference !== null && bottomDifference <= 2 && images[0].top >= textColumn[0].first.lineTop - 2;
+        pairs.push({ slide: index + 1, leftText: a.text, rightText: b.text, leftTop, rightTop, difference: Math.abs(leftTop - rightTop), imageBottom: imageBottom === null ? null : imageBottom - slideTop, textBottom: Number.isFinite(textBottom) ? textBottom - slideTop : null, bottomDifference, bottomAlignedFigure });
       }
     }
     return pairs;
@@ -305,7 +332,7 @@ function inspectColumns() {
 }
 
 function columnFindings(columns) {
-  return columns.filter(pair => pair.difference > 2).map(pair => ({
+  return columns.filter(pair => pair.difference > 2 && !pair.bottomAlignedFigure).map(pair => ({
     slide: pair.slide,
     kind: 'column-alignment',
     text: `${pair.leftText} (${Math.round(pair.leftTop)}px) / ${pair.rightText} (${Math.round(pair.rightTop)}px)`,
@@ -985,6 +1012,27 @@ async function main() {
         await page.evaluate(className => { document.querySelector('section').className = className; }, className);
         assert.deepEqual(await page.evaluate(inspectColumns), []);
       }
+      await page.setContent(`<section style="display:grid;grid-template-columns:1fr 1fr;width:500px;font:20px/20px monospace"><blockquote style="margin:60px 0 0;align-self:start"><img src="${picture}" alt="Figure" style="display:block;width:80px;height:40px"><p style="margin:4px 0 0">Figure from [Source]: caption</p></blockquote><blockquote style="margin:0">First<br>second<br>third<br>fourth<br>last</blockquote></section>`);
+      await page.evaluate(async () => { await document.querySelector('img').decode(); });
+      const bottomFigure = await page.evaluate(inspectColumns);
+      assert.ok(bottomFigure[0].bottomDifference <= 1);
+      assert.deepEqual(columnFindings(bottomFigure), []);
+      await page.evaluate(() => { document.querySelector('blockquote').style.order = '1'; });
+      assert.deepEqual(columnFindings(await page.evaluate(inspectColumns)), []);
+      for (const [top, errors] of [[61, 0], [65, 1], [36, 1]]) {
+        await page.evaluate(top => { document.querySelector('blockquote').style.marginTop = `${top}px`; }, top);
+        assert.equal(columnFindings(await page.evaluate(inspectColumns)).length, errors, `picture top ${top}; caption bottom is not picture bottom`);
+      }
+      await page.evaluate(() => { document.querySelector('blockquote').style.marginTop = '0'; Object.assign(document.querySelector('img').style, {height:'100px',objectFit:'contain'}); });
+      assert.equal(columnFindings(await page.evaluate(inspectColumns)).length, 1, 'element bottom matches but contained picture bottom does not');
+      await page.evaluate(() => { document.querySelector('img').style.objectPosition = '50% 100%'; });
+      assert.deepEqual(columnFindings(await page.evaluate(inspectColumns)), []);
+      await page.evaluate(() => { document.querySelector('img').style.objectFit = 'scale-down'; });
+      assert.deepEqual(columnFindings(await page.evaluate(inspectColumns)), []);
+      await page.evaluate(() => { document.querySelectorAll('blockquote')[1].style.height = '200px'; document.querySelector('blockquote').style.marginTop = '100px'; });
+      assert.equal(columnFindings(await page.evaluate(inspectColumns)).length, 1, 'empty text box height does not replace its last line');
+      await page.evaluate(() => { document.querySelector('blockquote').style.marginTop = '0'; document.querySelectorAll('blockquote')[1].style.paddingTop = '20px'; Object.assign(document.querySelector('img').style, {height:'120px',objectFit:'fill'}); });
+      assert.equal(columnFindings(await page.evaluate(inspectColumns)).length, 1, 'oversized picture starts above text');
       await page.setContent('<section style="display:grid;grid-template-columns:1fr 1fr;width:500px;font:20px/30px monospace"><blockquote style="margin:0">Left heading</blockquote><blockquote style="margin:0">Right heading</blockquote></section>');
       assert.deepEqual(columnFindings(await page.evaluate(inspectColumns)), []);
       await page.setContent('<section style="display:grid;grid-template-columns:1fr 1fr;width:500px;font:20px/30px monospace"><blockquote style="margin:0">First left</blockquote><blockquote style="margin:0">First right</blockquote><p style="grid-column:1 / -1;margin:0">Shared divider</p><blockquote style="margin:0">Second left<br>continues</blockquote><blockquote style="margin:10px 0 0">Second right</blockquote></section>');
