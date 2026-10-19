@@ -98,11 +98,11 @@ _Project page: [hukcc.github.io/Beyond-Atomic-Layouts/](https://hukcc.github.io/
 <!-- _class: background-slide content-slide-gray classification-public -->
 <!-- 発表目安 0:50 -->
 
-## 背景 **|** _Atomic layout と compositional layout の違い_
+## 背景 **|** _Atomic Layout と Compositional Layout の違い_
 
-- **Atomic layout:** 文書や画面を、文字・画像・ボタンなどの独立した要素として扱う
+- **Atomic Layout:** 文書や画面を、文字・画像・ボタンなどの独立した要素として扱う
   - 既存の文書・画面理解: 要素の位置・種類・読み順から内容を認識
-- **Compositional layout:** 複数のレイヤーが組み合わさり、1 つの視覚効果を構成
+- **Compositional Layout:** 複数のレイヤーが組み合わさり、1 つの視覚効果を構成
 
   - **(a) Clipping:**\
     切り抜いた画像と元画像の間に別要素を挿入
@@ -124,7 +124,7 @@ _Project page: [hukcc.github.io/Beyond-Atomic-Layouts/](https://hukcc.github.io/
 
     ![Figure 1 (d): Morphing](assets/beyond-atomic-morphing.png)
 
-Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S0.F1)]: Compositional layout の代表的な合成表現
+Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S0.F1)]: Compositional Layout の代表的な合成表現
 
 ---
 
