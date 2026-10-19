@@ -2,6 +2,9 @@
 
 Marp で論文紹介や技術発表のスライドを書くリポジトリです。Markdown・テーマ CSS・画像を管理し、PDF は手元で生成します。執筆には Codex / Claude Code も使えます。
 
+- [レイアウトの見本](slides/example/slides.md): `ly` テーマのクラスと Markdown の使用例
+- [Beyond Atomic Layouts の論文紹介](slides/2026-10-19-beyond-atomic-layouts/slides.md): 2026 年 10 月 19 日の発表資料
+
 初めて使う場合は、セットアップから PDF 出力まで進めてください。資料やテーマの書き方は後半、検査エラーの条件は [レイアウト検査の仕様](docs/check-layout.md) で確認できます。
 
 ## セットアップ
@@ -31,7 +34,7 @@ VS Code では推奨拡張の [Marp for VS Code](https://marketplace.visualstudi
 mise run pdf
 ```
 
-`slides/` 内の全資料を変換し、`dist/<発表名>/slides.pdf` に出力します。サンプルは `dist/example/slides.pdf` です。`dist/` は Git 管理対象外です。
+`slides/` 内の全資料を変換し、`dist/<発表名>/slides.pdf` に出力します。見本は `dist/example/slides.pdf`、論文紹介は `dist/2026-10-19-beyond-atomic-layouts/slides.pdf` です。`dist/` は Git 管理対象外です。
 
 PDF 生成前にレイアウト検査が走り、エラーがあると生成を止めます。プレビューサーバーを動かしたまま実行する場合は、別のターミナルを使ってください。
 
@@ -43,12 +46,12 @@ mise run check-layout
 
 Chrome でフォントと画像の読み込みを待ち、全資料を描画して検査します。追加の Puppeteer インストールは不要です。結果は `dist/<発表名>/slides-review/` に出力します。
 
-| ファイル | 確認する内容 |
-| --- | --- |
-| `review.md` | ページごとのエラーと、画像を見て判断する `Space review` の空白候補 |
-| `slide-N.png` | 全ページの原寸画像。改行、図、背景、日本語フォントを確認 |
-| `slide-N-space.png` | 空白候補を番号・寸法付きで着色した画像。通常画像と比較 |
-| `lines.json` / `spaces.json` | 描画行・配置の測定値 / 空白候補・列・要素間隔の測定値 |
+| ファイル                     | 確認する内容                                                       |
+| ---------------------------- | ------------------------------------------------------------------ |
+| `review.md`                  | ページごとのエラーと、画像を見て判断する `Space review` の空白候補 |
+| `slide-N.png`                | 全ページの原寸画像。改行、図、背景、日本語フォントを確認           |
+| `slide-N-space.png`          | 空白候補を番号・寸法付きで着色した画像。通常画像と比較             |
+| `lines.json` / `spaces.json` | 描画行・配置の測定値 / 空白候補・列・要素間隔の測定値              |
 
 エラーは終了コード 1 になり、`mise run pdf` も停止します。表示された検査 ID を [仕様表](docs/check-layout.md#検査一覧) で引き、対象ページを直してください。`Space review` の候補は人が判断するため、終了コードに影響しません。候補ゼロでも、全ページの原寸画像を確認します。保存時の自動検査は設定していません。
 
@@ -66,12 +69,12 @@ Chrome でフォントと画像の読み込みを待ち、全資料を描画し�
 
 `ly` は利用者提供の非公式テーマを元にしており、LINE ヤフーの公式テンプレートではありません。実際の構成はサンプル、共通設定は [themes/ly.css](themes/ly.css) を参照してください。
 
-| レイアウト | 指定するクラス・用途 |
-| --- | --- |
-| 論文表紙 | `paper-title title-slide-big first-slide`：論文・発表者情報を配置 |
-| 自己紹介 | `profile-slide content-slide-gray`：左に経歴・研究分野、右に写真・リンク |
-| 背景の切り替え | `title-slide-big` / `content-slide-gray` |
-| 大きな文字の中央配置 | `takahashi` |
+| レイアウト           | 指定するクラス・用途                                                     |
+| -------------------- | ------------------------------------------------------------------------ |
+| 論文表紙             | `paper-title title-slide-big first-slide`：論文・発表者情報を配置        |
+| 自己紹介             | `profile-slide content-slide-gray`：左に経歴・研究分野、右に写真・リンク |
+| 背景の切り替え       | `title-slide-big` / `content-slide-gray`                                 |
+| 大きな文字の中央配置 | `takahashi`                                                              |
 
 ### 論文表紙と自己紹介
 
@@ -81,7 +84,7 @@ Chrome でフォントと画像の読み込みを待ち、全資料を描画し�
 
 自己紹介は `##` の見出し、経歴・研究分野の引用ブロック、写真・関連リンクの引用ブロックの順です。右列の先頭段落に写真 2 枚、次の段落にプロフィールリンクを置きます。以降は `[![説明](assets/画像.png)](URL) [説明](URL)` の組で、サムネイル下部にテキストリンクを重ねます。リンクは画像中央を基準に文字数に応じた幅で 1 行表示し、標準で不透明度 85% の白背景が付きます。研究分野の親項目を `**太字**` にすると赤く強調します。
 
-サンプルの写真は [kitada-ly.jpg](https://shunk031.me/icons/kitada-ly.jpg)・[kitada-kita.jpg](https://shunk031.me/icons/kitada-kita.jpg)、講座・書籍のサムネイルは利用者提供の画像です。`slides/example/assets/` に保存し、自己紹介の本文も提供資料を元にしています。
+見本の写真は [kitada-ly.jpg](https://shunk031.me/icons/kitada-ly.jpg)・[kitada-kita.jpg](https://shunk031.me/icons/kitada-kita.jpg) を `slides/example/assets/` に保存しています。論文紹介でも同じ写真を使用し、講座・書籍のサムネイルとともに資料自身の `assets/` に保存しています。見本の自己紹介文は差し替え用の作例です。
 
 ### 見出しに説明を添える
 
@@ -103,14 +106,14 @@ Chrome でフォントと画像の読み込みを待ち、全資料を描画し�
 
 ### 情報分類を表示する
 
-| 表示 | クラス |
-| --- | --- |
-| Top Secret | `classification-top-secret` |
-| Secret | `classification-secret` |
-| Restricted | `classification-restricted` |
-| Internal Use Only | `classification-internal` |
-| Public | `classification-public` |
-| 表示なし | 全ページで情報分類クラスを指定しない |
+| 表示              | クラス                               |
+| ----------------- | ------------------------------------ |
+| Top Secret        | `classification-top-secret`          |
+| Secret            | `classification-secret`              |
+| Restricted        | `classification-restricted`          |
+| Internal Use Only | `classification-internal`            |
+| Public            | `classification-public`              |
+| 表示なし          | 全ページで情報分類クラスを指定しない |
 
 全ページで同じ分類を使い、`_class` にも含めます（例：`<!-- _class: content-slide-gray classification-public -->`）。ラベルは通常は左上、`first-slide` の表紙では右上です。`header` は通常のヘッダーとして使えます。
 
@@ -120,22 +123,22 @@ Chrome でフォントと画像の読み込みを待ち、全資料を描画し�
 
 `themes/ly.css` の `:root` に共通設定、`section.paper-title` の先頭に論文表紙の設定をまとめています。同じ役割の文字は共通変数で調整します。
 
-| 調整するもの | 主な変数・初期値 |
-| --- | --- |
-| 外側の余白・要素間隔 | `--slide-padding`、`--slide-top`、`--content-gap`（16px）。本文・ラベル・footer の左余白を共通化 |
-| 文字色・背景色 | `--color-heading`、`--color-text`、`--color-background` |
-| 本文・見出し | `--body-font-size`（30px）、`--heading-font-size`（48px）、`--heading-description-ratio` |
-| 入れ子 | `--nested-list-font-size` / `--deep-list-font-size`（ともに 26.25px）、`--nested-list-indent` |
-| 箇条書き | `--list-line-height`（一文内の行間）、`--list-item-gap`（項目間の余白） |
-| 引用・図 | `--citation-font-size` / `--figure-caption-font-size`（ともに 20px） |
-| 見出しの縦線 | `--heading-separator-*`（太さ・高さ） |
-| 情報分類・ページ番号・著作権 | `--classification-*`、`--pagination-font-size`、`--footer-*` |
-| 自己紹介 | `--profile-*`（列幅・文字・写真間隔）、`--profile-list-gap`（研究分野間）、`--profile-thumbnail-height`、`--profile-caption-*` |
-| 白背景の不透明度 | `--white-background-opacity`（85%）。値を大きくすると白が濃くなる |
-| 論文表紙の余白・列幅 | `--paper-padding-*`、`--paper-row-gap`、`--paper-column-gap`、`--paper-presenter-width` |
-| 論文表紙の文字・ハイライト・ロゴ | `--paper-title-*`、`--paper-authors-*`、`--paper-highlight-color`、`--paper-logo-width` |
+| 調整するもの                     | 主な変数・初期値                                                                                                               |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| 外側の余白・要素間隔             | `--slide-padding`、`--slide-top`、`--content-gap`（16px）。本文・ラベル・footer の左余白を共通化                               |
+| 文字色・背景色                   | `--color-heading`、`--color-text`、`--color-background`                                                                        |
+| 本文・見出し                     | `--body-font-size`（30px）、`--heading-font-size`（48px）、`--heading-description-ratio`                                       |
+| 入れ子                           | `--nested-list-font-size` / `--deep-list-font-size`（ともに 26.25px）、`--nested-list-indent`                                  |
+| 箇条書き                         | `--list-line-height`（一文内の行間）、`--list-item-gap`（項目間の余白）                                                        |
+| 引用・図                         | `--citation-font-size` / `--figure-caption-font-size`（ともに 20px）                                                           |
+| 見出しの縦線                     | `--heading-separator-*`（太さ・高さ）                                                                                          |
+| 情報分類・ページ番号・著作権     | `--classification-*`、`--pagination-font-size`、`--footer-*`                                                                   |
+| 自己紹介                         | `--profile-*`（列幅・文字・写真間隔）、`--profile-list-gap`（研究分野間）、`--profile-thumbnail-height`、`--profile-caption-*` |
+| 白背景の不透明度                 | `--white-background-opacity`（85%）。値を大きくすると白が濃くなる                                                              |
+| 論文表紙の余白・列幅             | `--paper-padding-*`、`--paper-row-gap`、`--paper-column-gap`、`--paper-presenter-width`                                        |
+| 論文表紙の文字・ハイライト・ロゴ | `--paper-title-*`、`--paper-authors-*`、`--paper-highlight-color`、`--paper-logo-width`                                        |
 
-通常本文のラベル→見出し→本文は `--content-gap` で間隔を揃えます。中央配置の `first-slide`・`lead`・`takahashi` は対象外です。行高・箇条書きの字下げ・注記の幅も変数で調整できます。
+通常本文のラベル → 見出し → 本文は `--content-gap` で間隔を揃えます。中央配置の `first-slide`・`lead`・`takahashi` は対象外です。行高・箇条書きの字下げ・注記の幅も変数で調整できます。
 
 `debug-layout` をページのクラスに加えると、要素を赤い実線、情報分類・ページ番号を青い破線で囲み、用途ラベルを表示します（例：`<!-- _class: content-slide-gray classification-public debug-layout -->`）。消すにはそのページのクラスから外します。全体の `class` に指定した場合も、`_class` のあるページには個別に必要です。全ページで消すときは両方から外します。枠の色・太さ・ラベルのサイズは `--debug-*` で調整でき、プロフィールでも併用できます。
 
