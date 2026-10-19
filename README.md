@@ -26,7 +26,7 @@ mise run preview
 
 ブラウザで <http://localhost:8080/slides/example/slides.md> を開きます。Markdown を保存すると表示が更新され、`Ctrl+C` でサーバーを終了します。
 
-VS Code では推奨拡張の [Marp for VS Code](https://marketplace.visualstudio.com/items?itemName=marp-team.marp-vscode) を入れ、[サンプル](slides/example/slides.md) の Markdown プレビューを開きます。ローカルの `ly` テーマは `.vscode/settings.json` に登録済みです。
+編集には VS Code と推奨拡張の [Marp for VS Code](https://marketplace.visualstudio.com/items?itemName=marp-team.marp-vscode) も使えます。ローカルの `ly` テーマは `.vscode/settings.json` に登録済みです。ただし、VS Code の Marp プレビューはリポジトリの engine プラグイン（情報分類・数式の検証、括弧補足のサイズ調整）を実行しません。正確な表示は `mise run preview` のブラウザで確認してください。
 
 ## PDF を出力する
 
