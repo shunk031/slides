@@ -236,3 +236,356 @@ $$
 ## 本文用の背景
 
 `_class: content-slide-gray classification-public layout-example`
+
+---
+
+<!-- _class: background-slide content-slide-gray classification-public -->
+
+## 背景の配置 **|** _説明と四つの図を対応付ける_
+
+**使用クラス: `background-slide`**
+
+- **導入:** 最初の項目で、比較に必要な前提を説明
+  - 例: 比較条件によって、処理の対象や手順が変わる
+- **四つの例:** 最後の親項目の下へ、図付きの例を配置
+
+  - **条件 A:** 入力の種類を確認
+
+    ![Figure 2 (a): 入力・処理・出力の作例](assets/layout-pipeline.svg)
+
+  - **条件 B:** 処理の順番を確認
+
+    ![Figure 2 (b): 入力・処理・出力の作例](assets/layout-pipeline.svg)
+
+  - **条件 C:** 出力の形式を確認
+
+    ![Figure 2 (c): 入力・処理・出力の作例](assets/layout-pipeline.svg)
+
+  - **条件 D:** 比較する範囲を確認
+
+    ![Figure 2 (d): 入力・処理・出力の作例](assets/layout-pipeline.svg)
+
+Figure from [[作例](assets/layout-pipeline.svg)]: 四つの画像枠への配置例
+
+---
+
+<!-- _class: analysis-slide case-study-slide content-slide-gray classification-public -->
+
+## 事例の配置 **|** _二つの図と説明を三列に置く_
+
+> ![Figure 2 (a): 入力・処理・出力の模式図](assets/layout-flow.svg)
+>
+> Figure from [[作例](assets/layout-flow.svg)]: 手順 A
+
+> ![Figure 2 (b): 入力・処理・出力の模式図](assets/layout-flow.svg)
+>
+> Figure from [[作例](assets/layout-flow.svg)]: 手順 B
+
+> **図を読み比べる観点**
+>
+> - 左列: 比較する一つ目の事例
+> - 中列: 比較する二つ目の事例
+> - 右列: 二つの事例に共通する説明
+> - 入力・処理・出力の順に比較
+> - キャプションは各図の直下に配置
+> - 原寸画像で図中の文字を確認
+>
+> 使用クラス: `case-study-slide`
+
+---
+
+<!-- _class: dataset-slide content-slide-gray classification-public -->
+
+## データ紹介の配置 **|** _図・表と収集手順を分ける_
+
+> ![Figure 1: 架空の条件別スコア](assets/layout-chart.svg)
+>
+> Figure from [[作例](assets/layout-chart.svg)]: 架空の条件別スコア
+
+> **条件ごとのスコアを記載**
+>
+> | 区分 | スコア | 用途 |
+> | :--- | -----: | :--- |
+> | A    |     40 | 学習 |
+> | B    |     60 | 検証 |
+> | C    |     80 | 評価 |
+
+> **収集・分割の説明**
+>
+> - 対象: 何を集めたデータか
+>   - 例: 配置確認用の架空データ
+> - 収集: 含める条件と除外する条件
+>   - 例: 対象範囲と収集期間を明記
+> - 分割: 学習・検証・評価の区別
+>   - 同じ対象の重複を確認
+> - 数値: 図と表で単位をそろえる
+>
+> 使用クラス: `dataset-slide`
+
+---
+
+<!-- _class: analysis-slide experiment-slide content-slide-gray classification-public -->
+
+## 実験設定の配置 **|** _比較条件と評価方法を左右に置く_
+
+> **比較条件**
+>
+> - 対象: 配置確認用の架空データ
+> - 条件 A: 標準の手順で処理
+> - 条件 B: 一つの処理だけを変更
+> - 固定: 入力・出力形式を統一
+> - 反復: 同じ条件で複数回実行
+
+> **評価方法**
+>
+> - 評価指標: 出力が正解と一致する割合
+> - 単位: 割合は百分率で表示
+> - 集計: 条件ごとに平均を計算
+> - 確認: 件数と対象範囲を明記
+> - 注意: 作例の値は実験結果ではない
+
+- 使用クラス: `experiment-slide` と `analysis-slide`
+  - 左右の引用ブロックに同じ粒度で条件と評価方法を記載
+  - 全幅の箇条書きには、両方に共通する条件を配置
+- 比較前に、条件ごとの件数と出力形式を確認
+
+---
+
+<!-- _class: analysis-slide failure-analysis-slide content-slide-gray classification-public -->
+
+## 課題分析の配置 **|** _図と読み方を上段にまとめる_
+
+> ![Figure 1: 架空の条件別スコア](assets/layout-chart.svg)
+>
+> Figure from [[作例](assets/layout-chart.svg)]: 条件 A・B・C の比較\
+> 横軸: 比較条件／縦軸: スコア\
+> 値は配置確認用の架空データ
+
+**観察:** 条件 A より条件 C の値が高い
+
+図の大小と文章の説明を対応付け、軸と単位を図の隣に置く
+
+**注意:** 図だけから因果関係は判断しない
+
+対象範囲と比較条件を併記。使用クラス: `failure-analysis-slide`
+
+---
+
+<!-- _class: method-slide content-slide-gray classification-public -->
+
+## 手法の配置 **|** _上段の図と下段の二列で手順を示す_
+
+> ![Figure 2: 入力・処理・出力の模式図](assets/layout-pipeline.svg)
+>
+> Figure from [[作例](assets/layout-pipeline.svg)]: 入力から出力までの三段階
+
+> **入力と処理**
+>
+> - 入力: 対象と前提条件を示す
+> - 処理: 実行順に手順を説明
+> - 固定する条件を明記
+> - 図の各段階と本文を対応付ける
+
+> **出力と確認**
+>
+> - 出力: 得られる結果の形式を示す
+> - 確認: 入力との対応を照合
+> - 処理の目的と結果を区別
+> - 使用クラス: `method-slide`
+
+---
+
+<!-- _class: method-slide mason-overview-slide content-slide-gray classification-public -->
+
+## 全体図の配置 **|** _低い図の下へ二つの処理を並べる_
+
+> ![Figure 2: 入力・処理・出力の模式図](assets/layout-pipeline.svg)
+>
+> Figure from [[作例](assets/layout-pipeline.svg)]: 三段階の処理を示す模式図
+
+> **処理 A の説明**
+>
+> - 入力: 最初に受け取るデータ
+>   - 形式と必要な属性を説明
+> - 処理: 入力の内容を確認
+>   - 対象が条件を満たすか判定
+> - 出力: 次の処理へ渡すデータ
+>   - 形式と引き継ぐ情報を明記
+
+> **処理 B の説明**
+>
+> - 入力: 処理 A から受け取るデータ
+>   - 形式と必要な属性を説明
+> - 処理: 目的に応じて変換
+>   - 入力との対応を維持
+> - 出力: 最終的に返すデータ
+>   - 形式と利用する場面を明記
+
+使用クラス: `mason-overview-slide` と `method-slide`
+
+---
+
+<!-- _class: method-slide ma-slide content-slide-gray classification-public -->
+
+## 左図・右本文の配置 **|** _右列に手順をまとめる_
+
+> ![Figure 1: 架空の条件別スコア](assets/layout-chart.svg)
+>
+> Figure from [[作例](assets/layout-chart.svg)]: 条件 A・B・C の比較
+
+> **図の対象と処理を説明**
+>
+> - 入力: 比較する三つの条件
+>   - A・B・C を同じ尺度で評価
+> - 処理: 条件ごとの値を集計
+>   - 例: 40・60・80 の三つの値
+> - 出力: 条件間の大小を可視化
+>   - 横軸は条件、縦軸はスコア
+> - 確認: 図と説明の条件名を照合
+>
+> 使用クラス: `ma-slide` と `method-slide`
+
+$$
+m=(40+60+80)/3=60
+$$
+
+**➜ 図・手順・集計式を同じページで対応付ける**
+
+---
+
+<!-- _class: problem-slide content-slide-gray classification-public -->
+
+## 問題設定の配置 **|** _入力と出力を図の下で対応付ける_
+
+> ![Figure 2: 入力・処理・出力の模式図](assets/layout-pipeline.svg)
+>
+> Figure from [[作例](assets/layout-pipeline.svg)]: 入力・処理・出力の対応
+
+> **入力として与えるもの**
+>
+> - 対象: 処理するデータ
+>   - 例: 比較条件ごとのスコア
+> - 条件: 処理前に決める範囲
+>   - 例: 集計対象と単位
+> - 質問: 何を求めるか
+>   - 例: 三つの値の平均
+
+> **出力として求めるもの**
+>
+> - 結果: 質問への回答
+>   - 例: 平均値は 60
+> - 説明: 回答を得た手順
+>   - 例: 三つの値を合計して 3 で割る
+> - 確認: 入力と回答の対応
+>   - 使用クラス: `problem-slide`
+
+---
+
+<!-- _class: analysis-slide efficiency-slide qualitative-slide content-slide-gray classification-public -->
+
+## 定性比較の配置 **|** _二つの図の隣で結果を説明する_
+
+> ![Figure 2 (a): 手順 A の模式図](assets/layout-flow.svg)
+>
+> Figure from [[作例](assets/layout-flow.svg)]: 手順 A
+
+> ![Figure 2 (b): 手順 B の模式図](assets/layout-flow.svg)
+>
+> Figure from [[作例](assets/layout-flow.svg)]: 手順 B
+
+> **手順 A**
+>
+> - 入力の形式を確認
+> - 一つずつ順に処理
+> - 出力を個別に照合
+> - 結果を個別に記録
+
+> **手順 B**
+>
+> - 入力をまとめて確認
+> - 条件ごとに一括処理
+> - 出力を条件別に照合
+> - 結果を条件別に記録
+
+- 使用クラス: `qualitative-slide` と `analysis-slide`・`efficiency-slide`
+  - 図と本文は同じ順で入力・処理・出力を説明
+  - キャプションは各図と説明の下にまとめて配置
+- 原寸で、図中の文字と本文の改行を確認
+
+---
+
+<!-- _class: selection-slide content-slide-gray classification-public -->
+
+## 導入の配置 **|** _問いと図を並べ、着目点を下段に置く_
+
+> ![Figure 2: 入力・処理・出力の模式図](assets/layout-pipeline.svg)
+>
+> Figure from [[作例](assets/layout-pipeline.svg)]: 比較する処理の流れ
+
+> **何を比べたいか**
+>
+> - 比較の目的を短く記載
+> - 条件間の違いを具体化
+> - 聞き手が持つ問いを示す
+> - 図の処理名と本文を対応
+> - 未説明の略語は避ける
+
+> **後続の説明で確認すること**
+>
+> - 条件を変えると、どの値が変わるのか
+> - 値の違いを説明するために、何を調べるのか
+> - 使用クラス: `selection-slide`
+
+---
+
+<!-- _class: method-slide sp-slide content-slide-gray classification-public -->
+
+## 右表・右数式の配置 **|** _左図と属性表を対応付ける_
+
+> ![Figure 1: 架空の条件別スコア](assets/layout-chart.svg)
+>
+> Figure from [[作例](assets/layout-chart.svg)]: 架空の三条件\
+> 横軸: 比較条件／縦軸: スコア
+
+> **条件を属性として整理**
+>
+> - 対象: 条件 A・B・C のスコア
+> - 入力: 条件名と値の組
+> - 処理: 三つの値から平均を計算
+>
+> | 属性 | 内容       |
+> | :--- | :--------- |
+> | 条件 | A・B・C    |
+> | 値   | 40・60・80 |
+> | 単位 | スコア     |
+> | 平均 | 60         |
+>
+> 使用クラス: `sp-slide` と `method-slide`
+
+$$
+m=(40+60+80)/3=60
+$$
+
+---
+
+<!-- _class: analysis-slide efficiency-slide summary-slide content-slide-gray classification-public -->
+
+## まとめの配置 **|** _左の図と右の要点を上端でそろえる_
+
+> ![Figure 1: 架空の条件別スコア](assets/layout-chart.svg)
+>
+> Figure from [[作例](assets/layout-chart.svg)]: 架空の条件別スコア\
+> 横軸: 比較条件／縦軸: スコア
+
+> **伝えたい内容を再確認**
+>
+> - 対象: 最初に立てた問いを示す
+>   - 例: どの条件で値が高くなるか
+> - 結果: 根拠となる図と対応付ける
+>   - 例: C の値は 80
+> - 範囲: 結果を適用できる条件を示す
+>   - 作例の値は架空データ
+> - 次の行動: 読者が確認する点を示す
+>   - 原寸で図と本文の上端を確認
+
+使用クラス: `summary-slide` と `analysis-slide`・`efficiency-slide`

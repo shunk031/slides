@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="430" viewBox="0 0 240 430" role="img" aria-labelledby="title">
+  <title id="title">入力・処理・出力の三段階</title>
+  <rect width="240" height="430" rx="12" fill="#f0f4f6"/>
+  <g fill="#fff" stroke="#435963" stroke-width="3">
+    <rect x="25" y="25" width="190" height="90" rx="8"/>
+    <rect x="25" y="170" width="190" height="90" rx="8"/>
+    <rect x="25" y="315" width="190" height="90" rx="8"/>
+  </g>
+  <g stroke="#435963" stroke-width="4" fill="none">
+    <path d="M120 120v40m-10-12 10 12 10-12M120 265v40m-10-12 10 12 10-12"/>
+  </g>
+  <g font-family="sans-serif" font-size="30" text-anchor="middle" fill="#000040">
+    <text x="120" y="80">Input</text>
+    <text x="120" y="225">Process</text>
+    <text x="120" y="370">Output</text>
+  </g>
+</svg>
