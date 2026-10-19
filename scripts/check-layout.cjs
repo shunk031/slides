@@ -475,7 +475,7 @@ function inspectSpaces() {
     const regions=maximal.map((r,i)=>({id:`S${i+1}`,...local(r),area:(r.right-r.left)*(r.bottom-r.top),neighbours:Object.fromEntries(['above','below','left','right'].map(side=>[side,nearest(r,side)]))}));
     const children=[...slide.children].filter(el=>!excluded(el));
     const blocks=children.map(el=>({el,box:el.getBoundingClientRect(),content:ink.filter(b=>el===b.element||el.contains(b.element))})).filter(b=>b.box.width&&b.box.height&&b.content.length);
-    const columns=[],seen=new Set();
+    const columns=[],seen=new Set(),rowGaps=new Map();
     for(let i=0;i<blocks.length;i++) for(const other of blocks.slice(i+1)) {
       const [a,b]=blocks[i].box.left<=other.box.left?[blocks[i],other]:[other,blocks[i]];
       if(a.box.right>b.box.left||Math.min(a.box.bottom,b.box.bottom)<=Math.max(a.box.top,b.box.top)) continue;
@@ -491,6 +491,12 @@ function inspectSpaces() {
       };
       const left=column(a),right=column(b);
       columns.push({left,right,topDifference:Math.abs(left.top-right.top),bottomDifference:Math.abs(left.bottom-right.bottom)});
+      const next=shared.filter(c=>c.box.left<=body.left+2&&c.box.right>=body.right-2&&c.box.top>=Math.max(a.box.top,b.box.top)+2).sort((a,b)=>a.box.top-b.box.top)[0];
+      if(next) {
+        const bottom=Math.max(left.bottom,right.bottom),top=Math.min(...next.content.map(r=>r.top))-bounds.top;
+        if(!rowGaps.has(next.el)||bottom>rowGaps.get(next.el).bottom)
+          rowGaps.set(next.el,{before:[left.text,right.text],after:label(next.el),bottom,top,gap:top-bottom});
+      }
     }
     const gaps={};
     for(const name of ['--content-gap','--list-item-gap','--list-group-gap']) {
@@ -510,7 +516,7 @@ function inspectSpaces() {
       const c=caption.getBoundingClientRect();
       return images.map(img=>{const r=paintedImage(img),dx=Math.max(r.left-c.right,c.left-r.right,0),dy=Math.max(r.top-c.bottom,c.top-r.bottom,0);return {caption:label(caption),image:img.alt||img.getAttribute('src'),distance:Math.hypot(dx,dy),verticalGap:c.top-r.bottom};});
     });
-    return {slide:index+1,title:headings.map(h=>label(h)).join(' | '),body:local(body),cell,threshold:{height:48,width:160,areaRatio:0.015},regions,columns,sharedGaps:gaps,blockGaps,captions};
+    return {slide:index+1,title:headings.map(h=>label(h)).join(' | '),body:local(body),cell,threshold:{height:48,width:160,areaRatio:0.015},regions,columns,rowGaps:[...rowGaps.values()],sharedGaps:gaps,blockGaps,captions};
   });
 }
 
@@ -1444,6 +1450,9 @@ async function main() {
       assert.equal(blankBand.captions.length, 1);
       assert.equal(blankBand.captions[0].distance, 0);
       assert.deepEqual(blankBand.sharedGaps, { '--content-gap': 16, '--list-item-gap': 8, '--list-group-gap': 24 });
+      assert.equal(blankBand.rowGaps.length, 1);
+      assert.equal(blankBand.rowGaps[0].bottom, 300);
+      assert.ok(blankBand.rowGaps[0].gap < blankBand.sharedGaps['--list-group-gap']);
       const beforeOverlay = await page.evaluate(() => [...document.querySelectorAll('section,blockquote,h3')].map(el => el.getBoundingClientRect().toJSON()));
       await page.evaluate(drawSpaceOverlay, blankBand);
       assert.equal(await page.$$eval('[data-space-overlay] rect', rects => rects.length), blankBand.regions.length);
@@ -1466,6 +1475,34 @@ async function main() {
       const [containedSpaces] = await page.evaluate(inspectSpaces);
       assert.ok(containedSpaces.regions.some(r => r.y === 0 && r.height >= 48 && r.width === 480));
       assert.ok(containedSpaces.regions.some(r => r.y >= 180 && r.height >= 48 && r.width === 480));
+      await page.setContent('<style>body{margin:0}section{position:relative;width:600px;height:400px;font:20px/20px monospace;--list-group-gap:16px}blockquote,p{position:absolute;margin:0}table{width:180px;border-spacing:0}</style><section><blockquote style="left:0;top:40px;width:180px"><table style="height:80px"><tr><td>Left</td></tr></table></blockquote><blockquote style="left:200px;top:40px;width:180px"><table style="height:140px"><tr><td>Deepest middle</td></tr></table></blockquote><blockquote style="left:400px;top:40px;width:180px"><table style="height:100px"><tr><td>Right</td></tr></table></blockquote><p style="left:0;top:188px;width:600px"><strong>Mixed heading</strong><br>Body text</p></section>');
+      let [rowSpace] = await page.evaluate(inspectSpaces);
+      assert.equal(rowSpace.rowGaps.length, 1);
+      assert.equal(rowSpace.rowGaps[0].bottom, 180);
+      assert.ok(rowSpace.rowGaps[0].gap < 16);
+      // Position the first rendered line exactly one group gap below the deepest column.
+      await page.$eval('section > p', (p, offset) => { p.style.top = `${parseFloat(p.style.top) + offset}px`; }, 16 - rowSpace.rowGaps[0].gap);
+      [rowSpace] = await page.evaluate(inspectSpaces);
+      assert.equal(rowSpace.rowGaps[0].gap, 16);
+      await page.evaluate(() => {
+        const p = document.querySelector('section > p');
+        const box = document.createElement('blockquote');
+        box.style.cssText = 'left:0;top:180px;width:600px;height:80px';
+        p.replaceWith(box); box.append(p);
+        p.style.top = '24px';
+      });
+      [rowSpace] = await page.evaluate(inspectSpaces);
+      assert.ok(rowSpace.rowGaps[0].gap >= 16);
+      await page.evaluate(() => {
+        const box = document.querySelector('section > blockquote:last-child');
+        box.style.top = '188px';
+        box.innerHTML = '<p style="width:600px"><mjx-container style="display:block;width:200px;height:30px"></mjx-container></p>';
+      });
+      [rowSpace] = await page.evaluate(inspectSpaces);
+      assert.equal(rowSpace.rowGaps[0].gap, 8);
+      await page.evaluate(() => document.querySelector('section > blockquote:last-child').remove());
+      [rowSpace] = await page.evaluate(inspectSpaces);
+      assert.deepEqual(rowSpace.rowGaps, []);
       const mathFixture = fs.mkdtempSync(path.join(require('node:os').tmpdir(), 'slide-math-labels-'));
       try {
         const renderMath = async tex => {
@@ -1571,6 +1608,8 @@ async function main() {
         }
         report.push('', 'Column content edges (painted bounds):', '');
         for (const pair of space.columns) report.push(`- ${JSON.stringify(pair.left.text)} / ${JSON.stringify(pair.right.text)}: top ${px(pair.left.top)} / ${px(pair.right.top)} (difference ${px(pair.topDifference)}); bottom ${px(pair.left.bottom)} / ${px(pair.right.bottom)} (difference ${px(pair.bottomDifference)}).`);
+        report.push('', 'Column row to next full-width block:', '');
+        for (const row of space.rowGaps) report.push(`- ${JSON.stringify(row.after)}: column bottom ${px(row.bottom)} → block top ${px(row.top)}; gap ${px(row.gap)}; --list-group-gap=${px(space.sharedGaps['--list-group-gap'])}.`);
         report.push('', `Shared gaps: ${Object.entries(space.sharedGaps).map(([name, value]) => `${name}=${px(value)}`).join(', ')}.`, '', 'Consecutive block gaps:', '');
         for (const gap of space.blockGaps) report.push(`- ${JSON.stringify(gap.before)} → ${JSON.stringify(gap.after)}: ${px(gap.gap)}; ${gap.variable}=${px(gap.expected)} (difference ${px(gap.gap - gap.expected)}).`);
         report.push('', 'Figure-to-caption distances:', '');
