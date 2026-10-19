@@ -144,14 +144,15 @@ Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S0.F1)]: Com
 - 約 2 万件の実デザインから、関連する要素ペアとデザイン意図を質問応答形式で注釈
   - 複数レイヤーの編集構造を保持
 
-**③ 学習手法: MASON**\
-**M**ultimodal **A**lignment and **S**tructural percepti**ON**
+**③ 学習手法: MASON**
 
+- **M**ultimodal **A**lignment and **S**tructural percepti**ON**
 - Multimodal Alignment (MA): 完成画像と各レイヤーの対応付けを学習
 - Structural Perception (SP): レイヤー間の位置・重なり・前後関係を明示
 
-**主な結果: 同一ベースモデル (Qwen2.5-VL 7B) の関連要素特定精度**\
-主タスク QA のみで微調整 88.80% → MASON 91.66% (+2.86 pt)
+**主な結果: 公開モデル Qwen2.5-VL 7B を CoDeLayout で微調整**
+
+- 重み付き精度: GPT-o3 (zero-shot) **79.68%** → MASON **91.66%** (+11.98 pt)
 
 ---
 
