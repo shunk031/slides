@@ -145,7 +145,7 @@ Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S0.F1)]: Com
   - 複数レイヤーの編集構造を保持
 
 **③ 学習手法: MASON**\
-Multimodal Alignment and Structural perceptiON
+**M**ultimodal **A**lignment and **S**tructural percepti**ON**
 
 - Multimodal Alignment（MA）: 完成画像と各レイヤーの対応付けを学習
 - Structural Perception（SP）: レイヤー間の位置・重なり・前後関係を明示
