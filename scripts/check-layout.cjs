@@ -915,26 +915,67 @@ function inspectMathLabels() {
   const formulas = [];
   [...document.querySelectorAll('section')].forEach((slide, index) => {
     [...slide.querySelectorAll('mjx-container[display="true"]')].forEach((formula, number) => {
-      const labels = [];
+      const labels = []; let ordinal = 0;
       for (const under of formula.querySelectorAll('[data-mml-node="munder"]')) {
         const brace = under.firstElementChild;
         if (!brace?.querySelector(':scope > [data-mml-node="munder"] > [data-mml-node="mo"] [data-c="E152"], :scope > [data-mml-node="munder"] > [data-mml-node="mo"] [data-c="23DF"]')) continue;
+        const term = brace.firstElementChild.firstElementChild.getBoundingClientRect(), order = ordinal++;
         const label = under.children[1];
         const texts = [...label.querySelectorAll('[data-mml-node="mtext"]')].filter(text => text.querySelector('text,[data-c]') && !text.closest('[data-mml-node="mphantom"]'));
         const boxes = texts.map(text => text.getBoundingClientRect()).filter(r => r.width && r.height);
         if (!boxes.length) continue;
         const em = Math.max(...texts.map(text => { const matrix = text.getScreenCTM(); return 1000 * Math.hypot(matrix.c,matrix.d); }));
-        labels.push({ text: texts.map(text => [...text.querySelectorAll('text,path[data-c],use[data-c]')].map(g => g.hasAttribute('data-c') ? String.fromCodePoint(parseInt(g.getAttribute('data-c'),16)) : g.textContent).join('')).join(''), left:Math.min(...boxes.map(r=>r.left)), right:Math.max(...boxes.map(r=>r.right)), top:Math.min(...boxes.map(r=>r.top)), bottom:Math.max(...boxes.map(r=>r.bottom)), em });
+        labels.push({ ordinal:order, term:{left:term.left,right:term.right,top:term.top,bottom:term.bottom}, text: texts.map(text => [...text.querySelectorAll('text,path[data-c],use[data-c]')].map(g => g.hasAttribute('data-c') ? String.fromCodePoint(parseInt(g.getAttribute('data-c'),16)) : g.textContent).join('')).join(''), left:Math.min(...boxes.map(r=>r.left)), right:Math.max(...boxes.map(r=>r.right)), top:Math.min(...boxes.map(r=>r.top)), bottom:Math.max(...boxes.map(r=>r.bottom)), em });
       }
       const findings = [];
       for (let i=0;i<labels.length;i++) for (const b of labels.slice(i+1)) {
         const a=labels[i], dx=Math.max(a.left-b.right,b.left-a.right,0),dy=Math.max(a.top-b.bottom,b.top-a.bottom,0),gap=Math.hypot(dx,dy),limit=Math.max(a.em,b.em)*0.25;
         if (gap < limit-0.1) findings.push({slide:index+1,kind:'math-label-gap',text:`${a.text} / ${b.text}: label clearance ${gap.toFixed(2)}px < ${limit.toFixed(2)}px (0.25em)`,gap,limit});
       }
-      formulas.push({slide:index+1,formula:number+1,labels,findings});
+      const matrix=formula.querySelector('[data-mml-node="math"]').getScreenCTM();
+      formulas.push({slide:index+1,formula:number+1,em:1000*Math.hypot(matrix.c,matrix.d),labels,findings});
     });
   });
   return formulas;
+}
+
+
+function mathSpacingFindings(formulas, sources) {
+  const findings = [];
+  formulas.forEach((formula, index) => {
+    const tex = sources[index]?.replace(/(?<!\\)%[^\n]*/g, '');
+    if (!tex) return;
+    const tokens = [...tex.matchAll(/\\[a-zA-Z]+|\\[\s\S]|%[^\n]*|[^\s]/g)].filter(t => !t[0].startsWith('%'));
+    const endGroup = start => {
+      if (tokens[start]?.[0] !== '{') return -1;
+      let depth = 0;
+      for (let i=start;i<tokens.length;i++) {
+        if (tokens[i][0] === '{') depth++;
+        if (tokens[i][0] === '}' && --depth === 0) return i;
+      }
+      return -1;
+    };
+    const terms = [];
+    for (let i=0;i<tokens.length;i++) if (tokens[i][0] === '\\underbrace') {
+      const bodyEnd=endGroup(i+1),labelEnd=endGroup(bodyEnd+2);
+      if (bodyEnd<0 || tokens[bodyEnd+1]?.[0] !== '_' || labelEnd<0) continue;
+      terms.push({start:tokens[i].index,end:tokens[labelEnd].index+1}); i=labelEnd;
+    }
+    for (let i=0;i+1<terms.length;i++) {
+      const between=tex.slice(terms[i].end,terms[i+1].start);
+      if (/\\\\|\\cr\b/.test(between)) continue;
+      const commands=[...between.matchAll(/\\(?:qquad|quad|hspace\*?)(?![a-zA-Z])/g)].map(m=>m[0]);
+      const separator=commands.length===1 && commands[0]==='\\quad' && /,\s*\\quad\b/.test(between) && (/=/.test(between.split(/,\s*\\quad\b/)[1]) || /^\s*=/.test(tex.slice(terms[i+1].end)));
+      if (separator) continue;
+      const a=formula.labels.find(l=>l.ordinal===i),b=formula.labels.find(l=>l.ordinal===i+1);
+      const text=a&&b?`${a.text} / ${b.text}`:`labeled terms ${i+1} / ${i+2}`;
+      if (commands.length) findings.push({slide:formula.slide,kind:'math-manual-spacing',review:true,text:`${text}: ${commands.join(' ')} between labeled terms`});
+      if (!a || !b || Math.abs(a.term.top-b.term.top)>formula.em) continue;
+      const gap=b.term.left-a.term.right,overhang=Math.max(0,a.right-a.term.right)+Math.max(0,b.term.left-b.left)+Math.max(a.em,b.em)*0.25,limit=Math.max(formula.em*1.5,overhang);
+      if (gap>limit+1) findings.push({slide:formula.slide,kind:'math-term-gap',review:true,gap,limit,text:`${text}: term gap ${gap.toFixed(2)}px > ${limit.toFixed(2)}px (max of label clearance and 1.5em)`});
+    }
+  });
+  return findings;
 }
 
 async function main() {
@@ -1530,6 +1571,22 @@ async function main() {
         await renderMath(`${a},${b}`); await moveLabel(labels[0].em*0.25+1);
         assert.deepEqual((await page.evaluate(inspectMathLabels))[0].findings, []);
       } finally { fs.rmSync(mathFixture, {recursive:true,force:true}); }
+      const spacingPair = (gap, overhang=0) => [{slide:1,em:20,labels:[{ordinal:0,text:'A',left:0,right:20+overhang,top:0,bottom:10,em:14,term:{left:0,right:20,top:0,bottom:10}},{ordinal:1,text:'B',left:20+gap-overhang,right:40+gap,top:0,bottom:10,em:14,term:{left:20+gap,right:40+gap,top:0,bottom:10}}]}];
+      const labeled = String.raw`\underbrace{x}_{\mathclap{\text{A}}}`;
+      assert.deepEqual(mathSpacingFindings(spacingPair(30),[`${labeled},${labeled}`]), []);
+      assert.equal(mathSpacingFindings(spacingPair(60),[`${labeled},${labeled}`])[0].kind, 'math-term-gap');
+      assert.deepEqual(mathSpacingFindings(spacingPair(60,30),[`${labeled},${labeled}`]), []);
+      for (const command of ['quad','qquad','hspace{2em}']) {
+        assert.ok(mathSpacingFindings(spacingPair(30),[`${labeled},\\${command}${labeled}`]).some(f=>f.kind==='math-manual-spacing'));
+      }
+      assert.deepEqual(mathSpacingFindings(spacingPair(100),[`${labeled}=G(x),\\quad ${labeled}=P(x)`]), []);
+      assert.ok(mathSpacingFindings(spacingPair(100),[`${labeled},\\quad ${labeled},z`]).some(f=>f.kind==='math-manual-spacing'));
+      assert.ok(mathSpacingFindings(spacingPair(100),[`${labeled}=G(x),\\qquad ${labeled}=P(x)`]).some(f=>f.kind==='math-manual-spacing'));
+      assert.deepEqual(mathSpacingFindings(spacingPair(100),[`${labeled}\\\\${labeled}`]), []);
+      assert.deepEqual(mathSpacingFindings(spacingPair(30),[`${labeled}, % \\qquad ignored\n${labeled}`]), []);
+      const parser = new (marpRequire('@marp-team/marp-core').Marp)();
+      const sources = parser.markdown.parse('```tex\n$$x\\quad y$$\n```\n\n<!-- $$z$$ -->\n\n$$\nx+y\n$$',{}).filter(t=>t.type==='marp_math_block').map(t=>t.content);
+      assert.deepEqual(sources, ['x+y\n']);
       console.log('Layout inspection self-test passed');
       return;
     }
@@ -1572,15 +1629,18 @@ async function main() {
       const spaces = await page.evaluate(inspectSpaces);
       const textConventions = await page.evaluate(inspectTextConventions, terms);
       const languageReview = textConventions.filter(f => f.review);
+      const math = await page.evaluate(inspectMathLabels);
+      const mathSources = new (marpRequire('@marp-team/marp-core').Marp)().markdown.parse(fs.readFileSync(input, 'utf8'), {}).filter(t => t.type === 'marp_math_block').map(t => t.content);
+      const mathReview = mathSpacingFindings(math, mathSources);
       fs.writeFileSync(path.join(output, 'spaces.json'), JSON.stringify({ input, browser: await browser.version(), slides: spaces }, null, 2));
-      const structure = [...(input === files[0] ? layoutCoverage.findings : []), ...await page.evaluate(inspectStructure), ...(await page.evaluate(inspectMathLabels)).flatMap(f => f.findings), ...textConventions.filter(f => !f.review), ...await page.evaluate(inspectTypography), ...await page.evaluate(inspectTerms, terms), ...await page.evaluate(inspectMidwordWraps), ...await page.evaluate(inspectItemGaps), ...titleFindings, ...headingFindings, ...columnFindings(columns), ...groupGapFindings(groupGaps), ...bodyFillFindings(bodyFill)];
+      const structure = [...(input === files[0] ? layoutCoverage.findings : []), ...await page.evaluate(inspectStructure), ...math.flatMap(f => f.findings), ...textConventions.filter(f => !f.review), ...await page.evaluate(inspectTypography), ...await page.evaluate(inspectTerms, terms), ...await page.evaluate(inspectMidwordWraps), ...await page.evaluate(inspectItemGaps), ...titleFindings, ...headingFindings, ...columnFindings(columns), ...groupGapFindings(groupGaps), ...bodyFillFindings(bodyFill)];
       structuralErrors += structure.length + candidates.length;
       candidateCount += candidates.length + structure.length;
-      fs.writeFileSync(path.join(output, 'lines.json'), JSON.stringify({ input, browser: await browser.version(), blocks, columnPairs: columns, groupGaps, bodyFill, structure, languageReview }, null, 2));
+      fs.writeFileSync(path.join(output, 'lines.json'), JSON.stringify({ input, browser: await browser.version(), blocks, columnPairs: columns, groupGaps, bodyFill, structure, languageReview, mathReview, math }, null, 2));
       await page.evaluate(() => document.querySelectorAll('.debug-layout').forEach(e => e.classList.remove('debug-layout')));
       const sections = await page.$$('section');
       if (!sections.length) throw new Error(`No slides rendered: ${input}`);
-      const report = [`# Layout review: ${input}`, '', `${candidates.length} line-balance errors; ${structure.length} structure/typography findings; ${spaces.reduce((sum, slide) => sum + slide.regions.length, 0)} review-only space candidates; ${languageReview.length} review-only demonstrative candidates. Review each image at full size; zero findings does not mean good layout.`, ''];
+      const report = [`# Layout review: ${input}`, '', `${candidates.length} line-balance errors; ${structure.length} structure/typography findings; ${spaces.reduce((sum, slide) => sum + slide.regions.length, 0)} review-only space candidates; ${languageReview.length} review-only demonstrative candidates; ${mathReview.length} review-only formula-spacing candidates. Review each image at full size; zero findings does not mean good layout.`, ''];
       for (const finding of structure.filter(f => f.slide === 0)) {
         report.push(`Error ${finding.kind}: ${finding.text}`, '');
         console.log(`${input} ERROR ${finding.kind}: ${finding.text}`);
@@ -1589,7 +1649,7 @@ async function main() {
         const filename = `slide-${i + 1}.png`;
         await sections[i].screenshot({ path: path.join(output, filename) });
         report.push(`## Slide ${i + 1}`, '', `![Slide ${i + 1}](${filename})`, '');
-        for (const finding of languageReview.filter(f => f.slide === i + 1)) {
+        for (const finding of [...languageReview, ...mathReview].filter(f => f.slide === i + 1)) {
           report.push(`Review ${finding.kind}: ${finding.text}`, '');
           console.log(`${input}:${i + 1} REVIEW ${finding.kind}: ${finding.text}`);
         }
@@ -1628,7 +1688,7 @@ async function main() {
       fs.writeFileSync(path.join(output, 'review.md'), report.join('\n'));
       console.log(`${sections.length} slides saved: ${path.join(output, 'review.md')}`);
     }
-    console.log(`${candidateCount} layout errors; space/language-review candidates do not fail the check.`);
+    console.log(`${candidateCount} layout errors; space/language/math-review candidates do not fail the check.`);
     if (structuralErrors) throw new Error(`${structuralErrors} layout errors: see review.md.`);
   } finally {
     await browser.close();
