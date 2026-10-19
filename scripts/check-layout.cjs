@@ -153,10 +153,15 @@ function inspectGroupGaps() {
       if (!group(previous)) {
         const previousBox = heading.parentElement.previousElementSibling;
         if (!previousBox || previousBox.parentElement !== slide || previousBox.tagName !== 'BLOCKQUOTE' || previousBox.querySelector('img')) continue;
-        const currentBox = heading.parentElement.getBoundingClientRect();
+        const boxes = [...slide.children];
+        const position = boxes.indexOf(heading.parentElement);
+        const current = heading.getBoundingClientRect();
         const previousBoxRect = previousBox.getBoundingClientRect();
-        if (previousBoxRect.right <= currentBox.left || currentBox.right <= previousBoxRect.left) continue;
-        previous = lastGroup(previousBox);
+        if (previousBoxRect.right <= current.left || current.right <= previousBoxRect.left) continue;
+        previous = boxes.slice(0, position).filter(box => box.tagName === 'BLOCKQUOTE').map(lastGroup).filter(group).filter(item => {
+          const before = item.getBoundingClientRect();
+          return before.width && before.right > current.left && current.right > before.left && before.bottom <= current.top;
+        }).sort((a, b) => b.getBoundingClientRect().bottom - a.getBoundingClientRect().bottom)[0];
         crossesBox = true;
       }
       if (!group(previous)) continue;
@@ -905,6 +910,19 @@ async function main() {
       assert.ok(groupGapFindings(await page.evaluate(inspectGroupGaps)).some(f => f.kind === 'group-gap' && f.gap === 8 && f.limit === 16));
       await page.evaluate(() => { document.querySelectorAll('blockquote')[1].style.top = '56px'; });
       assert.deepEqual(groupGapFindings(await page.evaluate(inspectGroupGaps)), []);
+      await page.setContent('<style>section{position:relative;width:500px;height:180px;font:20px/20px monospace;--list-group-gap:16px}blockquote,p,ul{margin:0}blockquote{position:absolute}li{list-style:none}</style><section><blockquote style="left:250px;top:20px;width:250px"><p><img style="display:block;width:80px;height:40px"></p><p style="margin-top:20px">Figure from [S]</p></blockquote><blockquote style="left:0;top:20px;width:250px"><ul style="height:47px"><li>Previous text</li></ul></blockquote><blockquote style="left:0;top:116px;width:500px"><p><strong>Full-width group</strong></p><ul><li>Next</li></ul></blockquote></section><section><ul><li>Previous</li></ul><p style="margin-top:16px"><strong>Normal group</strong></p><ul><li>Next</li></ul></section>');
+      const captionGroupGaps = await page.evaluate(inspectGroupGaps);
+      assert.deepEqual(captionGroupGaps.groups.map(group => group.gap), [16, 16]);
+      assert.deepEqual(groupGapFindings(captionGroupGaps), []);
+      await page.evaluate(() => { document.querySelectorAll('blockquote')[2].style.top = '108px'; });
+      assert.ok(groupGapFindings(await page.evaluate(inspectGroupGaps)).some(f => f.slide === 1 && f.gap === 8));
+      await page.evaluate(() => { const box = document.querySelectorAll('blockquote')[2]; box.style.top = '83px'; box.querySelector('p').style.width = '250px'; });
+      const narrowHeadingGaps = await page.evaluate(inspectGroupGaps);
+      assert.equal(narrowHeadingGaps.groups[0].previous, 'ul');
+      assert.deepEqual(narrowHeadingGaps.groups.map(group => group.gap), [16, 16]);
+      assert.deepEqual(groupGapFindings(narrowHeadingGaps), []);
+      await page.setContent('<section style="--list-group-gap:16px"><blockquote><p><img style="width:80px;height:40px"></p><p>Figure from [S]</p></blockquote><blockquote><p><strong>First text group beside a figure</strong></p><ul><li>Next</li></ul></blockquote></section>');
+      assert.deepEqual((await page.evaluate(inspectGroupGaps)).groups, []);
       await page.setContent('<section style="font:20px/20px monospace;--list-group-gap:16px"><h2>Title</h2><p style="margin:0"><strong>Group</strong></p><ul style="margin:0"><li>Next</li></ul></section>');
       assert.deepEqual((await page.evaluate(inspectGroupGaps)).groups, []);
       for (const heading of ['<strong>Group</strong>', '<strong><a href="#table">Group</a></strong>', '<a href="#table"><strong>Group</strong></a>']) {
