@@ -187,13 +187,13 @@ Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S0.F1)]: Com
 > **入力: 完成画像 + 各レイヤーのメタデータ**
 >
 > $$
-> \mathcal{L}=(\underbrace{\bbox[0px,#E2F0D9]{\vphantom{\mathcal{IM}}\mathcal{I}}}_{\mathclap{\bbox[0px,#E2F0D9]{\text{完成画像}}\hphantom{\text{完成}}}},\;\underbrace{\bbox[0px,#DBEAFE]{\vphantom{\mathcal{IM}}\mathcal{M}}}_{\mathclap{\hphantom{\text{完成}}\bbox[0px,#DBEAFE]{\text{メタデータ}}}}),\,
-> \bbox[0px,#DBEAFE]{\mathcal{M}}=\{\mathcal{M}_{e_1},\ldots,\mathcal{M}_{e_n}\}
+> \bbox[0px,#E7E6E6]{\mathcal{L}}=(\underbrace{\bbox[0px,#E2F0D9]{\vphantom{\mathcal{IM}}\mathcal{I}}}_{\mathclap{\bbox[0px,#E2F0D9]{\text{完成画像}}\hphantom{\text{完成}}}},\;\underbrace{\bbox[0px,#DBEAFE]{\vphantom{\mathcal{IM}}\mathcal{M}}}_{\mathclap{\hphantom{\text{完成}}\bbox[0px,#DBEAFE]{\text{メタデータ}}}}),\,
+> \bbox[0px,#DBEAFE]{\mathcal{M}}=\{\bbox[0px,#DBEAFE]{\mathcal{M}_{e_1}},\ldots,\bbox[0px,#DBEAFE]{\mathcal{M}_{e_n}}\}
 > $$
 >
-> - $\mathcal{M}_{e_i}$: 要素識別子 (ID)・種類・位置・\
+> - $\bbox[0px,#DBEAFE]{\mathcal{M}_{e_i}}$: 要素識別子 (ID)・種類・位置・\
 >   不透明度・重なり順などの属性
-> - 質問 $Q(e^q)$: 注目する要素 $e^q$ を指定
+> - 質問 $\bbox[0px,#FFF2CC]{Q(e^q)}$: 注目する要素 $e^q$ を指定
 
 > **主タスク: 関連要素の特定と意図説明**
 >
@@ -345,22 +345,22 @@ Qwen2.5-VL 7B _[[Bai+ arXiv’25](https://arxiv.org/abs/2502.13923)]_ の構造�
 
 > **補助 QA (Grounding QA) を生成**
 >
-> - 入力: レイアウト $\mathcal{L}$ (完成画像＋メタデータ)\
->   対象要素の切り出し画像・メタデータ・質問
-> - $Q^g(e_i)$: 要素 $e_i$ の見た目と位置を問う質問
+> - 入力: レイアウト $\bbox[0px,#E7E6E6]{\mathcal{L}}$ ($\bbox[0px,#E2F0D9]{\text{完成画像}}$＋$\bbox[0px,#DBEAFE]{\text{メタデータ}}$)\
+>   対象要素の$\bbox[0px,#E2F0D9]{\text{切り出し画像}}$・$\bbox[0px,#DBEAFE]{\text{メタデータ}}$・$\bbox[0px,#FFF2CC]{\text{質問}}$
+> - $\bbox[0px,#FFF2CC]{Q^g(e_i)}$: 要素 $e_i$ の見た目と位置を問う質問
 >   - 例: 「ID が $i$ の要素は何か・完成画像のどこにあるか」
-> - 出力 $A^g(e_i)$: 要素の視覚的特徴と位置を記述した回答
+> - 出力 $\bbox[0px,#FCE4D6]{A^g(e_i)}$: 要素の視覚的特徴と位置を記述した回答
 >   - GPT-4o が生成し、MASON の学習に使用
 > - 推論時には GPT-4o を使用しない
 
 $$
-\underbrace{\vphantom{A^g(e_i)\mathcal{P}_{\mathrm{ground}}}A^g(e_i)}_{\mathclap{\text{回答}}} =
+\underbrace{\vphantom{A^g(e_i)\mathcal{P}_{\mathrm{ground}}}\bbox[0px,#FCE4D6]{A^g(e_i)}}_{\mathclap{\bbox[0px,#FCE4D6]{\text{回答}}}} =
 \underbrace{\vphantom{A^g(e_i)\mathcal{P}_{\mathrm{ground}}}\mathcal{G}}_{\mathclap{\vphantom{\text{回答}}\text{GPT-4o}}}\quad\Bigl(
 \underbrace{\vphantom{A^g(e_i)\mathcal{P}_{\mathrm{ground}}}\mathcal{P}_{\mathrm{ground}}}_{\mathclap{\text{プロンプト}}}\quad\Bigl(
-\underbrace{\vphantom{A^g(e_i)\mathcal{P}_{\mathrm{ground}}}\mathcal{L}}_{\mathclap{\text{レイアウト}}},\quad\;
-\underbrace{\vphantom{A^g(e_i)\mathcal{P}_{\mathrm{ground}}}\mathcal{I}_{e_i}}_{\mathclap{\text{要素画像}}},\quad
-\underbrace{\vphantom{A^g(e_i)\mathcal{P}_{\mathrm{ground}}}\mathcal{M}_{e_i}}_{\mathclap{\text{属性}}},\quad\;
-\underbrace{\vphantom{A^g(e_i)\mathcal{P}_{\mathrm{ground}}}Q^g(e_i)}_{\mathclap{\text{質問}}}
+\underbrace{\vphantom{A^g(e_i)\mathcal{P}_{\mathrm{ground}}}\bbox[0px,#E7E6E6]{\mathcal{L}}}_{\mathclap{\bbox[0px,#E7E6E6]{\text{レイアウト}}}},\quad\;
+\underbrace{\vphantom{A^g(e_i)\mathcal{P}_{\mathrm{ground}}}\bbox[0px,#E2F0D9]{\mathcal{I}_{e_i}}}_{\mathclap{\bbox[0px,#E2F0D9]{\text{要素画像}}}},\quad
+\underbrace{\vphantom{A^g(e_i)\mathcal{P}_{\mathrm{ground}}}\bbox[0px,#DBEAFE]{\mathcal{M}_{e_i}}}_{\mathclap{\bbox[0px,#DBEAFE]{\text{属性}}}},\quad\;
+\underbrace{\vphantom{A^g(e_i)\mathcal{P}_{\mathrm{ground}}}\bbox[0px,#FFF2CC]{Q^g(e_i)}}_{\mathclap{\bbox[0px,#FFF2CC]{\text{質問}}}}
 \Bigr)\Bigr)
 $$
 
@@ -392,10 +392,10 @@ $$
 > | 位置・距離 | 中心距離・上下左右 |
 > | 前後       | どちらが前面か     |
 >
-> - **学習時・推論時の両方で拡張メタデータ $\mathcal{M}'$ を利用**
+> - **学習時・推論時の両方で拡張メタデータ $\bbox[0px,#DBEAFE]{\mathcal{M}'}$ を利用**
 
 $$
-\mathcal{M}'_{e_i}=\mathcal{M}_{e_i}\cup\texttt{spatialRelationship}(e_i,e^q)
+\bbox[0px,#DBEAFE]{\mathcal{M}'_{e_i}}=\bbox[0px,#DBEAFE]{\mathcal{M}_{e_i}}\cup\texttt{spatialRelationship}(e_i,e^q)
 $$
 
 ---
@@ -407,10 +407,10 @@ $$
 ## 実験設定 **|** _主タスクだけで微調整した DF と比べ、MA・SP の効果を評価_
 
 $$
-\underbrace{\vphantom{\hat A\mathcal M'Q}\hat A}_{\mathclap{\text{回答}}}
-=\operatorname{VLM}\Bigl((\underbrace{\vphantom{\hat A\mathcal M'Q}\mathcal I}_{\mathclap{\text{完成画像}}},\qquad
-\underbrace{\vphantom{\hat A\mathcal M'Q}\mathcal M'}_{\mathclap{\text{拡張メタデータ}}}),\qquad\,
-\underbrace{\vphantom{\hat A\mathcal M'Q}Q}_{\mathclap{\text{2 種類の質問}}}\Bigr)
+\underbrace{\vphantom{\hat A\mathcal M'Q}\bbox[0px,#FCE4D6]{\hat A}}_{\mathclap{\bbox[0px,#FCE4D6]{\text{回答}}}}
+=\operatorname{VLM}\Bigl((\underbrace{\vphantom{\hat A\mathcal M'Q}\bbox[0px,#E2F0D9]{\mathcal I}}_{\mathclap{\bbox[0px,#E2F0D9]{\text{完成画像}}}},\qquad
+\underbrace{\vphantom{\hat A\mathcal M'Q}\bbox[0px,#DBEAFE]{\mathcal M'}}_{\mathclap{\bbox[0px,#DBEAFE]{\text{拡張メタデータ}}}}),\qquad\,
+\underbrace{\vphantom{\hat A\mathcal M'Q}\bbox[0px,#FFF2CC]{Q}}_{\mathclap{\bbox[0px,#FFF2CC]{\text{2 種類の質問}}}}\Bigr)
 $$
 
 > **学習条件の比較**
