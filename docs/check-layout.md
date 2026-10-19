@@ -22,7 +22,7 @@ ID はターミナルの `ERROR <ID>` に対応します。確認候補だけは
 | `text-overlap`                 | 異なるテキスト要素の重なり             | 縦横とも 2px 超の交差                                          | 同一要素内、文字と画像、一般の疑似要素             |
 | `text-overflow`                | 文字のボックス・画面外へのはみ出し     | 各辺 1px 超                                                    | 画像内の文字                                       |
 | `box-overflow`                 | 図・比較枠の画面外へのはみ出し         | `img` / `blockquote` の各辺 1px 超                             | DOM にない背景画像                                 |
-| `footer-overflow`              | 本文・図の footer 領域への侵入         | 本文ボックス下端が footer 枠上端以上                           | footer がないページ、背景・疑似要素                |
+| `footer-overflow`              | footer・ページ番号との衝突、下端逸脱   | 実文字と縦横 2px の余白内で交差、または下端安全線を 1px 超過   | 背景・一般の疑似要素、画像内部の余白               |
 | `math-overflow`                | 表示数式の下余白への侵入               | 下 padding の上端を 1px 超過                                   | 注釈どうしの重なり                                 |
 | `column-alignment`             | 兄弟列の内容上端のずれ                 | 差が 2px 超。条件付きで図と本文の下端一致を許容                | 入れ子列、画像ファイル内部の余白                   |
 | `paired-definition-alignment`  | 左右の定義段落の欠落・高さ違い         | `paired-definitions` の定義が 2 個でない、または高さ差 2px 超  | この ID 単独では定義の上端差                       |
@@ -103,7 +103,9 @@ Chrome の CSS parser でテーマを読み、`section` / `:root` と同じ comp
 
 ### footer-overflow
 
-本文のテキスト・画像のボックス下端が、実際の footer 枠の上端に触れるか越えるとエラーです。y 座標は各 section の上端を 0px とした値です。header・footer・ページ番号・情報分類ラベル・背景装飾は対象外で、CSS 疑似要素や DOM にない背景画像も測りません。footer がないページでは検査しません。
+本文の描画文字・画像・表・数式が、footer またはページ番号の実文字に縦横 2px の余白内で交差するとエラーです。footer 要素の幅全体は侵入禁止帯にしません。右下バナーと左下著作権のように横方向に離れた配置を許容します。Marpit のページ番号は `text-overlap` と同じ方法で疑似要素の字形を測ります。
+
+footer の有無にかかわらず、内容が下端安全線を 1px 超える場合もエラーです。安全線はスライド下端から共通 `--slide-padding`（`ly` は 20px）、未定義なら section の `padding-bottom` を引いた位置です。表紙の本文配置用の大きな padding とは区別し、下端から 24px のバナーを移動させません。header・footer・ページ番号・情報分類・背景装飾は本文から除外します。画像・表・数式はボックス、文字は描画行を測り、画像内部の余白と一般の疑似要素・背景画像の実内容は判定しません。
 
 ### math-overflow
 

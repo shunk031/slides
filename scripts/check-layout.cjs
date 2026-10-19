@@ -757,18 +757,6 @@ function inspectStructure() {
       if (math.getBoundingClientRect().bottom > contentBottom + 1)
         findings.push({ slide: index + 1, kind: 'math-overflow', text: 'Display formula extends below the content area.' });
     }
-    const footer = slide.querySelector(':scope > footer');
-    if (footer) {
-      const slideTop = bounds.top;
-      const footerTop = footer.getBoundingClientRect().top - slideTop;
-      for (const block of slide.querySelectorAll('h1,h2,h3,h4,h5,h6,p,li,figcaption,td,th,img')) {
-        if (block.closest('header,footer,.pagination,.page-number,.classification,.classification-badge,.background-decoration')) continue;
-        const box = block.getBoundingClientRect();
-        const bodyBottom = box.bottom - slideTop;
-        if (box.width && box.height && bodyBottom >= footerTop)
-          findings.push({ slide: index + 1, kind: 'footer-overflow', text: `${block.textContent.trim() || block.getAttribute('alt') || ''} (body bottom ${Math.round(bodyBottom)}px, footer top ${Math.round(footerTop)}px)`, bodyBottom, footerTop });
-      }
-    }
     const textRuns = [];
     const textBlocks = 'h1,h2,h3,h4,h5,h6,p,li,figcaption,td,th,header,footer';
     for (const block of slide.querySelectorAll(textBlocks)) {
@@ -805,9 +793,25 @@ function inspectStructure() {
       const range = document.createRange();
       range.selectNodeContents(counter);
       for (const rect of range.getClientRects())
-        if (rect.width && rect.height) textRuns.push({ block: counter, rect });
+        if (rect.width && rect.height) textRuns.push({ block: counter, rect, reserved: true });
       counter.remove();
     }
+    const excluded = 'header,footer,.pagination,.page-number,.classification,.classification-badge,.background-decoration';
+    const reserved = textRuns.filter(run => run.reserved || run.block.closest('footer,.pagination,.page-number'));
+    const content = textRuns.filter(run => !run.reserved && !run.block.closest(excluded));
+    for (const block of slide.querySelectorAll('img,table,mjx-container')) {
+      if (!block.closest(excluded)) content.push({ block, rect: block.getBoundingClientRect() });
+    }
+    // The cover's larger flow padding reserves author rows; the shared inset protects the slide edge.
+    const safeBottom = bounds.bottom - (parseFloat(getComputedStyle(slide).getPropertyValue('--slide-padding')) || parseFloat(getComputedStyle(slide).paddingBottom) || 0);
+    const footerOverlaps = new Set();
+    for (const { block, rect } of content) {
+      if (!rect.width || !rect.height) continue;
+      if (rect.bottom > safeBottom + 1 || reserved.some(other => Math.min(rect.right,other.rect.right)+2 > Math.max(rect.left,other.rect.left) && Math.min(rect.bottom,other.rect.bottom)+2 > Math.max(rect.top,other.rect.top)))
+        footerOverlaps.add(block);
+    }
+    for (const block of footerOverlaps)
+      findings.push({ slide: index + 1, kind: 'footer-overflow', text: `${block.textContent.trim() || block.getAttribute('alt') || ''}: content intersects footer/page-number text within 2px or crosses the bottom safe inset.` });
     const overlapping = new Set();
     for (let i = 0; i < textRuns.length; i++) {
       const a = textRuns[i];
@@ -1074,13 +1078,21 @@ async function main() {
       assert.equal((await page.evaluate(inspectStructure)).some(f => f.kind === 'text-overlap'), true);
       await page.setContent('<section style="position:relative;width:500px;height:300px;font:20px/20px monospace"><p style="position:absolute;top:240px;height:20px;margin:0">Touches footer</p><footer style="position:absolute;top:260px;height:20px">Footer</footer></section>');
       const footerTouch = (await page.evaluate(inspectStructure)).find(f => f.kind === 'footer-overflow');
-      assert.equal(footerTouch.bodyBottom, 260);
-      assert.equal(footerTouch.footerTop, 260);
-      await page.evaluate(() => { document.querySelector('p').style.top = '239px'; });
+      assert.ok(footerTouch.text.startsWith('Touches footer'));
+      await page.evaluate(() => { document.querySelector('p').style.top = '230px'; });
       assert.equal((await page.evaluate(inspectStructure)).some(f => f.kind === 'footer-overflow'), false);
+      await page.setContent('<section style="position:relative;width:1280px;height:720px;padding-bottom:64px;box-sizing:border-box;--slide-padding:20px"><img alt="ECCV banner" style="position:absolute;right:24px;bottom:24px;width:360px;height:120px"><footer style="position:absolute;left:20px;bottom:24px;font:10px/13px monospace;width:1240px">Copyright</footer></section>');
+      assert.equal((await page.evaluate(inspectStructure)).some(f => f.kind === 'footer-overflow'), false);
+      await page.$eval('img', img => { img.style.left = '20px'; });
+      assert.equal((await page.evaluate(inspectStructure)).some(f => f.kind === 'footer-overflow'), true);
+      await page.$eval('img', img => { img.style.left = '896px'; img.style.bottom = '10px'; });
+      assert.equal((await page.evaluate(inspectStructure)).some(f => f.kind === 'footer-overflow'), true);
       await page.setContent('<style>section::after{content:attr(data-marpit-pagination) " / " attr(data-marpit-pagination-total);position:absolute;top:0;right:0;font:10px/12px monospace}</style><section data-marpit-pagination="1" data-marpit-pagination-total="1" style="position:relative;width:500px;height:300px;font:20px/20px monospace"><p style="position:absolute;top:20px;left:0;margin:0">Body</p><footer style="position:absolute;bottom:10px;left:0;font:10px/12px monospace;white-space:nowrap">Copyright / dataset creation / provenance notes</footer></section>');
       assert.deepEqual((await page.evaluate(inspectStructure)).filter(f => ['footer-overflow', 'text-overflow', 'text-overlap'].includes(f.kind)), []);
       assert.deepEqual(await page.evaluate(inspectTypography), []);
+      await page.$eval('p', p => { p.style.left = '440px'; p.style.top = '0'; });
+      assert.ok((await page.evaluate(inspectStructure)).some(f => f.kind === 'footer-overflow' && f.text.startsWith('Body')));
+      await page.$eval('p', p => { p.style.left = '0'; p.style.top = '20px'; });
       await page.evaluate(() => { Object.assign(document.querySelector('footer').style, {top:'20px',bottom:'auto'}); });
       const footerBodyOverlap = await page.evaluate(inspectStructure);
       assert.ok(footerBodyOverlap.some(f => f.kind === 'text-overlap' && f.text === 'Body'));
