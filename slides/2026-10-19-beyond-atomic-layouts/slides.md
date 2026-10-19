@@ -634,24 +634,3 @@ _[[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.T5)]: Table 5 の主
 重み付き精度: DF **88.80%** → MASON **91.66%** (+2.86 pt)\
 MASON は主タスク QA に加え、補助 QA と構造情報を利用
 
----
-
-<!-- _class: title-slide-big classification-public -->
-
-# 表紙用の背景
-
-`_class: title-slide-big classification-public`
-
----
-
-<!-- _class: content-slide-gray classification-public layout-example -->
-
-## 図や説明を置くページ
-
-`_class: content-slide-gray classification-public`
-
----
-
-<!-- _class: takahashi classification-public -->
-
-# 伝えたいことを一つ
