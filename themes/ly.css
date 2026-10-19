@@ -2,6 +2,7 @@
 
 @import "gaia";
 
+/* Keep normal punctuation widths; the deck uses ASCII parentheses. */
 @font-face {
   font-family: "LINE Seed JP";
   font-style: normal;
@@ -16,27 +17,6 @@
   font-weight: 700;
   font-display: swap;
   src: url("../../themes/assets/ly/fonts/LINESeedJP-Bold.ttf") format("truetype");
-}
-
-/* Limit pwid to parentheses: its slash glyph overhangs both neighbours. */
-@font-face {
-  font-family: "LINE Seed JP";
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url("../../themes/assets/ly/fonts/LINESeedJP-Regular.ttf") format("truetype");
-  unicode-range: U+FF08-FF09;
-  font-feature-settings: "pwid";
-}
-
-@font-face {
-  font-family: "LINE Seed JP";
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url("../../themes/assets/ly/fonts/LINESeedJP-Bold.ttf") format("truetype");
-  unicode-range: U+FF08-FF09;
-  font-feature-settings: "pwid";
 }
 
 :root {
