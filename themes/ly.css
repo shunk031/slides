@@ -417,7 +417,7 @@ section.paper-title > p:nth-of-type(4) img {
 section.paper-title > p:nth-of-type(5) {
   position: absolute;
   right: var(--paper-banner-inset);
-  bottom: var(--paper-padding-bottom);
+  bottom: var(--paper-banner-inset);
   width: var(--paper-banner-width);
   line-height: 0;
 }
