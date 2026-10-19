@@ -375,8 +375,10 @@ function inspectColumns() {
         const imageBottom = images.length === 1 && !textColumn.some(item => item.images.length) ? images[0].bottom : null;
         const bottomDifference = imageBottom === null ? null : Math.abs(imageBottom - textBottom);
         const explicitBottomAnchor = textColumn.length === 1 && textColumn[0].alignEnd;
-        const bottomAlignedFigure = bottomDifference !== null && bottomDifference <= 2 && (explicitBottomAnchor || images[0].top >= textColumn[0].first.lineTop - 2);
-        pairs.push({ slide: index + 1, leftText: a.text, rightText: b.text, leftTop, rightTop, difference: Math.abs(leftTop - rightTop), imageBottom: imageBottom === null ? null : imageBottom - slideTop, textBottom: Number.isFinite(textBottom) ? textBottom - slideTop : null, bottomDifference, bottomAlignedFigure });
+        const figureContentBottom = Math.max(imageBottom ?? -Infinity, ...figureColumn.map(item => item.textBottom));
+        const endAlignedCaption = explicitBottomAnchor && imageBottom !== null && Math.abs(figureContentBottom - textBottom) <= 2 && figureColumn.some(item => item.textBottom > imageBottom && Math.abs(item.box.bottom - figureContentBottom) <= 2) && Math.abs(textColumn[0].box.bottom - textBottom) <= 2;
+        const bottomAlignedFigure = endAlignedCaption || bottomDifference !== null && bottomDifference <= 2 && (explicitBottomAnchor || images[0].top >= textColumn[0].first.lineTop - 2);
+        pairs.push({ slide: index + 1, leftText: a.text, rightText: b.text, leftTop, rightTop, difference: Math.abs(leftTop - rightTop), imageBottom: imageBottom === null ? null : imageBottom - slideTop, textBottom: Number.isFinite(textBottom) ? textBottom - slideTop : null, bottomDifference, endAlignedCaption, bottomAlignedFigure });
       }
     }
     return pairs;
@@ -1299,6 +1301,17 @@ async function main() {
       assert.equal(columnFindings(await page.evaluate(inspectColumns)).length, 1, 'explicit end does not replace the final text line with an empty box bottom');
       await page.evaluate(() => { document.querySelectorAll('blockquote')[1].style.height = ''; Object.assign(document.querySelector('img').style, {width:'80px',objectFit:'contain'}); });
       assert.equal(columnFindings(await page.evaluate(inspectColumns)).length, 1, 'explicit end uses the contained picture, not the image element bottom');
+      await page.setContent(`<section style="display:grid;grid-template-columns:1fr 1fr;width:500px;font:20px/20px monospace"><blockquote style="margin:0"><img src="${picture}" alt="Figure" style="display:block;width:160px;height:80px"><p style="margin:4px 0 0">Figure from [Source]: caption</p></blockquote><blockquote style="margin:0;align-self:end">First<br>second<br>third</blockquote></section>`);
+      await page.evaluate(async () => { await document.querySelector('img').decode(); });
+      const captionBottomPair = await page.evaluate(inspectColumns);
+      assert.ok(captionBottomPair[0].endAlignedCaption);
+      assert.deepEqual(columnFindings(captionBottomPair), []);
+      await page.evaluate(() => { document.querySelectorAll('blockquote')[1].style.alignSelf = 'center'; });
+      assert.equal(columnFindings(await page.evaluate(inspectColumns)).length, 1, 'caption alignment needs explicit end');
+      await page.evaluate(() => { Object.assign(document.querySelectorAll('blockquote')[1].style, {alignSelf:'end',height:'80px'}); });
+      assert.equal(columnFindings(await page.evaluate(inspectColumns)).length, 1, 'empty text height cannot stand in for content bottom');
+      await page.evaluate(() => { document.querySelectorAll('blockquote')[1].style.height = ''; document.querySelector('blockquote').style.paddingBottom = '5px'; });
+      assert.equal(columnFindings(await page.evaluate(inspectColumns)).length, 1, 'empty space below caption is not content');
       await page.setContent('<section style="display:grid;grid-template-columns:1fr 1fr;width:500px;font:20px/30px monospace"><blockquote style="margin:0">Left heading</blockquote><blockquote style="margin:0">Right heading</blockquote></section>');
       assert.deepEqual(columnFindings(await page.evaluate(inspectColumns)), []);
       await page.setContent('<section style="display:grid;grid-template-columns:1fr 1fr;width:500px;font:20px/30px monospace"><blockquote style="margin:0">First left</blockquote><blockquote style="margin:0">First right</blockquote><p style="grid-column:1 / -1;margin:0">Shared divider</p><blockquote style="margin:0">Second left<br>continues</blockquote><blockquote style="margin:10px 0 0">Second right</blockquote></section>');
