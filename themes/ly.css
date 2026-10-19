@@ -231,7 +231,8 @@ section:not(.first-slide, .lead, .takahashi) ul ul ul {
 
 section li:has(> .conclusion) { list-style: none; }
 
-section:not(.first-slide, .lead, .takahashi) li:has(> ul) + li {
+/* Separate claim-and-evidence groups; plain siblings keep the normal item gap. */
+section:not(.first-slide, .lead, .takahashi) li:has(> ul) + li:has(> ul) {
   margin-top: var(--list-group-gap);
 }
 
