@@ -57,6 +57,14 @@ Chrome でフォントと画像の読み込みを待ち、全資料を描画し�
 
 `LAYOUT_OUT` で出力先のルート、`CHROME_PATH` で Chrome の位置を指定できます。検査画像では `debug-layout` の枠を一時的に消しますが、元の Markdown は変更しません。検査の範囲・閾値・限界、出力の読み方は仕様書にまとめています。
 
+## main への変更を CI で検査する
+
+`main` 向けの Pull Request と `main` への push で、[Slides ワークフロー](.github/workflows/slides.yml) が `mise run check-release`・`mise run test`・`mise run test-layout`・`mise run pdf` を実行します。ローカルと OS・CPU を揃えるため macOS 26 (arm64) を使いますが、Chrome の更新で改行が変わる場合はあります。成功・失敗のどちらでも、生成済みの PDF と原寸 PNG・`review.md` を Actions の `slides-review` artifact から確認できます。
+
+`mise run check-release` はサンプルを含む `slides/` 以下の Markdown を調べ、1 行で書いた `class:` / `_class:` 指定に `debug-layout` があれば失敗します。除外を設ける場合は `scripts/check-release.cjs` の `excludedPaths` を編集します。
+
+検査が通るまでマージできないようにするには、管理者が GitHub の Settings → Rules → Rulesets で `main` を対象にし、Require status checks to pass で **Validate slides** を必須にします。従来の branch protection でも同じチェック名を選べます。一度ワークフローを実行してから設定してください。CI の追加だけでは、このリポジトリ設定は変わりません。
+
 ## 資料を追加する
 
 [サンプルの Markdown](slides/example/slides.md) を `slides/<発表名>/slides.md` にコピーし、本文を差し替えます。図は同じディレクトリの `assets/` に置き、`![図の説明](assets/figure.png)` と参照します。この階層を保つと、テーマ内の素材パスも解決できます。

@@ -22,3 +22,7 @@ run = "node scripts/check-layout.cjs"
 [tasks.test-layout]
 description = "改行検査が短い途中・最終行、入れ子リスト、引用を扱えるか確認"
 run = "node scripts/check-layout.cjs --self-test"
+
+[tasks.check-release]
+description = "全資料の class / _class に debug-layout が残っていないか確認"
+run = "node scripts/check-release.cjs"
