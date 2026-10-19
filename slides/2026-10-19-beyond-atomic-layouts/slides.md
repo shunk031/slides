@@ -355,14 +355,15 @@ Qwen2.5-VL 7B _[[Bai+ arXiv’25](https://arxiv.org/abs/2502.13923)]_ の構造�
 > - 推論時には GPT-4o を使用しない
 
 $$
-\underbrace{\vphantom{A^g(e_i)\mathcal{P}_{\mathrm{ground}}}\bbox[0px,#FCE4D6]{A^g(e_i)}}_{\mathclap{\bbox[0px,#FCE4D6]{\text{回答}}}} =
-\underbrace{\vphantom{A^g(e_i)\mathcal{P}_{\mathrm{ground}}}\mathcal{G}}_{\mathclap{\vphantom{\text{回答}}\text{GPT-4o}}}\quad\Bigl(
-\underbrace{\vphantom{A^g(e_i)\mathcal{P}_{\mathrm{ground}}}\mathcal{P}_{\mathrm{ground}}}_{\mathclap{\text{プロンプト}}}\quad\Bigl(
-\underbrace{\vphantom{A^g(e_i)\mathcal{P}_{\mathrm{ground}}}\bbox[0px,#E7E6E6]{\mathcal{L}}}_{\mathclap{\bbox[0px,#E7E6E6]{\text{レイアウト}}}},\quad\;
-\underbrace{\vphantom{A^g(e_i)\mathcal{P}_{\mathrm{ground}}}\bbox[0px,#E2F0D9]{\mathcal{I}_{e_i}}}_{\mathclap{\bbox[0px,#E2F0D9]{\text{要素画像}}}},\quad
-\underbrace{\vphantom{A^g(e_i)\mathcal{P}_{\mathrm{ground}}}\bbox[0px,#DBEAFE]{\mathcal{M}_{e_i}}}_{\mathclap{\bbox[0px,#DBEAFE]{\text{属性}}}},\quad\;
-\underbrace{\vphantom{A^g(e_i)\mathcal{P}_{\mathrm{ground}}}\bbox[0px,#FFF2CC]{Q^g(e_i)}}_{\mathclap{\bbox[0px,#FFF2CC]{\text{質問}}}}
-\Bigr)\Bigr)
+\underbrace{\vphantom{A^g(e_i)\mathcal{P}_{\mathrm{ground}}}\bbox[0px,#FCE4D6]{A^g(e_i)}}_{\mathclap{\bbox[0px,#FCE4D6]{\text{回答}}}}
+=\underbrace{\vphantom{A^g(e_i)\mathcal{P}_{\mathrm{ground}}}\mathcal{G}}_{\mathclap{\vphantom{\text{回答}}\text{GPT-4o}}}(\pi_i),\quad
+\underbrace{\vphantom{A^g(e_i)\mathcal{P}_{\mathrm{ground}}}\pi_i}_{\mathclap{\text{プロンプト}}}
+=\mathcal{P}_{\mathrm{ground}}\Bigl(
+\underbrace{\vphantom{A^g(e_i)\mathcal{P}_{\mathrm{ground}}}\bbox[0px,#E7E6E6]{\mathcal{L}}}_{\mathclap{\bbox[0px,#E7E6E6]{\text{レイアウト}}\hphantom{\text{レイ}}}},
+\underbrace{\vphantom{A^g(e_i)\mathcal{P}_{\mathrm{ground}}}\bbox[0px,#E2F0D9]{\mathcal{I}_{e_i}}}_{\mathclap{\hphantom{\text{要素}}\bbox[0px,#E2F0D9]{\text{要素画像}}}},
+\underbrace{\vphantom{A^g(e_i)\mathcal{P}_{\mathrm{ground}}}\bbox[0px,#DBEAFE]{\mathcal{M}_{e_i}}}_{\mathclap{\hphantom{\text{属性と}}\bbox[0px,#DBEAFE]{\text{属性}}}},
+\underbrace{\vphantom{A^g(e_i)\mathcal{P}_{\mathrm{ground}}}\bbox[0px,#FFF2CC]{Q^g(e_i)}}_{\mathclap{\hphantom{\text{補助}}\bbox[0px,#FFF2CC]{\text{補助質問}}}}
+\Bigr)
 $$
 
 **➜ 完成画像と切り出し画像を対応付け、隠れた要素の視覚と言語の対応を強化**
