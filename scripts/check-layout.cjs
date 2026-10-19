@@ -557,6 +557,47 @@ function bodyFillFindings(regions) {
   return regions.filter(region => !region.excluded && region.used < region.limit).map(region => ({ ...region, kind: 'sparse-body', text: `${region.scope}: content reaches ${Math.round(region.used * 100)}% of the available height (minimum ${Math.round(region.limit * 100)}%); ${region.text}` }));
 }
 
+function inspectParentheses() {
+  const selector = 'h1,h2,h3,h4,h5,h6,p,li,figcaption,td,th,header,footer';
+  const word = '[\\p{Script=Latin}\\p{Script=Han}\\p{Script=Hiragana}\\p{Script=Katakana}ー\\p{Nd}]';
+  return [...document.querySelectorAll('section')].flatMap((slide, index) => [...slide.querySelectorAll(selector)].flatMap(block => {
+    const citation = link => {
+      const before = document.createRange(), after = document.createRange();
+      before.selectNodeContents(block);
+      before.setEndBefore(link);
+      after.selectNodeContents(block);
+      after.setStartAfter(link);
+      return /^\[.*\]$/s.test(link.textContent.trim()) || /\[[^\[\]]*$/.test(before.toString()) && /^[^\[\]]*\]/.test(after.toString());
+    };
+    let text = '';
+    const collect = parent => {
+      for (const child of parent.childNodes) {
+        if (child.nodeType === Node.TEXT_NODE) text += child.textContent;
+        else if (child.nodeType === Node.ELEMENT_NODE) {
+          if (child.matches('a') && citation(child)) text += '\uFFFD';
+          else if (child.matches('code,pre,mjx-container,math,.katex,svg,img')) text += '\uFFFC';
+          else if (child.matches('br')) text += '\n';
+          else if (child.matches(selector)) text += '\uFFFC';
+          else collect(child);
+        }
+      }
+    };
+    if (block.closest('code,pre,mjx-container,math,.katex')) return [];
+    collect(block);
+    text = text.replace(/\[[^\[\]]*\uFFFD[^\[\]]*\]/g, '\uFFFC').replace(/\uFFFD/g, '\uFFFC').replace(/(?:[a-z][a-z0-9+.-]*:\/\/|www\.)[^\s<>]+/gi, '\uFFFC');
+    const findings = [];
+    const add = (kind, match) => findings.push({ slide: index + 1, kind, text: `${match[0]} — ${text.slice(Math.max(0, match.index - 20), match.index + match[0].length + 20)}` });
+    for (const match of text.matchAll(/[（）]/g)) add('parenthesis-width', match);
+    for (const pattern of [new RegExp(`${word}([^\\S\\r\\n]*)\\(`, 'gu'), new RegExp(`\\)([^\\S\\r\\n]*)${word}`, 'gu')]) {
+      for (const match of text.matchAll(pattern)) if (match[1] !== ' ') add('parenthesis-spacing', match);
+    }
+    for (const pattern of [/\(\s+|\s+\)/g, /\)[^\S\r\n]+(?=\p{P}|$|\n)/gu]) {
+      for (const match of text.matchAll(pattern)) add('parenthesis-spacing', match);
+    }
+    return findings;
+  }));
+}
+
 function inspectStructure() {
   return [...document.querySelectorAll('section')].flatMap((slide, index) => {
     const findings = [];
@@ -1070,6 +1111,38 @@ async function main() {
       }
       const { Marp } = marpRequire('@marp-team/marp-core');
       const math = new Marp().use(require('./check-math.cjs'));
+      for (const [source, kinds] of [
+        ['（DF） （Qwen2.5-VL 7B） （%） （Table 4） （日本語）', Array(10).fill('parenthesis-width')],
+        ['（unpaired', ['parenthesis-width']],
+        ['unpaired）', ['parenthesis-width']],
+        ['(DF); (Qwen2.5-VL 7B); (%); (Table 4); (日本語)', []],
+        ['(説明); (日本語 (DF))', []],
+        ['日本語(DF) レイヤー(DF) Model(DF) 7(DF)', Array(4).fill('parenthesis-spacing')],
+        ['日本語 (DF) Model (DF) 7 (DF)', []],
+        ['Model  (DF); (DF)  text', Array(2).fill('parenthesis-spacing')],
+        ['日本語\u3000(DF); (DF)\u00a0文字', Array(2).fill('parenthesis-spacing')],
+        ['( DF )', Array(2).fill('parenthesis-spacing')],
+        ['(DF)説明 (MA)Latin (SP)7', Array(3).fill('parenthesis-spacing')],
+        ['(DF) 説明 (MA) Latin (SP) 7', []],
+        ['(DF) 、 (DF) ： (DF) .', Array(3).fill('parenthesis-spacing')],
+        ['(DF) (SP)', ['parenthesis-spacing']],
+        ['(DF)、(DF)。(DF)／(DF)', []],
+        ['**日本語**(DF) **Model**(DF)', Array(2).fill('parenthesis-spacing')],
+        ['- Parent\n  - Child（DF）', Array(2).fill('parenthesis-width')],
+        ['`（DF）` `( 説明 )` `Model(DF)text`\n\n```text\n（DF） ( 説明 ) Model(DF)text\n```', []],
+        [String.raw`$Q(e^q)$ $A^g(e_i)$ $\text{（DF）}$ $\text{( 説明 )}$ $\text{(DF)text}$`, []],
+        ['https://example.test/Model(説明)/（DF） [URL](https://example.test/Model(説明)/（DF）)', []],
+        ['FTP://example.test/Model(DF)/（説明） www.example.test/Model(DF)', []],
+        ['[[Author+ ( 説明 ) Model(DF) （DF）](https://example.test/paper)]', []],
+        ['低ランク適応 (LoRA) [[Hu+ ICLR’22](https://example.test/paper)]', []],
+        ['[Regular （説明） link](https://example.test/)', Array(2).fill('parenthesis-width')],
+        ['(説明 `Model(DF)`)', []],
+      ]) {
+        await page.setContent(math.render(source).html);
+        assert.deepEqual((await page.evaluate(inspectParentheses)).map(f => f.kind), kinds, source);
+      }
+      await page.setContent('<section><p>(DF) </p><p>(DF)<br>次の行</p></section>');
+      assert.deepEqual((await page.evaluate(inspectParentheses)).map(f => f.kind), ['parenthesis-spacing']);
       for (const tex of [
         String.raw`\underbrace{x}_{\text{label}}`,
         String.raw`\underbrace{\mathclap{x}}_{label}`,
@@ -1272,7 +1345,7 @@ async function main() {
       const bodyFill = await page.evaluate(inspectBodyFill);
       const spaces = await page.evaluate(inspectSpaces);
       fs.writeFileSync(path.join(output, 'spaces.json'), JSON.stringify({ input, browser: await browser.version(), slides: spaces }, null, 2));
-      const structure = [...await page.evaluate(inspectStructure), ...await page.evaluate(inspectTypography), ...await page.evaluate(inspectTerms, terms), ...await page.evaluate(inspectMidwordWraps), ...await page.evaluate(inspectItemGaps), ...titleFindings, ...headingFindings, ...columnFindings(columns), ...groupGapFindings(groupGaps), ...bodyFillFindings(bodyFill)];
+      const structure = [...await page.evaluate(inspectStructure), ...await page.evaluate(inspectParentheses), ...await page.evaluate(inspectTypography), ...await page.evaluate(inspectTerms, terms), ...await page.evaluate(inspectMidwordWraps), ...await page.evaluate(inspectItemGaps), ...titleFindings, ...headingFindings, ...columnFindings(columns), ...groupGapFindings(groupGaps), ...bodyFillFindings(bodyFill)];
       structuralErrors += structure.length + candidates.length;
       candidateCount += candidates.length + structure.length;
       fs.writeFileSync(path.join(output, 'lines.json'), JSON.stringify({ input, browser: await browser.version(), blocks, columnPairs: columns, groupGaps, bodyFill, structure }, null, 2));
