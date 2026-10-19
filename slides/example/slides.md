@@ -168,8 +168,8 @@ Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S0.F1)]: Com
   - LayoutDM _[[Inoue+ CVPR’23](https://openaccess.thecvf.com/content/CVPR2023/html/Inoue_LayoutDM_Discrete_Diffusion_Model_for_Controllable_Layout_Generation_CVPR_2023_paper.html)]_: 要素の位置・種類を生成
   - COLE _[[Jia+ arXiv’23](https://arxiv.org/abs/2311.16974)]_ / ART _[[Pu+ CVPR’25](https://openaccess.thecvf.com/content/CVPR2025/html/Pu_ART_Anonymous_Region_Transformer_for_Variable_Multi-Layer_Transparent_Image_Generation_CVPR_2025_paper.html)]_: 複数レイヤーのデザインを生成
 - **本論文との差分**
-  - PubLayNet _[[Zhong+ ICDAR’19](https://arxiv.org/abs/1908.07836)]_ / DocLayNet _[[Pfitzmann+ KDD’22](https://arxiv.org/abs/2206.01062)]_: 個別領域を提供
-  - Crello _[[Yamaguchi ICCV’21](https://arxiv.org/abs/2108.01249)]_ / MLTD _[[Pu+ CVPR’25](https://openaccess.thecvf.com/content/CVPR2025/html/Pu_ART_Anonymous_Region_Transformer_for_Variable_Multi-Layer_Transparent_Image_Generation_CVPR_2025_paper.html)]_: レイヤー構造を提供
+  - PubLayNet _[[Zhong+ ICDAR’19](https://arxiv.org/abs/1908.07836)]_ / DocLayNet _[[Pfitzmann+ KDD’22](https://arxiv.org/abs/2206.01062)]_: 本文等の枠・レイヤーなし
+  - Crello _[[Yamaguchi ICCV’21](https://arxiv.org/abs/2108.01249)]_ / MLTD _[[Pu+ CVPR’25](https://openaccess.thecvf.com/content/CVPR2025/html/Pu_ART_Anonymous_Region_Transformer_for_Variable_Multi-Layer_Transparent_Image_Generation_CVPR_2025_paper.html)]_: 生成向けデザインのレイヤー構造を収録
   - <span class="conclusion">➜ 合成要素ペアとデザイン意図の明示的注釈はない</span>
 
 <!-- Table 1 は比較の典拠として参照。大きな表画像は1枚に併置しない -->
