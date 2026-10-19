@@ -240,21 +240,18 @@ function inspectColumns() {
   const textSelector = 'h1,h2,h3,h4,h5,h6,p,li,figcaption,td,th';
   const firstText = block => {
     const walker = document.createTreeWalker(block, NodeFilter.SHOW_TEXT);
-    let first = null, bottom = -Infinity;
     while (walker.nextNode()) {
       const node = walker.currentNode;
       if (!node.textContent.trim()) continue;
       const range = document.createRange();
       range.selectNodeContents(node);
-      const rects = [...range.getClientRects()].filter(rect => rect.width && rect.height);
-      const rect = rects[0];
+      const rect = [...range.getClientRects()].find(rect => rect.width && rect.height);
       if (!rect) continue;
       const owner = node.parentElement.closest(textSelector) || node.parentElement;
       const lineHeight = parseFloat(getComputedStyle(owner).lineHeight);
-      first ??= { top: rect.top, lineTop: Number.isFinite(lineHeight) ? rect.top + (rect.height - lineHeight) / 2 : owner.getBoundingClientRect().top, text: owner.textContent.trim(), image: false };
-      bottom = Math.max(bottom, ...rects.map(r => r.bottom + (Number.isFinite(lineHeight) ? (lineHeight - r.height) / 2 : 0)));
+      return { top: rect.top, lineTop: Number.isFinite(lineHeight) ? rect.top + (rect.height - lineHeight) / 2 : owner.getBoundingClientRect().top, text: owner.textContent.trim(), image: false };
     }
-    return first && { ...first, bottom };
+    return null;
   };
   const imageStart = img => {
     const box = img.getBoundingClientRect();
@@ -264,16 +261,14 @@ function inspectColumns() {
     const width = box.width - inset('Left') - inset('Right');
     const height = box.height - inset('Top') - inset('Bottom');
     let top = box.top + inset('Top');
-    let paintedHeight = height;
     if (['contain', 'scale-down'].includes(style.objectFit) && img.naturalWidth && img.naturalHeight) {
       const scale = Math.min(width / img.naturalWidth, height / img.naturalHeight, style.objectFit === 'scale-down' ? 1 : Infinity);
       const spare = height - img.naturalHeight * scale;
-      paintedHeight = img.naturalHeight * scale;
       // shortcut: only percentage/px object-position is resolved; extend when a deck uses position expressions.
       const position = style.objectPosition.match(/^\S+\s+(-?[\d.]+)(%|px)$/);
       if (position) top += position[2] === '%' ? spare * Number(position[1]) / 100 : Number(position[1]);
     }
-    return { top, bottom: top + paintedHeight, lineTop: top, text: img.alt || img.getAttribute('src') || 'Image', image: true };
+    return { top, lineTop: top, text: img.alt || img.getAttribute('src') || 'Image', image: true };
   };
   return [...document.querySelectorAll('section')].flatMap((slide, index) => {
     if (slide.matches('.first-slide,.lead,.takahashi,.title-slide-big,.profile-slide,.layout-example')) return [];
@@ -282,7 +277,7 @@ function inspectColumns() {
       const starts = [firstText(block), ...[...block.querySelectorAll('img'), ...(block.matches('img') ? [block] : [])].map(imageStart)].filter(Boolean);
       const first = starts.sort((a, b) => a.lineTop - b.lineTop)[0];
       const box = block.getBoundingClientRect();
-      return first && box.width && box.height ? { box, first, bottom: Math.max(...starts.map(r => r.bottom)), centeredFigure: first.image && getComputedStyle(block).alignSelf === 'center' } : null;
+      return first && box.width && box.height ? { box, first } : null;
     }).filter(Boolean);
     const pairs = [];
     const seen = new Set();
@@ -295,19 +290,14 @@ function inspectColumns() {
         const shared = blocks.filter(item => item.box.left <= first.box.left + 2 && item.box.right >= second.box.right - 2);
         const start = Math.max(slideTop, ...shared.filter(item => item.box.bottom <= Math.min(first.box.top, second.box.top) + 2).map(item => item.box.bottom));
         const end = Math.min(...shared.filter(item => item.box.top >= Math.max(first.box.top, second.box.top) + 2).map(item => item.box.top));
-        const columnStart = column => {
-          const items = blocks.filter(item => Math.abs(item.box.left - column.box.left) <= 2 && Math.abs(item.box.right - column.box.right) <= 2 && item.box.top >= start - 2 && item.box.top < end).sort((a, b) => a.first.lineTop - b.first.lineTop);
-          return { ...items[0].first, bottom: Math.max(...items.map(item => item.bottom)), centeredFigure: items.length === 1 && items[0].centeredFigure };
-        };
+        const columnStart = column => blocks.filter(item => Math.abs(item.box.left - column.box.left) <= 2 && Math.abs(item.box.right - column.box.right) <= 2 && item.box.top >= start - 2 && item.box.top < end).sort((a, b) => a.first.lineTop - b.first.lineTop)[0].first;
         const a = columnStart(first), b = columnStart(second);
         const key = `${first.box.left}:${first.box.right}:${second.box.left}:${second.box.right}:${start}:${end}`;
         if (seen.has(key)) continue;
         seen.add(key);
         const leftTop = (a.image || b.image ? a.lineTop : a.top) - slideTop;
         const rightTop = (a.image || b.image ? b.lineTop : b.top) - slideTop;
-        const centerDifference = Math.abs((a.lineTop + a.bottom - b.lineTop - b.bottom) / 2);
-        const centeredFigure = (a.centeredFigure && a.bottom - a.lineTop <= b.bottom - b.lineTop) || (b.centeredFigure && b.bottom - b.lineTop <= a.bottom - a.lineTop);
-        pairs.push({ slide: index + 1, leftText: a.text, rightText: b.text, leftTop, rightTop, difference: Math.abs(leftTop - rightTop), centerDifference, centeredFigure });
+        pairs.push({ slide: index + 1, leftText: a.text, rightText: b.text, leftTop, rightTop, difference: Math.abs(leftTop - rightTop) });
       }
     }
     return pairs;
@@ -315,10 +305,10 @@ function inspectColumns() {
 }
 
 function columnFindings(columns) {
-  return columns.filter(pair => pair.centeredFigure ? pair.centerDifference > 2 : pair.difference > 2).map(pair => ({
+  return columns.filter(pair => pair.difference > 2).map(pair => ({
     slide: pair.slide,
     kind: 'column-alignment',
-    text: `${pair.leftText} (${Math.round(pair.leftTop)}px) / ${pair.rightText} (${Math.round(pair.rightTop)}px)${pair.centeredFigure ? `; content center difference ${pair.centerDifference.toFixed(2)}px` : ''}`,
+    text: `${pair.leftText} (${Math.round(pair.leftTop)}px) / ${pair.rightText} (${Math.round(pair.rightTop)}px)`,
     leftTop: pair.leftTop,
     rightTop: pair.rightTop,
   }));
@@ -971,13 +961,10 @@ async function main() {
       const centeredFigure = await page.evaluate(inspectColumns);
       assert.ok(Math.abs(centeredFigure[0].difference - 30) <= 1);
       assert.equal(columnFindings(centeredFigure).length, 1);
+      // Matching content centers must not exempt a 30px leading blank area.
       await page.evaluate(() => { document.querySelectorAll('blockquote')[1].innerHTML = 'Right<br>column<br>has<br>five<br>lines'; });
-      assert.deepEqual(columnFindings(await page.evaluate(inspectColumns)), []);
-      await page.evaluate(() => { document.querySelector('img').style.transform = 'translateY(5px)'; });
       assert.equal(columnFindings(await page.evaluate(inspectColumns)).length, 1);
-      await page.evaluate(() => { Object.assign(document.querySelector('img').style, {height:'120px'}); });
-      assert.equal(columnFindings(await page.evaluate(inspectColumns)).length, 1);
-      await page.evaluate(() => { Object.assign(document.querySelector('img').style, {transform:'none',height:'40px'}); document.querySelectorAll('blockquote')[1].textContent = 'Right column'; });
+      await page.evaluate(() => { document.querySelectorAll('blockquote')[1].textContent = 'Right column'; });
       await page.evaluate(() => { document.querySelector('blockquote').style.alignSelf = 'start'; });
       assert.deepEqual(columnFindings(await page.evaluate(inspectColumns)), []);
       await page.evaluate(() => { Object.assign(document.querySelector('img').style, {height:'100px',objectFit:'contain'}); });
