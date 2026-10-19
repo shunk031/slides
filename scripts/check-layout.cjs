@@ -603,9 +603,11 @@ function bodyFillFindings(regions) {
   return regions.filter(region => !region.excluded && region.used < region.limit).map(region => ({ ...region, kind: 'sparse-body', text: `${region.scope}: content reaches ${Math.round(region.used * 100)}% of the available height (minimum ${Math.round(region.limit * 100)}%); ${region.text}` }));
 }
 
-function inspectParentheses() {
+function inspectTextConventions() {
   const selector = 'h1,h2,h3,h4,h5,h6,p,li,figcaption,td,th,header,footer';
   const word = '[\\p{Script=Latin}\\p{Script=Han}\\p{Script=Hiragana}\\p{Script=Katakana}ー\\p{Nd}]';
+  const demonstratives = new Set(['その', 'この', 'それ', 'これ', 'あの', 'あれ', '当該']);
+  const segmenter = new Intl.Segmenter('ja', { granularity: 'word' });
   return [...document.querySelectorAll('section')].flatMap((slide, index) => [...slide.querySelectorAll(selector)].flatMap(block => {
     const citation = link => {
       const before = document.createRange(), after = document.createRange();
@@ -639,6 +641,10 @@ function inspectParentheses() {
     }
     for (const pattern of [/\(\s+|\s+\)/g, /\)[^\S\r\n]+(?=\p{P}|$|\n)/gu]) {
       for (const match of text.matchAll(pattern)) add('parenthesis-spacing', match);
+    }
+    // Segmentation cannot distinguish demonstratives from names or quoted examples.
+    for (const token of segmenter.segment(text)) if (demonstratives.has(token.segment)) {
+      findings.push({ slide: index + 1, kind: 'demonstrative', review: true, text: `${token.segment} — ${text.slice(Math.max(0, token.index - 20), token.index + token.segment.length + 30).replace(/[\s\uFFFC]+/g, ' ').trim()}` });
     }
     return findings;
   }));
@@ -1170,6 +1176,24 @@ async function main() {
       }
       const { Marp } = marpRequire('@marp-team/marp-core');
       const math = new Marp().use(require('./check-math.cjs'));
+      for (const [source, count] of [
+        ['その図 この図 それを選ぶ これを選ぶ あの図 あれを選ぶ 当該資料', 7],
+        ['その他 その他の条件', 0],
+        ['こ**の**図', 1],
+        ['- この図\n  - その条件', 2],
+        ['[この図](https://example.test/)', 1],
+        ['`この図`\n\n```text\nその条件\n```', 0],
+        [String.raw`$\text{この図}$ $\text{その条件}$`, 0],
+        ['https://example.test/この図 www.example.test/その条件 [URL](https://example.test/それ)', 0],
+        ['[[この著者+ 会議’26](https://example.test/)]', 0],
+        ['<!-- speaker note: この図、その条件 -->\n\n具体的な説明', 0],
+        ['このはずく', 1],
+      ]) {
+        await page.setContent(math.render(source).html);
+        const review = (await page.evaluate(inspectTextConventions)).filter(f => f.kind === 'demonstrative');
+        assert.equal(review.length, count, source);
+        assert.ok(review.every(f => f.review === true), source);
+      }
       for (const [source, kinds] of [
         ['（DF） （Qwen2.5-VL 7B） （%） （Table 4） （日本語）', Array(10).fill('parenthesis-width')],
         ['（unpaired', ['parenthesis-width']],
@@ -1198,10 +1222,10 @@ async function main() {
         ['(説明 `Model(DF)`)', []],
       ]) {
         await page.setContent(math.render(source).html);
-        assert.deepEqual((await page.evaluate(inspectParentheses)).map(f => f.kind), kinds, source);
+        assert.deepEqual((await page.evaluate(inspectTextConventions)).map(f => f.kind), kinds, source);
       }
       await page.setContent('<section><p>(DF) </p><p>(DF)<br>次の行</p></section>');
-      assert.deepEqual((await page.evaluate(inspectParentheses)).map(f => f.kind), ['parenthesis-spacing']);
+      assert.deepEqual((await page.evaluate(inspectTextConventions)).map(f => f.kind), ['parenthesis-spacing']);
       for (const tex of [
         String.raw`\underbrace{x}_{\text{label}}`,
         String.raw`\underbrace{\mathclap{x}}_{label}`,
@@ -1406,15 +1430,17 @@ async function main() {
       const groupGaps = await page.evaluate(inspectGroupGaps);
       const bodyFill = await page.evaluate(inspectBodyFill);
       const spaces = await page.evaluate(inspectSpaces);
+      const textConventions = await page.evaluate(inspectTextConventions);
+      const languageReview = textConventions.filter(f => f.review);
       fs.writeFileSync(path.join(output, 'spaces.json'), JSON.stringify({ input, browser: await browser.version(), slides: spaces }, null, 2));
-      const structure = [...(input === files[0] ? layoutCoverage.findings : []), ...await page.evaluate(inspectStructure), ...await page.evaluate(inspectParentheses), ...await page.evaluate(inspectTypography), ...await page.evaluate(inspectTerms, terms), ...await page.evaluate(inspectMidwordWraps), ...await page.evaluate(inspectItemGaps), ...titleFindings, ...headingFindings, ...columnFindings(columns), ...groupGapFindings(groupGaps), ...bodyFillFindings(bodyFill)];
+      const structure = [...(input === files[0] ? layoutCoverage.findings : []), ...await page.evaluate(inspectStructure), ...textConventions.filter(f => !f.review), ...await page.evaluate(inspectTypography), ...await page.evaluate(inspectTerms, terms), ...await page.evaluate(inspectMidwordWraps), ...await page.evaluate(inspectItemGaps), ...titleFindings, ...headingFindings, ...columnFindings(columns), ...groupGapFindings(groupGaps), ...bodyFillFindings(bodyFill)];
       structuralErrors += structure.length + candidates.length;
       candidateCount += candidates.length + structure.length;
-      fs.writeFileSync(path.join(output, 'lines.json'), JSON.stringify({ input, browser: await browser.version(), blocks, columnPairs: columns, groupGaps, bodyFill, structure }, null, 2));
+      fs.writeFileSync(path.join(output, 'lines.json'), JSON.stringify({ input, browser: await browser.version(), blocks, columnPairs: columns, groupGaps, bodyFill, structure, languageReview }, null, 2));
       await page.evaluate(() => document.querySelectorAll('.debug-layout').forEach(e => e.classList.remove('debug-layout')));
       const sections = await page.$$('section');
       if (!sections.length) throw new Error(`No slides rendered: ${input}`);
-      const report = [`# Layout review: ${input}`, '', `${candidates.length} line-balance errors; ${structure.length} structure/typography findings; ${spaces.reduce((sum, slide) => sum + slide.regions.length, 0)} review-only space candidates. Review each image at full size; zero findings does not mean good layout.`, ''];
+      const report = [`# Layout review: ${input}`, '', `${candidates.length} line-balance errors; ${structure.length} structure/typography findings; ${spaces.reduce((sum, slide) => sum + slide.regions.length, 0)} review-only space candidates; ${languageReview.length} review-only demonstrative candidates. Review each image at full size; zero findings does not mean good layout.`, ''];
       for (const finding of structure.filter(f => f.slide === 0)) {
         report.push(`Error ${finding.kind}: ${finding.text}`, '');
         console.log(`${input} ERROR ${finding.kind}: ${finding.text}`);
@@ -1423,6 +1449,10 @@ async function main() {
         const filename = `slide-${i + 1}.png`;
         await sections[i].screenshot({ path: path.join(output, filename) });
         report.push(`## Slide ${i + 1}`, '', `![Slide ${i + 1}](${filename})`, '');
+        for (const finding of languageReview.filter(f => f.slide === i + 1)) {
+          report.push(`Review ${finding.kind}: ${finding.text}`, '');
+          console.log(`${input}:${i + 1} REVIEW ${finding.kind}: ${finding.text}`);
+        }
         const space = spaces[i];
         const overlay = `slide-${i + 1}-space.png`;
         await page.evaluate(drawSpaceOverlay, space);
@@ -1456,7 +1486,7 @@ async function main() {
       fs.writeFileSync(path.join(output, 'review.md'), report.join('\n'));
       console.log(`${sections.length} slides saved: ${path.join(output, 'review.md')}`);
     }
-    console.log(`${candidateCount} layout errors; space-review candidates do not fail the check.`);
+    console.log(`${candidateCount} layout errors; space/language-review candidates do not fail the check.`);
     if (structuralErrors) throw new Error(`${structuralErrors} layout errors: see review.md.`);
   } finally {
     await browser.close();
