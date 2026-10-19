@@ -604,7 +604,7 @@ function bodyFillFindings(regions) {
   return regions.filter(region => !region.excluded && region.used < region.limit).map(region => ({ ...region, kind: 'sparse-body', text: `${region.scope}: content reaches ${Math.round(region.used * 100)}% of the available height (minimum ${Math.round(region.limit * 100)}%); ${region.text}` }));
 }
 
-function inspectTextConventions() {
+function inspectTextConventions(terms = {}) {
   const selector = 'h1,h2,h3,h4,h5,h6,p,li,figcaption,td,th,header,footer';
   const word = '[\\p{Script=Latin}\\p{Script=Han}\\p{Script=Hiragana}\\p{Script=Katakana}ー\\p{Nd}]';
   const demonstratives = new Set(['その', 'この', 'それ', 'これ', 'あの', 'あれ', '当該']);
@@ -635,6 +635,12 @@ function inspectTextConventions() {
     collect(block);
     text = text.replace(/\[[^\[\]]*\uFFFD[^\[\]]*\]/g, '\uFFFC').replace(/\uFFFD/g, '\uFFFC').replace(/(?:[a-z][a-z0-9+.-]*:\/\/|www\.)[^\s<>]+/gi, '\uFFFC');
     const findings = [];
+    if (!(block.matches('h1') && slide.matches('.paper-title'))) for (const term of Object.keys(terms)) {
+      const phrase = term.trim().split(/\s+/).map(word => word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('\\s+');
+      const pattern = new RegExp(phrase, 'giu');
+      for (const match of text.matchAll(pattern)) if (match[0].replace(/\s+/g, ' ') !== term.replace(/\s+/g, ' '))
+        findings.push({ slide: index + 1, kind: 'term-casing', text: `${match[0]} — expected ${term}` });
+    }
     const add = (kind, match) => findings.push({ slide: index + 1, kind, text: `${match[0]} — ${text.slice(Math.max(0, match.index - 20), match.index + match[0].length + 20)}` });
     for (const match of text.matchAll(/[（）]/g)) add('parenthesis-width', match);
     for (const pattern of [new RegExp(`${word}([^\\S\\r\\n]*)\\(`, 'gu'), new RegExp(`\\)([^\\S\\r\\n]*)${word}`, 'gu')]) {
@@ -1219,6 +1225,23 @@ async function main() {
         assert.equal(review.length, count, source);
         assert.ok(review.every(f => f.review === true), source);
       }
+      const casingTerms = { 'Atomic Layout': '', 'Compositional Layout': '', 'Semantic drift': '' };
+      for (const [source, count] of [
+        ['## Atomic layout and compositional layout\n\n**Atomic layout**: 説明\n\nFigure from [Source]: Compositional layout', 4],
+        ['Atomic Layout / Compositional Layout / Semantic drift', 0],
+        ['Semantic Drift', 1],
+        ['**Atomic** Layout / Atomic\nLayout', 0],
+        ['Atomic Layouts / PreAtomic Layout / Atomic LayoutSuffix', 0],
+        ['Atomic layoutの理解 / compositional layouts', 2],
+        ['`Atomic layout`\n\n```text\ncompositional layout\n```\n\nhttps://example.test/AtomicLayout [[Atomic layout](https://example.test/)]', 0],
+        [String.raw`$\text{Atomic layout}$`, 0],
+        ['[Atomic layout](https://example.test/)', 1],
+      ]) {
+        await page.setContent(math.render(source).html);
+        assert.equal((await page.evaluate(inspectTextConventions, casingTerms)).filter(f => f.kind === 'term-casing').length, count, source);
+      }
+      await page.setContent('<section class="paper-title"><h1>Atomic layout: Target paper title</h1><p>Atomic layout</p></section>');
+      assert.equal((await page.evaluate(inspectTextConventions, casingTerms)).filter(f => f.kind === 'term-casing').length, 1);
       for (const [source, kinds] of [
         ['（DF） （Qwen2.5-VL 7B） （%） （Table 4） （日本語）', Array(10).fill('parenthesis-width')],
         ['（unpaired', ['parenthesis-width']],
@@ -1455,7 +1478,7 @@ async function main() {
       const groupGaps = await page.evaluate(inspectGroupGaps);
       const bodyFill = await page.evaluate(inspectBodyFill);
       const spaces = await page.evaluate(inspectSpaces);
-      const textConventions = await page.evaluate(inspectTextConventions);
+      const textConventions = await page.evaluate(inspectTextConventions, terms);
       const languageReview = textConventions.filter(f => f.review);
       fs.writeFileSync(path.join(output, 'spaces.json'), JSON.stringify({ input, browser: await browser.version(), slides: spaces }, null, 2));
       const structure = [...(input === files[0] ? layoutCoverage.findings : []), ...await page.evaluate(inspectStructure), ...textConventions.filter(f => !f.review), ...await page.evaluate(inspectTypography), ...await page.evaluate(inspectTerms, terms), ...await page.evaluate(inspectMidwordWraps), ...await page.evaluate(inspectItemGaps), ...titleFindings, ...headingFindings, ...columnFindings(columns), ...groupGapFindings(groupGaps), ...bodyFillFindings(bodyFill)];
