@@ -425,7 +425,7 @@ $$
 > **共通のモデル・実行条件**
 >
 > - Qwen2.5-VL 7B _[[Bai+ arXiv’25](https://arxiv.org/abs/2502.13923)]_ / 8×A100
-> - 低ランク適応 (LoRA)_[[Hu+ ICLR’22](https://arxiv.org/abs/2106.09685)]_
+> - 低ランク適応 (LoRA) _[[Hu+ ICLR’22](https://arxiv.org/abs/2106.09685)]_
 >   - 3 エポック / 学習率 $3\times10^{-5}$ / ランク 4
 > - 画像 336×336 / 出力は最大 256 トークン
 
