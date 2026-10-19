@@ -23,6 +23,7 @@ ID はターミナルの `ERROR <ID>` に対応します。確認候補だけは
 | `text-overflow`                | 文字のボックス・画面外へのはみ出し     | 各辺 1px 超                                                    | 画像内の文字                                       |
 | `box-overflow`                 | 図・比較枠の画面外へのはみ出し         | `img` / `blockquote` の各辺 1px 超                             | DOM にない背景画像                                 |
 | `footer-overflow`              | footer・ページ番号との衝突、下端逸脱   | 実文字と縦横 2px の余白内で交差、または下端安全線を 1px 超過   | 背景・一般の疑似要素、画像内部の余白               |
+| `math-label-gap`               | 同じ表示数式内の下括弧注釈の衝突       | 注釈の描画矩形の距離が 0.25em 未満                            | 画像・別数式間、テキストを使わない注釈             |
 | `math-overflow`                | 表示数式の下余白への侵入               | 下 padding の上端を 1px 超過                                   | 注釈どうしの重なり                                 |
 | `column-alignment`             | 兄弟列の内容上端のずれ                 | 差が 2px 超。条件付きで図と本文の下端一致を許容                | 入れ子列、画像ファイル内部の余白                   |
 | `paired-definition-alignment`  | 左右の定義段落の欠落・高さ違い         | `paired-definitions` の定義が 2 個でない、または高さ差 2px 超  | この ID 単独では定義の上端差                       |
@@ -110,9 +111,15 @@ Chrome の CSS parser でテーマを読み、`section` / `:root` と同じ comp
 
 footer の有無にかかわらず、内容が下端安全線を 1px 超える場合もエラーです。安全線はスライド下端から共通 `--slide-padding`（`ly` は 20px）、未定義なら section の `padding-bottom` を引いた位置です。表紙の本文配置用の大きな padding とは区別し、下端から 24px のバナーを移動させません。header・footer・ページ番号・情報分類・背景装飾は本文から除外します。画像・表・数式はボックス、文字は描画行を測り、画像内部の余白と一般の疑似要素・背景画像の実内容は判定しません。
 
+### math-label-gap
+
+同じ MathJax の表示数式内で、下括弧の注釈に属する `mtext` の実描画矩形をまとめ、すべての注釈ペアを比べます。SVG の日本語 text と英数字の path の両方を含み、phantom 自体は数えません。矩形の交差、または矩形間の最短距離が大きい方の注釈の 0.25em 未満（計測誤差 0.1px）ならエラーです。em は SVG の変換を含めた実サイズから得ます。上下にずらした注釈も、実際の距離で判定します。
+
+同じ注釈内に複数の `text` がある場合は一つの外接矩形とします。下括弧は MathJax SVG の munder と brace glyph で識別し、通常の添字・上括弧・画像内の文字・別数式間は対象外です。`text` を使わない数学記号だけの注釈や将来の MathJax 出力構造は検出を保証しません。余白を広げるだけで式を不自然に伸ばさず、原寸画像で式と注釈の対応を確認してください。
+
 ### math-overflow
 
-MathJax の表示数式が、本文の下 padding の上端から 1px を超えて出るとエラーです。数式内の注釈どうしの重なりは自動判定しないため、原寸画像で確認します。
+MathJax の表示数式が、本文の下 padding の上端から 1px を超えて出るとエラーです。下括弧の注釈どうしは `math-label-gap` でも検査し、原寸画像で確認します。
 
 ### column-alignment
 
@@ -232,7 +239,7 @@ MathJax の表示数式が、本文の下 padding の上端から 1px を超え�
 
 ### underbrace-mathclap
 
-[Marp の数式検証プラグイン](../scripts/check-math.cjs) が変換時に検査します。下括弧は `\underbrace{式}_{\mathclap{注釈}}` と書き、注釈全体を `\mathclap` で包んでください。コード内の TeX は対象外です。注釈どうしの重なりと下端の余白は原寸画像で確認します。
+[Marp の数式検証プラグイン](../scripts/check-math.cjs) が変換時に検査します。下括弧は `\underbrace{式}_{\mathclap{注釈}}` と書き、注釈全体を `\mathclap` で包んでください。コード内の TeX は対象外です。注釈どうしの衝突は `math-label-gap` で検査します。下端の余白と注釈の読みやすさも原寸画像で確認します。
 
 ## Space review の出力を読む
 

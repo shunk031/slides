@@ -905,6 +905,32 @@ function inspectTypography() {
   return samples.filter(s => mismatched.has(s.role)).map(s => ({ slide: s.slide, kind: 'font-size-mismatch', text: `${s.role}: ${s.size} (${s.text})` }));
 }
 
+function inspectMathLabels() {
+  const formulas = [];
+  [...document.querySelectorAll('section')].forEach((slide, index) => {
+    [...slide.querySelectorAll('mjx-container[display="true"]')].forEach((formula, number) => {
+      const labels = [];
+      for (const under of formula.querySelectorAll('[data-mml-node="munder"]')) {
+        const brace = under.firstElementChild;
+        if (!brace?.querySelector(':scope > [data-mml-node="munder"] > [data-mml-node="mo"] [data-c="E152"], :scope > [data-mml-node="munder"] > [data-mml-node="mo"] [data-c="23DF"]')) continue;
+        const label = under.children[1];
+        const texts = [...label.querySelectorAll('[data-mml-node="mtext"]')].filter(text => text.querySelector('text,[data-c]') && !text.closest('[data-mml-node="mphantom"]'));
+        const boxes = texts.map(text => text.getBoundingClientRect()).filter(r => r.width && r.height);
+        if (!boxes.length) continue;
+        const em = Math.max(...texts.map(text => { const matrix = text.getScreenCTM(); return 1000 * Math.hypot(matrix.c,matrix.d); }));
+        labels.push({ text: texts.map(text => [...text.querySelectorAll('text,path[data-c],use[data-c]')].map(g => g.hasAttribute('data-c') ? String.fromCodePoint(parseInt(g.getAttribute('data-c'),16)) : g.textContent).join('')).join(''), left:Math.min(...boxes.map(r=>r.left)), right:Math.max(...boxes.map(r=>r.right)), top:Math.min(...boxes.map(r=>r.top)), bottom:Math.max(...boxes.map(r=>r.bottom)), em });
+      }
+      const findings = [];
+      for (let i=0;i<labels.length;i++) for (const b of labels.slice(i+1)) {
+        const a=labels[i], dx=Math.max(a.left-b.right,b.left-a.right,0),dy=Math.max(a.top-b.bottom,b.top-a.bottom,0),gap=Math.hypot(dx,dy),limit=Math.max(a.em,b.em)*0.25;
+        if (gap < limit-0.1) findings.push({slide:index+1,kind:'math-label-gap',text:`${a.text} / ${b.text}: label clearance ${gap.toFixed(2)}px < ${limit.toFixed(2)}px (0.25em)`,gap,limit});
+      }
+      formulas.push({slide:index+1,formula:number+1,labels,findings});
+    });
+  });
+  return formulas;
+}
+
 async function main() {
   const marpBin = process.env.PATH.split(path.delimiter).map(p => path.join(p, 'marp')).find(p => fs.existsSync(p));
   if (!marpBin) throw new Error('Run with mise: mise run check-layout');
@@ -1440,6 +1466,33 @@ async function main() {
       const [containedSpaces] = await page.evaluate(inspectSpaces);
       assert.ok(containedSpaces.regions.some(r => r.y === 0 && r.height >= 48 && r.width === 480));
       assert.ok(containedSpaces.regions.some(r => r.y >= 180 && r.height >= 48 && r.width === 480));
+      const mathFixture = fs.mkdtempSync(path.join(require('node:os').tmpdir(), 'slide-math-labels-'));
+      try {
+        const renderMath = async tex => {
+          const input = path.join(mathFixture, 'slides.md');
+          fs.writeFileSync(input, `---\nmarp: true\nmath: mathjax\n---\n\n$$\n${tex}\n$$`);
+          const html = execFileSync('marp', ['--no-config', '--template', 'bare', input, '-o', '-'], {encoding:'utf8',maxBuffer:20*1024*1024});
+          await page.setContent(html); await page.evaluate(async()=>document.fonts.ready);
+          return (await page.evaluate(inspectMathLabels)).flatMap(f=>f.findings);
+        };
+        const annotated = (term,label) => String.raw`\underbrace{${term}}_{\mathclap{\text{${label}}}}`;
+        const a = annotated('L','レイアウト'), b = annotated('I','要素画像');
+        assert.equal((await renderMath(`${a},${b}`))[0].kind, 'math-label-gap');
+        assert.deepEqual(await renderMath(String.raw`${a},\qquad\qquad${b}`), []);
+        assert.equal((await renderMath(`${annotated('x','Long label')},${annotated('y','Another label')}`))[0].kind, 'math-label-gap');
+        assert.deepEqual(await renderMath(annotated('x','単独ラベル')), []);
+        await renderMath(`${a},${b}`);
+        const labels = (await page.evaluate(inspectMathLabels))[0].labels;
+        const moveLabel = async clearance => page.evaluate((clearance) => {
+          const under = [...document.querySelectorAll('[data-mml-node="munder"]')].filter(el=>el.firstElementChild?.querySelector(':scope > [data-mml-node="munder"] > [data-mml-node="mo"] [data-c="E152"]'));
+          const a=under[0].children[1].getBoundingClientRect(),b=under[1].children[1].getBoundingClientRect(),label=under[1].children[1];
+          const matrix=label.getScreenCTM(); label.setAttribute('transform', `${label.getAttribute('transform')} translate(${(a.right+clearance-b.left)/matrix.a},0)`);
+        }, clearance);
+        await moveLabel(labels[0].em*0.25-1);
+        assert.equal((await page.evaluate(inspectMathLabels))[0].findings.length, 1);
+        await renderMath(`${a},${b}`); await moveLabel(labels[0].em*0.25+1);
+        assert.deepEqual((await page.evaluate(inspectMathLabels))[0].findings, []);
+      } finally { fs.rmSync(mathFixture, {recursive:true,force:true}); }
       console.log('Layout inspection self-test passed');
       return;
     }
@@ -1483,7 +1536,7 @@ async function main() {
       const textConventions = await page.evaluate(inspectTextConventions, terms);
       const languageReview = textConventions.filter(f => f.review);
       fs.writeFileSync(path.join(output, 'spaces.json'), JSON.stringify({ input, browser: await browser.version(), slides: spaces }, null, 2));
-      const structure = [...(input === files[0] ? layoutCoverage.findings : []), ...await page.evaluate(inspectStructure), ...textConventions.filter(f => !f.review), ...await page.evaluate(inspectTypography), ...await page.evaluate(inspectTerms, terms), ...await page.evaluate(inspectMidwordWraps), ...await page.evaluate(inspectItemGaps), ...titleFindings, ...headingFindings, ...columnFindings(columns), ...groupGapFindings(groupGaps), ...bodyFillFindings(bodyFill)];
+      const structure = [...(input === files[0] ? layoutCoverage.findings : []), ...await page.evaluate(inspectStructure), ...(await page.evaluate(inspectMathLabels)).flatMap(f => f.findings), ...textConventions.filter(f => !f.review), ...await page.evaluate(inspectTypography), ...await page.evaluate(inspectTerms, terms), ...await page.evaluate(inspectMidwordWraps), ...await page.evaluate(inspectItemGaps), ...titleFindings, ...headingFindings, ...columnFindings(columns), ...groupGapFindings(groupGaps), ...bodyFillFindings(bodyFill)];
       structuralErrors += structure.length + candidates.length;
       candidateCount += candidates.length + structure.length;
       fs.writeFileSync(path.join(output, 'lines.json'), JSON.stringify({ input, browser: await browser.version(), blocks, columnPairs: columns, groupGaps, bodyFill, structure, languageReview }, null, 2));
