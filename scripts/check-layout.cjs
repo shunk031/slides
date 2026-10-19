@@ -273,16 +273,26 @@ function inspectItemGaps() {
     return Number.isFinite(gap) ? [gap] : [];
   });
   if (!themeGaps.length) return [];
-  const limit = 2 * Math.min(...themeGaps);
+  const paragraphLimit = 2 * Math.min(...themeGaps);
   return body.flatMap(slide => [...slide.querySelectorAll('li + li,p + p')].flatMap(current => {
     const previous = current.previousElementSibling;
     if (current.closest('header,footer,blockquote:has(img)') || current.querySelector('img') || previous.querySelector('img')) return [];
     const strong = current.querySelector(':scope > strong, :scope > a > strong');
     const label = [...current.childNodes].filter(node => !node.matches?.('ul,ol')).map(node => node.textContent).join('').trim();
-    if (strong && strong.textContent.trim() === label && (current.tagName === 'P' ? current.nextElementSibling?.matches('p,ul,ol,table') : current.querySelector(':scope > ul,:scope > ol'))) return [];
+    if (current.tagName === 'P' && strong && strong.textContent.trim() === label && current.nextElementSibling?.matches('p,ul,ol,table')) return [];
     const before = previous.getBoundingClientRect(), after = current.getBoundingClientRect();
     if (!before.width || !before.height || !after.width || !after.height || Math.min(before.right, after.right) <= Math.max(before.left, after.left)) return [];
     const gap = after.top - before.bottom;
+    let limit = paragraphLimit;
+    if (current.tagName === 'LI') {
+      const grouped = current.matches('li:has(> ul)') && previous.matches('li:has(> ul)');
+      const probe = document.createElement('div');
+      probe.style.cssText = `position:absolute;visibility:hidden;width:0;height:var(${grouped ? '--list-group-gap' : '--list-item-gap'});margin:0;padding:0;border:0`;
+      current.append(probe);
+      limit = parseFloat(getComputedStyle(probe).height);
+      probe.remove();
+      if (!Number.isFinite(limit)) return [];
+    }
     return gap > limit + 2 ? [{ slide: sections.indexOf(slide) + 1, kind: 'list-item-gap', gap, limit, text: current.textContent.trim() }] : [];
   }));
 }
@@ -1108,19 +1118,32 @@ async function main() {
       const spreadItems = await page.evaluate(inspectItemGaps);
       assert.equal(spreadItems.length, 1);
       assert.equal(spreadItems[0].gap, 160);
-      assert.equal(spreadItems[0].limit, 15);
+      assert.equal(spreadItems[0].limit, 7.5);
       await page.evaluate(() => { document.querySelector('ul').style.justifyContent = 'flex-start'; document.querySelector('li + li').style.marginTop = 'var(--list-item-gap)'; });
       assert.deepEqual(await page.evaluate(inspectItemGaps), []);
-      await page.evaluate(() => { document.querySelector('li + li').style.marginTop = '17px'; });
+      await page.evaluate(() => { document.querySelector('li + li').style.marginTop = '9.5px'; });
       assert.deepEqual(await page.evaluate(inspectItemGaps), []);
-      await page.evaluate(() => { document.querySelector('li + li').style.marginTop = '18px'; });
+      await page.evaluate(() => { document.querySelector('li + li').style.marginTop = '10px'; });
       assert.equal((await page.evaluate(inspectItemGaps)).length, 1);
       for (const heading of ['<strong>Group</strong>', '<a><strong>Group</strong></a>']) {
         await page.setContent(`<section style="font:30px/20px monospace;--list-item-gap:7.5px"><p style="margin:0">Previous</p><p style="margin:24px 0 0">${heading}</p><ul><li>Next group</li></ul></section>`);
         assert.deepEqual(await page.evaluate(inspectItemGaps), []);
       }
-      await page.setContent('<section style="font:30px/20px monospace;--list-item-gap:7.5px"><ul><li>Previous</li><li style="margin-top:24px"><strong>Group</strong><ul><li>Next group</li></ul></li></ul></section>');
+      for (const [previousChild, currentChild, gap, errors] of [
+        ['', '<ul><li>Evidence</li></ul>', 16, 1],
+        ['<ul><li>Evidence</li></ul>', '', 16, 1],
+        ['<ul><li>Evidence</li></ul>', '<ul><li>Evidence</li></ul>', 16, 0],
+        ['<ul><li>Evidence</li></ul>', '<ul><li>Evidence</li></ul>', 19, 1],
+        ['<ol><li>Evidence</li></ol>', '<ul><li>Evidence</li></ul>', 16, 1],
+        ['', '<ul><li>Evidence</li></ul>', 7.5, 0],
+      ]) {
+        await page.setContent(`<section style="font:30px/20px monospace;--list-item-gap:7.5px;--list-group-gap:16px"><ul><li>Previous${previousChild}</li><li style="margin-top:${gap}px"><strong>Group</strong>${currentChild}</li></ul></section>`);
+        assert.equal((await page.evaluate(inspectItemGaps)).length, errors, `${previousChild}/${currentChild}/${gap}`);
+      }
+      await page.setContent('<section style="font:30px/20px monospace;--list-item-gap:.25em"><ul><li>Parent<ul style="font-size:20px"><li>Nested first</li><li style="margin-top:5px">Nested second</li></ul></li></ul></section>');
       assert.deepEqual(await page.evaluate(inspectItemGaps), []);
+      await page.$eval('li li + li', el=>el.style.marginTop='8px');
+      assert.equal((await page.evaluate(inspectItemGaps)).length, 1);
       await page.setContent('<section style="font:30px/20px monospace;--list-item-gap:7.5px"><p style="margin:0">First</p><p style="margin:80px 0 0">Second</p></section>');
       assert.equal((await page.evaluate(inspectItemGaps)).length, 1);
       await page.evaluate(() => { document.querySelector('p + p').style.marginTop = '16px'; });
