@@ -214,7 +214,7 @@ Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S0.F1)]: Com
 >
 > Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S3.F2)]: デザインとメタデータ
 
-> **実デザインを質問応答形式の教師データに変換<sup>\*</sup>**
+> **実デザインから質問応答形式の教師データを構築<sup>\*</sup>**
 >
 > - 質問対象と正解要素のペアに意図を付与
 > - 完成画像と各要素の JSON メタデータを保持
