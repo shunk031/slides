@@ -829,7 +829,7 @@ section.failure-analysis-slide img { display: block; height: auto; }
 section.failure-analysis-slide > blockquote:first-of-type {
   grid-column: 1 / -1;
   display: grid;
-  grid-template-columns: 580px minmax(0, 1fr);
+  grid-template-columns: 556px minmax(0, 1fr);
   gap: var(--content-gap) 12px;
   align-items: center;
 }
@@ -938,6 +938,11 @@ section.qualitative-slide > blockquote:has(img) > p:nth-child(2) { grid-column: 
 section.qualitative-slide > blockquote > ul { margin: 0; }
 section.qualitative-slide img { object-position: top; }
 section.qualitative-slide > ul { grid-column: 1 / -1; margin: 0; }
+
+/* Root row gaps also serve figures; complete the group gap only after columns. */
+section:is(.problem-slide, .dataset-slide, .method-slide, .analysis-slide) > blockquote + :is(p, ul):not(:has(> mjx-container)) {
+  margin-top: calc(var(--list-group-gap) - var(--content-gap));
+}
 
 section.case-study-slide {
   --analysis-figure-height: 430px;
