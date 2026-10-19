@@ -44,13 +44,13 @@ _Project page: [hukcc.github.io/Beyond-Atomic-Layouts/](https://hukcc.github.io/
 > **経歴**
 >
 > - ’23/04 LINE → ’23/10 LINE ヤフー Research Scientist
-> - ’23/03 法政大学大学院 彌冨研 博士（工学）/ 学振 DC2
+> - ’23/03 法政大学大学院 彌冨研 博士 (工学)/ 学振 DC2
 >
 > **研究分野**
 >
-> - 自然言語処理（NLP）/ 画像処理（CV）
+> - 自然言語処理 (NLP)/ 画像処理 (CV)
 >   - 摂動に頑健で解釈可能な深層学習 _[[Kitada+ IEEE Access’21](https://shunk031.me/publication/kitada2021making/), [Appl. Intell.’22](https://shunk031.me/publication/kitada2022making/)]_
-> - 計算機広告（Multi-modal / Vision & Language）
+> - 計算機広告 (Multi-modal / Vision & Language)
 >   - 効果の高いデジタル広告の作成支援 _[[Kitada+ KDD’19](https://shunk031.me/publication/kitada2019conversion/)]_
 >   - 効果の低いデジタル広告の停止支援 _[[Kitada+ Appl. Sci.’22](https://shunk031.me/publication/kitada2022ad/)]_
 > - **デザイン生成 AI**
@@ -73,7 +73,7 @@ _Project page: [hukcc.github.io/Beyond-Atomic-Layouts/](https://hukcc.github.io/
 
 ## 本論文の選定理由 **|** _デザイン編集に向けたレイヤー間の関係へ注目_
 
-> ![Figure 1(e): 関連レイヤーを理解する design assistant の例](assets/beyond-atomic-fig1e.png)
+> ![Figure 1 (e): 関連レイヤーを理解する design assistant の例](assets/beyond-atomic-fig1e.png)
 >
 > Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S0.F1.sf5)]: デザイン支援の例
 
@@ -108,22 +108,22 @@ _Project page: [hukcc.github.io/Beyond-Atomic-Layouts/](https://hukcc.github.io/
   - **(a) Clipping:**\
     切り抜いた画像と元画像の間に別要素を挿入
 
-    ![Figure 1(a): Clipping](assets/beyond-atomic-clipping.png)
+    ![Figure 1 (a): Clipping](assets/beyond-atomic-clipping.png)
 
   - **(b) Blending:**\
     同じ画像の異なる領域を組み合わせて形状を表現
 
-    ![Figure 1(b): Blending](assets/beyond-atomic-blending.png)
+    ![Figure 1 (b): Blending](assets/beyond-atomic-blending.png)
 
   - **(c) Overlaying:**\
     輪郭や影を重ねて視覚的な階層を強調
 
-    ![Figure 1(c): Overlaying](assets/beyond-atomic-overlaying.png)
+    ![Figure 1 (c): Overlaying](assets/beyond-atomic-overlaying.png)
 
   - **(d) Morphing:**\
     文字の一部を画像・図形に置き換え
 
-    ![Figure 1(d): Morphing](assets/beyond-atomic-morphing.png)
+    ![Figure 1 (d): Morphing](assets/beyond-atomic-morphing.png)
 
 Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S0.F1)]: Compositional layout の代表的な合成表現
 
@@ -147,11 +147,11 @@ Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S0.F1)]: Com
 **③ 学習手法: MASON**\
 **M**ultimodal **A**lignment and **S**tructural percepti**ON**
 
-- Multimodal Alignment（MA）: 完成画像と各レイヤーの対応付けを学習
-- Structural Perception（SP）: レイヤー間の位置・重なり・前後関係を明示
+- Multimodal Alignment (MA): 完成画像と各レイヤーの対応付けを学習
+- Structural Perception (SP): レイヤー間の位置・重なり・前後関係を明示
 
-**主な結果: 同一ベースモデル（Qwen2.5-VL 7B）の関連要素特定精度**\
-主タスク QA のみで微調整 88.80% → MASON 91.66%（+2.86 pt）
+**主な結果: 同一ベースモデル (Qwen2.5-VL 7B) の関連要素特定精度**\
+主タスク QA のみで微調整 88.80% → MASON 91.66% (+2.86 pt)
 
 ---
 
@@ -192,7 +192,7 @@ Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S0.F1)]: Com
 > \bbox[0px,#DBEAFE]{\mathcal{M}}=\{\mathcal{M}_{e_1},\ldots,\mathcal{M}_{e_n}\}
 > $$
 >
-> - $\mathcal{M}_{e_i}$: 要素識別子（ID）・種類・位置・\
+> - $\mathcal{M}_{e_i}$: 要素識別子 (ID)・種類・位置・\
 >   不透明度・重なり順などの属性
 > - 質問 $Q(e^q)$: 注目する要素 $e^q$ を指定
 
@@ -247,13 +247,13 @@ Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S0.F1)]: Com
 
 ## 課題分析 1/2 **|** _要素の取り違え: メタデータと見た目が一致しない_
 
-Vision-Language Model（VLM）である GPT-4o の要素対応付けを測定
+Vision-Language Model (VLM) である GPT-4o の要素対応付けを測定
 
-> ![Figure 3(a): 要素説明の一致度が高いデザインほど関連要素の特定正解率が高い](assets/beyond-atomic-semantic-drift.svg)
+> ![Figure 3 (a): 要素説明の一致度が高いデザインほど関連要素の特定正解率が高い](assets/beyond-atomic-semantic-drift.svg)
 >
 > Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S3.F3.sf1)]: 説明が一致するほど特定も正確\
-> 横軸: 要素説明の語句一致度（平均 BLEU [[Papineni+ ACL’02](https://aclanthology.org/P02-1040/)]）\
-> 縦軸: 関連要素の特定正解率（%）
+> 横軸: 要素説明の語句一致度 (平均 BLEU [[Papineni+ ACL’02](https://aclanthology.org/P02-1040/)])\
+> 縦軸: 関連要素の特定正解率 (%)
 
 > **Semantic drift:**\
 > メタデータと画像中の見た目の不一致
@@ -265,10 +265,10 @@ Vision-Language Model（VLM）である GPT-4o の要素対応付けを測定
 > **2 文の BLEU** _[[Papineni+ ACL’02](https://aclanthology.org/P02-1040/)]_ **= 一致度**
 >
 > - デザイン内の要素で平均 → 横軸の値
->   - 横軸の区間ごとに特定正解率（縦軸）を集計
+>   - 横軸の区間ごとに特定正解率 (縦軸) を集計
 > - 失敗例: 重なって隠れた要素を見失う
 
-**➜ MASON の Multimodal Alignment（MA）で要素 ID と見た目の対応付けを支援**
+**➜ MASON の Multimodal Alignment (MA) で要素 ID と見た目の対応付けを支援**
 
 ---
 
@@ -279,11 +279,11 @@ Vision-Language Model（VLM）である GPT-4o の要素対応付けを測定
 
 GPT-4o のレイヤー間の位置関係を読み取る能力を測定
 
-> ![Figure 3(b): 位置関係の質問への正答率が高いデザインほど関連要素の特定正解率が高い](assets/beyond-atomic-structural-ambiguity.svg)
+> ![Figure 3 (b): 位置関係の質問への正答率が高いデザインほど関連要素の特定正解率が高い](assets/beyond-atomic-structural-ambiguity.svg)
 >
 > Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S3.F3.sf2)]: 関係に正答するほど特定も正確\
 > 横軸: 要素ペアの位置関係を問う Yes/No 正答率\
-> 縦軸: 関連要素の特定正解率（%）
+> 縦軸: 関連要素の特定正解率 (%)
 
 > **Structural ambiguity:**\
 > レイヤー間の曖昧な関係
@@ -295,11 +295,11 @@ GPT-4o のレイヤー間の位置関係を読み取る能力を測定
 > **30 組の Yes/No 回答から正答率を計算**
 >
 > - 30 組の Yes/No 正答率 → 横軸の値
->   - 横軸の区間ごとに特定正解率（縦軸）を集計
+>   - 横軸の区間ごとに特定正解率 (縦軸) を集計
 > - 失敗例: 座標だけでは関係を捉えにくい
 >   - 前後・包含・重なりを区別しにくい
 
-**➜ MASON の Structural Perception（SP）でレイヤー間の位置関係を明示**
+**➜ MASON の Structural Perception (SP) でレイヤー間の位置関係を明示**
 
 ---
 
@@ -312,7 +312,7 @@ GPT-4o のレイヤー間の位置関係を読み取る能力を測定
 >
 > Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S3.F4)]: MA・SP を組み込む追加学習の全体像
 
-> **Multimodal Alignment（MA）**
+> **Multimodal Alignment (MA)**
 >
 > - 追加: ID と見た目を結ぶ補助 QA
 >   - 質問: ID が $i$ の要素の見た目と位置
@@ -321,7 +321,7 @@ GPT-4o のレイヤー間の位置関係を読み取る能力を測定
 >   - 推論時: 補助 QA は不使用
 > - ➜ Semantic drift を軽減
 
-> **Structural Perception（SP）**
+> **Structural Perception (SP)**
 >
 > - 追加: 質問対象と各候補の空間関係
 >   - 重なり・包含・距離・上下左右・前後
@@ -330,7 +330,7 @@ GPT-4o のレイヤー間の位置関係を読み取る能力を測定
 >   - 学習時・推論時の両方で使用
 > - ➜ Structural ambiguity を軽減
 
-Qwen2.5-VL 7B _[[Bai+ arXiv’25](https://arxiv.org/abs/2502.13923)]_ のモデル構造は変えず、学習データ（MA）と入力（SP）を拡張
+Qwen2.5-VL 7B _[[Bai+ arXiv’25](https://arxiv.org/abs/2502.13923)]_ の構造を保ち、学習データ (MA) と入力 (SP) を拡張
 
 ---
 
@@ -344,12 +344,12 @@ Qwen2.5-VL 7B _[[Bai+ arXiv’25](https://arxiv.org/abs/2502.13923)]_ のモデ�
 > Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S3.F4)]:\
 > 補助 QA の生成
 
-> **補助 QA（Grounding QA）を生成**
+> **補助 QA (Grounding QA) を生成**
 >
-> - 入力: レイアウト $\mathcal{L}$（完成画像＋メタデータ）\
+> - 入力: レイアウト $\mathcal{L}$ (完成画像＋メタデータ)\
 >   対象要素の切り出し画像・メタデータ・質問
 > - $Q^g(e_i)$: 要素 $e_i$ の見た目と位置を問う質問
->   - [Table 2（和訳）](https://arxiv.org/html/2608.26716v1#S4.T2): 「ID が $i$ の要素は何か。\
+>   - [Table 2 (和訳)](https://arxiv.org/html/2608.26716v1#S4.T2): 「ID が $i$ の要素は何か。\
 >     完成画像のどこにあるか」
 > - 出力 $A^g(e_i)$: 要素の視覚的特徴と位置を記述した回答
 >   - GPT-4o が生成し、MASON の学習に使用
@@ -385,7 +385,7 @@ $$
 > - 各候補 $e_i$ に、質問対象 $e^q$ との空間関係を追加
 >   - `spatialRelationship` フィールドに記述
 >
-> **[質問対象 $e^q$ から見た候補 $e_i$ の空間関係（Table 3）](https://arxiv.org/html/2608.26716v1#S4.T3)**
+> **[質問対象 $e^q$ から見た候補 $e_i$ の空間関係 (Table 3)](https://arxiv.org/html/2608.26716v1#S4.T3)**
 >
 > | 関係       | 属性が表す内容     |
 > | :--------- | :----------------- |
@@ -418,21 +418,21 @@ $$
 > **学習条件の比較**
 >
 > - 主タスク: 関連要素 ID と意図を回答
-> - Direct Finetune（DF）
+> - Direct Finetune (DF)
 >   - 主タスク QA のみで微調整
 > - MASON: 主タスク＋ MA・SP
 
 > **共通のモデル・実行条件**
 >
 > - Qwen2.5-VL 7B _[[Bai+ arXiv’25](https://arxiv.org/abs/2502.13923)]_ / 8×A100
-> - 低ランク適応（LoRA） _[[Hu+ ICLR’22](https://arxiv.org/abs/2106.09685)]_
+> - 低ランク適応 (LoRA)_[[Hu+ ICLR’22](https://arxiv.org/abs/2106.09685)]_
 >   - 3 エポック / 学習率 $3\times10^{-5}$ / ランク 4
 > - 画像 336×336 / 出力は最大 256 トークン
 
 **評価指標**
 
 - Accuracy: ID 一致率
-- GPT-Score _[[Zheng+ NeurIPS’23](https://arxiv.org/abs/2306.05685)]_: 意図との意味的一致（0–10）
+- GPT-Score _[[Zheng+ NeurIPS’23](https://arxiv.org/abs/2306.05685)]_: 意図との意味的一致 (0–10)
 - BLEU _[[Papineni+ ACL’02](https://aclanthology.org/P02-1040/)]_・ROUGE _[[Lin+ ACL WS’04](https://aclanthology.org/W04-1013/)]_: 参照文との語句一致
 
 ---
@@ -442,22 +442,22 @@ $$
 
 ## 結果 1/2 **|** _MASON は DF より +2.86 pt 改善_
 
-**CoDeLayout: 関連要素の特定精度（%）**
+**CoDeLayout: 関連要素の特定精度 (%)**
 
-| モデル        | 学習データ           | 重み付き精度 |  Clipping |  Morphing |
-| :------------ | :------------------- | -----------: | --------: | --------: |
-| Max-Overlap   | なし（ルールベース） |        44.27 |     69.70 |     36.17 |
-| Qwen2.5-VL 7B | zero-shot            |        52.60 |     37.88 |     36.17 |
-| Qwen3-VL      | zero-shot            |        77.08 |     71.21 |     55.32 |
-| GPT-o3        | zero-shot            |        79.68 |     63.64 |     68.09 |
-| DF            | 全データ             |        88.80 |     83.33 |     65.96 |
-| **MASON**     | **全データ**         |    **91.66** | **90.91** | **70.21** |
+| モデル        | 学習データ          | 重み付き精度 |  Clipping |  Morphing |
+| :------------ | :------------------ | -----------: | --------: | --------: |
+| Max-Overlap   | なし (ルールベース) |        44.27 |     69.70 |     36.17 |
+| Qwen2.5-VL 7B | zero-shot           |        52.60 |     37.88 |     36.17 |
+| Qwen3-VL      | zero-shot           |        77.08 |     71.21 |     55.32 |
+| GPT-o3        | zero-shot           |        79.68 |     63.64 |     68.09 |
+| DF            | 全データ            |        88.80 |     83.33 |     65.96 |
+| **MASON**     | **全データ**        |    **91.66** | **90.91** | **70.21** |
 
 _[[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.T4)]: Table 4 の主要列を再構成。重み付き精度はテストデータの構成比で重み付け_
 
-- Max-Overlap: 質問対象との重なり率（IoU）が最大の要素を選ぶルールベースの手法
-- Clipping: DF 83.33 → MASON 90.91（+7.58 pt）/ Morphing は 70.21%に留まる
-- GPT-o3 比: +11.98 pt（79.68 → 91.66）
+- Max-Overlap: 質問対象との重なり率 (IoU) が最大の要素を選ぶルールベースの手法
+- Clipping: DF 83.33 → MASON 90.91 (+7.58 pt)/ Morphing は 70.21%に留まる
+- GPT-o3 比: +11.98 pt (79.68 → 91.66)
 
 ---
 
@@ -474,7 +474,7 @@ _[[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.T4)]: Table 4 の主
 > 30%: 種類の偏りを緩和して抽出\
 > 100% の差: 図中 +2.87／Table 4 の計算値 +2.86 pt
 
-> **重み付き精度と種類別の平均精度（%）**
+> **重み付き精度と種類別の平均精度 (%)**
 >
 > | モデル    | 主タスクデータ |      精度 |      平均 |
 > | :-------- | -------------: | --------: | --------: |
@@ -486,10 +486,10 @@ _[[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.T4)]: Table 4 の主
 >
 > **MA・SP で主タスクの必要データ量を削減**
 >
-> - MASON（主タスク 30%）
+> - MASON (主タスク 30%)
 >   - 主タスク QA 約 6K ペア
 >   - 補助 Grounding QA 約 2K ペア
-> - DF（主タスク 100%）
+> - DF (主タスク 100%)
 >   - 主タスク QA 約 20K ペア
 
 ---
@@ -499,23 +499,23 @@ _[[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.T4)]: Table 4 の主
 
 ## Ablation 1/2 **|** _MA・SP の組み合わせ効果は単純な加算ではない_
 
-**種類ごとの件数を均衡化した部分データで MA・SP を比較（精度 %）**
+**種類ごとの件数を均衡化した部分データで MA・SP を比較 (精度 %)**
 
-| モデル         | 重み付き精度 |  平均精度 |  Clipping |  Morphing |
-| :------------- | -----------: | --------: | --------: | --------: |
-| DF             |        80.21 |     78.36 |     74.24 |     72.34 |
-| DF + MA        |        82.03 |     80.32 |     81.82 |     70.21 |
-| DF + SP        |        83.85 |     82.51 | **83.33** |     74.47 |
-| MASON（MA+SP） |    **84.11** | **83.40** |     81.82 | **80.85** |
+| モデル        | 重み付き精度 |  平均精度 |  Clipping |  Morphing |
+| :------------ | -----------: | --------: | --------: | --------: |
+| DF            |        80.21 |     78.36 |     74.24 |     72.34 |
+| DF + MA       |        82.03 |     80.32 |     81.82 |     70.21 |
+| DF + SP       |        83.85 |     82.51 | **83.33** |     74.47 |
+| MASON (MA+SP) |    **84.11** | **83.40** |     81.82 | **80.85** |
 
 _[[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.T5)]: Table 5 の主要列を再構成_
 
-**MA・SP の学習効果（Table 4 の全データ結果とは別条件）**
+**MA・SP の学習効果 (Table 4 の全データ結果とは別条件)**
 
 - DF 比の重み付き精度: MA **+1.82 pt** / SP **+3.64 pt**
-- MA+SP: **+3.90 pt**（SP 単独からの改善は +0.26 pt）
+- MA+SP: **+3.90 pt** (SP 単独からの改善は +0.26 pt)
 - Morphing: DF 72.34 → MA+SP **80.85**
-- Clipping: SP 単独 **83.33** > MA+SP 81.82（組み合わせで低下）
+- Clipping: SP 単独 **83.33** > MA+SP 81.82 (組み合わせで低下)
 
 ---
 
@@ -531,20 +531,20 @@ _[[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.T5)]: Table 5 の主
 > | DF     |     88.8 |     60.9 |
 > | MASON  | **91.6** | **65.1** |
 >
-> _[[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.T7)]: Table 7 / 重み付き精度（%）_
+> _[[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.T7)]: Table 7 / 重み付き精度 (%)_
 >
-> - MASON: **−26.5 pt**（91.6 → 65.1）
+> - MASON: **−26.5 pt** (91.6 → 65.1)
 > - SP で重なり・包含・レイヤー順を付与しても、画像に依存する視覚的な意味関係は残る
 
 > **Grounding QA の生成モデルを比較**
 >
-> | 生成モデル                 |     精度 |
-> | :------------------------- | -------: |
-> | GPT-4o                     | **91.6** |
-> | Qwen3-VL（直接生成）       |     90.7 |
-> | Qwen3-VL（スクリプト併用） |     91.1 |
+> | 生成モデル                |     精度 |
+> | :------------------------ | -------: |
+> | GPT-4o                    | **91.6** |
+> | Qwen3-VL (直接生成)       |     90.7 |
+> | Qwen3-VL (スクリプト併用) |     91.1 |
 >
-> _[[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.T6)]: Table 6 / 重み付き精度（%）_
+> _[[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.T6)]: Table 6 / 重み付き精度 (%)_
 >
 > - 直接生成: 見た目の説明と位置を生成
 > - スクリプト併用: 位置をメタデータから取得・モデルは見た目を説明
@@ -558,11 +558,11 @@ _[[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.T5)]: Table 5 の主
 
 ## 定性結果・制限 **|** _Clipping の切り抜き先を特定・Morphing はなお難しい_
 
-> ![Figure 6(c): Clippingの完成画像・質問対象・DFとMASONの対応先](assets/beyond-atomic-case-clipping.png)
+> ![Figure 6 (c): Clippingの完成画像・質問対象・DFとMASONの対応先](assets/beyond-atomic-case-clipping.png)
 >
 > Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.F6.sf3)]: Clipping の比較
 
-> ![Figure 6(a): Morphingの完成画像・質問対象・DFとMASONの対応先](assets/beyond-atomic-case-morphing.png)
+> ![Figure 6 (a): Morphingの完成画像・質問対象・DFとMASONの対応先](assets/beyond-atomic-case-morphing.png)
 >
 > Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.F6.sf1)]: Morphing の比較
 
@@ -603,11 +603,11 @@ _[[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.T5)]: Table 5 の主
 
 > **MA・SP の効果は合成関係の種類で異なる**
 >
-> - Clipping（Table 5）
+> - Clipping (Table 5)
 >   - SP 単独 **83.33%** > MA+SP **81.82%**
-> - Morphing（Table 5）
+> - Morphing (Table 5)
 >   - DF **72.34%** → MA+SP **80.85%**
->   - 全データ条件では **70.21%**（Table 4）
+>   - 全データ条件では **70.21%** (Table 4)
 >
 > **追加で確認したい点**
 >
@@ -623,17 +623,17 @@ _[[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.T5)]: Table 5 の主
 
 ## まとめ **|** _要素の「見た目」と「レイヤー間の関係」を同時に扱うことが重要_
 
-> ![Figure 1(e): 見た目と関連レイヤーを理解するデザイン支援の例](assets/beyond-atomic-fig1e.png)
+> ![Figure 1 (e): 見た目と関連レイヤーを理解するデザイン支援の例](assets/beyond-atomic-fig1e.png)
 >
 > Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S0.F1.sf5)]: 関連レイヤーの一括編集
 
 > - **課題**: 複数レイヤーが協調するデザインでは、独立要素の位置認識だけでは不十分
 > - **CoDeLayout**: 約 20K 件のデザインで関連要素ペアとデザイン意図を評価
-> - **MASON**: 見た目の対応付け（MA）とレイヤー間の関係（SP）で追加学習
+> - **MASON**: 見た目の対応付け (MA) とレイヤー間の関係 (SP) で追加学習
 > - **残る論点**: Morphing の難しさ・推論時に必要な正確なメタデータ
 
 **Qwen2.5-VL 7B を主タスクの全データで学習した場合の比較**\
-重み付き精度: DF **88.80%** → MASON **91.66%**（+2.86 pt）\
+重み付き精度: DF **88.80%** → MASON **91.66%** (+2.86 pt)\
 MASON は主タスク QA に加え、補助 QA と構造情報を利用
 
 ---
