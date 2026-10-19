@@ -1,7 +1,7 @@
 ---
 marp: true
 theme: ly
-class: classification-public debug-layout
+class: classification-public
 size: 16:9
 lang: ja
 footer: © LY Corporation
@@ -638,7 +638,7 @@ MASON は主タスク QA に加え、補助 QA と構造情報を利用
 
 ---
 
-<!-- _class: title-slide-big classification-public debug-layout-->
+<!-- _class: title-slide-big classification-public -->
 
 # 表紙用の背景
 
