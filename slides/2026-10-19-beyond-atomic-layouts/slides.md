@@ -71,7 +71,7 @@ _Project page: [hukcc.github.io/Beyond-Atomic-Layouts/](https://hukcc.github.io/
 <!-- _class: selection-slide content-slide-gray classification-public -->
 <!-- 発表目安 0:45 -->
 
-## 本論文の選定理由 **|** _独立したデザイン要素の扱いから compositional な扱いへ拡張_
+## 本論文の選定理由 **|** _独立した要素から、組み合わさる要素の理解へ_
 
 > ![Figure 1 (e): 関連レイヤーを理解する design assistant の例](assets/beyond-atomic-fig1e.png)
 >
