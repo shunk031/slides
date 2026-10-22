@@ -10,7 +10,7 @@
 mise run check-layout
 ```
 
-Chrome でフォントと画像の読み込みを待ち、全資料を描画して検査します。追加の Puppeteer インストールは不要です。結果は `dist/<発表名>/slides-review/` に出力します。
+Chrome でフォントと画像の読み込みを待ち、全資料を描画して検査します。結果は `dist/<発表名>/slides-review/` に出力します。
 
 | ファイル                     | 確認する内容                                                       |
 | ---------------------------- | ------------------------------------------------------------------ |
@@ -21,7 +21,7 @@ Chrome でフォントと画像の読み込みを待ち、全資料を描画し�
 
 エラーは終了コード 1 になり、`mise run pdf` も停止します。表示された検査 ID を [仕様表](#検査一覧) で引き、対象ページを直してください。`Space review` の候補は人が判断するため、終了コードに影響しません。候補ゼロでも、全ページの原寸画像を確認します。保存時の自動検査は設定していません。
 
-`LAYOUT_OUT` で出力先のルート、`CHROME_PATH` で Chrome の位置を指定できます。検査画像では `debug-layout` の枠を一時的に消しますが、元の Markdown は変更しません。検査の範囲・閾値・限界、出力の読み方は本仕様書にまとめています。
+`LAYOUT_OUT` で出力先のルート、`CHROME_PATH` で Chrome の位置を指定できます。検査画像では `debug-layout` の枠を消します。検査の範囲・閾値・限界、出力の読み方は本仕様書にまとめています。
 
 ## 検査一覧
 
@@ -282,7 +282,7 @@ MathJax の表示数式が、本文の下 padding の上端から 1px を超え�
 
 ### missing-term-definition
 
-登録された説明必須の用語は、正本どおりの定義が資料内に少なくとも一度必要です。定義がないと資料全体のエラー（slide 0）として報告します。重複掲載は必須ではありません。登録外の概念の欠落や説明の妥当性は人が確認します。
+登録された説明必須の用語は、正本どおりの定義が資料内に少なくとも一度必要です。定義がないと資料全体のエラー（slide 0）として報告します。登録外の概念の欠落や説明の妥当性は人が確認します。
 
 ### underbrace-mathclap
 
@@ -316,4 +316,4 @@ MathJax の表示数式が、本文の下 padding の上端から 1px を超え�
 
 参考: [Chrome の pretty 解説](https://developer.chrome.com/blog/css-text-wrap-pretty)、[BudouX の文節分割](https://github.com/google/budoux/blob/main/README.md)、[Chromium の行分割実装](https://github.com/chromium/chromium/blob/main/third_party/blink/renderer/core/layout/inline/score_line_breaker.cc)。
 
-フォント・画像の読み込み失敗や実行エラーも非ゼロで終了します。Marp CLI 同梱の Puppeteer を使うため追加インストールは不要です。Marp 更新時や検査スクリプト変更時は `mise run test-layout` を実行してください。新しい見た目の不具合を検査に追加するときは、実際の不具合と正常例を回帰テストにし、修正前に PDF 生成が停止し、修正後に通ることを確認します。情報分類の検証や Marp 設定を変更した場合は `mise run test` も実行します。
+フォント・画像の読み込み失敗や実行エラーも非ゼロで終了します。Marp 更新時や検査スクリプト変更時は `mise run test-layout` を実行してください。新しい見た目の不具合を検査に追加するときは、実際の不具合と正常例を回帰テストにし、修正前に PDF 生成が停止し、修正後に通ることを確認します。情報分類の検証や Marp 設定を変更した場合は `mise run test` も実行します。

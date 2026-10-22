@@ -2,7 +2,7 @@
 
 ## 準備と PDF 出力
 
-Node.js と Marp CLI のバージョンは [mise.toml](../mise.toml) で管理します。`ly` テーマの LINE Seed JP は同梱済みで、フォントのインストールや取得用のネット接続は不要です。入手元とライセンスは [フォントの README](../themes/assets/ly/fonts/README.md) と [OFL.txt](../themes/assets/ly/fonts/OFL.txt) にあります。
+Node.js と Marp CLI のバージョンは [mise.toml](../mise.toml) で管理します。LINE Seed JP の入手元とライセンスは [フォントの README](../themes/assets/ly/fonts/README.md) と [OFL.txt](../themes/assets/ly/fonts/OFL.txt) にあります。
 
 ```sh
 mise run pdf
@@ -28,7 +28,7 @@ PDF 生成前にレイアウト検査が走り、エラーがあると生成を�
 
 本文の括弧補足 `(zero-shot)` などは Marp プラグインが自動で囲み、括弧も含めて引用と同じ 20px（`--citation-font-size`）で表示します。数式・コード・URL・引用リンク・表紙・スライド題目は対象外です。装飾をまたぐ括弧は自動変換せず、検査のレビュー候補になります。
 
-段落・箇条書きの引用は `_[[Author+ ConfName’YY](URL)]_` と書くと、斜体の代わりに共通の 20px で表示します。通常リンクのサイズは変わりません。複数研究は `LayoutLMv3 _[[Huang+ MM’22](文献URL)]_ / ScreenQA _[[Hsiao+ NAACL’25](文献URL)]_` のように各研究名の直後へ置きます。同一著者の複数論文は `_[[Kitada+ IEEE Access’21](URL1), [Appl. Intell.’22](URL2)]_` とまとめ、角括弧とカンマをリンクの外に置きます。リンク先は各論文か対応する参考文献項目です。
+段落・箇条書きの引用は `_[[Author+ ConfName’YY](URL)]_` と書くと、斜体の代わりに共通の 20px で表示します。複数研究は `LayoutLMv3 _[[Huang+ MM’22](文献URL)]_ / ScreenQA _[[Hsiao+ NAACL’25](文献URL)]_` のように各研究名の直後へ置きます。同一著者の複数論文は `_[[Kitada+ IEEE Access’21](URL1), [Appl. Intell.’22](URL2)]_` とまとめ、角括弧とカンマをリンクの外に置きます。リンク先は各論文か対応する参考文献項目です。
 
 ```markdown
 > ![Figure 2: 入出力の対応](assets/figure.png)
