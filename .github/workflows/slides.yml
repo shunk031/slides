@@ -1,0 +1,39 @@
+name: Slides
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate slides
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: jdx/mise-action@9b200bcecbfd6303e69a4a261b2e09e3757440a7 # v5
+      - name: Test release check
+        run: node scripts/check-release.test.cjs
+      - name: Check release classes
+        run: mise run check-release
+      - name: Test classification
+        if: ${{ !cancelled() }}
+        run: mise run test
+      - name: Test layout checks
+        if: ${{ !cancelled() }}
+        run: mise run test-layout
+      - name: Render and check all slides
+        if: ${{ !cancelled() }}
+        run: mise run pdf
+      - name: Upload PDFs and layout reviews
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: slides-review
+          path: |
+            dist/**/slides-review/**
+            dist/**/*.pdf

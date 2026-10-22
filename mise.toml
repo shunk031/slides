@@ -1,0 +1,28 @@
+[tools]
+node = "24.18.0"
+"npm:@marp-team/marp-cli" = "4.5.1"
+
+[tasks.pdf]
+description = "すべての資料を dist/ に PDF 出力"
+depends = ["check-layout"]
+run = "marp --pdf --allow-local-files --input-dir slides --output dist"
+
+[tasks.preview]
+description = "ブラウザでスライドをプレビュー"
+run = "marp --server ."
+
+[tasks.test]
+description = "情報分類の検証が正常・不正な指定を判別するか確認"
+run = "node scripts/check-classification.test.cjs"
+
+[tasks.check-layout]
+description = "改行・引用・空白・文字のはみ出しを検査し、全ページの画像を出力"
+run = "node scripts/check-layout.cjs"
+
+[tasks.test-layout]
+description = "改行検査が短い途中・最終行、入れ子リスト、引用を扱えるか確認"
+run = "node scripts/check-layout.cjs --self-test"
+
+[tasks.check-release]
+description = "全資料の class / _class に debug-layout が残っていないか確認"
+run = "node scripts/check-release.cjs"
