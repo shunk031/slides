@@ -921,25 +921,40 @@ section.efficiency-slide :is(th, td) { padding: var(--efficiency-cell-padding); 
 section.efficiency-slide > blockquote > p:has(> em > a) { text-align: center; }
 section.summary-slide > blockquote:has(img) { align-self: start; }
 section.summary-slide img { height: auto; }
+section.summary-slide > ul { grid-column: 1 / -1; margin: 0; }
 section.qualitative-slide {
-  --efficiency-figure-height: 280px;
-  grid-template-columns: 180px minmax(0, 1fr) 280px minmax(0, 1fr);
+  --qualitative-comparison-row: 3;
+  --efficiency-figure-height: 380px;
+  grid-template-columns: 205px 330px 320px minmax(0, 1fr);
 }
-section.qualitative-slide > blockquote:has(img) {
+/* Reserve space for a full-width list below the comparison. */
+section.qualitative-slide:has(> ul) { --efficiency-figure-height: 260px; }
+section.qualitative-slide:has(> h2 + p) { --qualitative-comparison-row: 4; }
+section.qualitative-slide > blockquote:has(> p > img) {
   display: grid;
-  grid-template-rows: subgrid;
+  grid-template-rows: auto auto;
   gap: var(--content-gap);
   align-content: start;
 }
-section.qualitative-slide > blockquote:first-of-type { grid-column: 1 / 3; grid-row: 3 / span 2; grid-template-columns: 180px minmax(0, 1fr); }
-section.qualitative-slide > blockquote:nth-of-type(2) { grid-column: 3 / 5; grid-row: 3 / span 2; grid-template-columns: 280px minmax(0, 1fr); }
-section.qualitative-slide > blockquote:nth-of-type(3) { grid-column: 2; grid-row: 3; }
-section.qualitative-slide > blockquote:nth-of-type(4) { grid-column: 4; grid-row: 3; }
-section.qualitative-slide > blockquote:has(img) > p:first-child { grid-column: 1; grid-row: 1; margin: 0; }
-section.qualitative-slide > blockquote:has(img) > p:nth-child(2) { grid-column: 1 / -1; grid-row: 2; margin: 0; }
+section.qualitative-slide > blockquote:first-of-type { grid-column: 1 / 3; grid-row: var(--qualitative-comparison-row) / span 2; grid-template-columns: 205px minmax(0, 1fr); }
+section.qualitative-slide > blockquote:nth-of-type(2) { grid-column: 3 / 5; grid-row: var(--qualitative-comparison-row) / span 2; grid-template-columns: 320px minmax(0, 1fr); }
+section.qualitative-slide > blockquote:nth-of-type(3) { grid-column: 2; grid-row: var(--qualitative-comparison-row); }
+section.qualitative-slide > blockquote:nth-of-type(4) { grid-column: 4; grid-row: var(--qualitative-comparison-row); }
+section.qualitative-slide > blockquote:not(:has(> p > img)) { font-size: var(--body-font-size); }
+section.qualitative-slide > blockquote:has(> p > img) > p:first-child { grid-column: 1; grid-row: 1; margin: 0; }
+/* Keep each caption under its image, independently of the adjacent text height. */
+section.qualitative-slide > blockquote:has(> p > img) > p:nth-child(2) { grid-column: 1; grid-row: 2; margin: 0; }
 section.qualitative-slide > blockquote > ul { margin: 0; }
 section.qualitative-slide img { object-position: top; }
+section.qualitative-slide img.emoji { width: 1em; height: 1em; vertical-align: -0.125em; }
 section.qualitative-slide > ul { grid-column: 1 / -1; margin: 0; }
+section.qualitative-slide:has(> h2 + p) > ul {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  column-gap: var(--list-group-gap);
+  align-items: start;
+}
+section.qualitative-slide:has(> h2 + p) > ul > li { margin-top: 0; }
 
 /* Root row gaps also serve figures; complete the group gap only after columns. */
 section:is(.problem-slide, .dataset-slide, .method-slide, .analysis-slide) > blockquote + :is(p, ul):not(:has(> mjx-container)) {
