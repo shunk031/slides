@@ -8,7 +8,7 @@ Node.js と Marp CLI のバージョンは [mise.toml](../mise.toml) で管理�
 mise run pdf
 ```
 
-`slides/` 内の全資料を変換し、`dist/<発表名>/slides.pdf` に出力します。見本は `dist/example/slides.pdf`、論文紹介は `dist/2026-10-19-beyond-atomic-layouts/slides.pdf` です。`dist/` は Git 管理対象外です。
+`slides/` 内の全資料を変換し、`dist/<発表名>/slides.pdf` に出力します。`dist/` は Git 管理対象外です。
 
 PDF 生成前にレイアウト検査が走り、エラーがあると生成を止めます。プレビューサーバーを動かしたまま実行する場合は、別のターミナルを使ってください。
 
@@ -63,7 +63,7 @@ PDF 生成前にレイアウト検査が走り、エラーがあると生成を�
 
 自己紹介は `##` の見出し、経歴・研究分野の引用ブロック、写真・関連リンクの引用ブロックの順です。右列の先頭段落に写真 2 枚、次の段落にプロフィールリンクを置きます。以降は `[![説明](assets/画像.png)](URL) [説明](URL)` の組で、サムネイル下部にテキストリンクを重ねます。リンクは画像中央を基準に文字数に応じた幅で 1 行表示し、標準で不透明度 85% の白背景が付きます。研究分野の親項目を `**太字**` にすると赤く強調します。
 
-見本の写真は [kitada-ly.jpg](https://shunk031.me/icons/kitada-ly.jpg)・[kitada-kita.jpg](https://shunk031.me/icons/kitada-kita.jpg) を `slides/example/assets/` に保存しています。論文紹介でも同じ写真を使用し、講座・書籍のサムネイルとともに資料自身の `assets/` に保存しています。見本の自己紹介文は差し替え用の作例です。
+見本の写真は [kitada-ly.jpg](https://shunk031.me/icons/kitada-ly.jpg)・[kitada-kita.jpg](https://shunk031.me/icons/kitada-kita.jpg) を `slides/example/assets/` に保存しています。見本の自己紹介文は差し替え用の作例です。
 
 ## VS Code のプレビュー
 
