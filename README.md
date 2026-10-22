@@ -2,9 +2,6 @@
 
 Marp で論文紹介や技術発表のスライドを書くリポジトリです。Markdown・テーマ CSS・画像を管理し、PDF は手元で生成します。執筆には Codex / Claude Code も使えます。
 
-- [レイアウトの見本](slides/example/slides.md): `ly` テーマのクラスと Markdown の使用例
-- [Beyond Atomic Layouts の論文紹介](slides/2026-10-19-beyond-atomic-layouts/slides.md): 2026 年 10 月 19 日の発表資料
-
 ## セットアップ
 
 [mise](https://mise.jdx.dev/getting-started.html) と Google Chrome を用意し、リポジトリのルートで実行します。
