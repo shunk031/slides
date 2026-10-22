@@ -10,7 +10,7 @@
 mise run check-layout
 ```
 
-Chrome でフォントと画像の読み込みを待ち、全資料を描画して検査します。追加の Puppeteer インストールは不要です。結果は `dist/<発表名>/slides-review/` に出力します。
+Chrome でフォントと画像の読み込みを待ち、全資料を描画して検査します。結果は `dist/<発表名>/slides-review/` に出力します。
 
 | ファイル                     | 確認する内容                                                       |
 | ---------------------------- | ------------------------------------------------------------------ |
@@ -316,4 +316,4 @@ MathJax の表示数式が、本文の下 padding の上端から 1px を超え�
 
 参考: [Chrome の pretty 解説](https://developer.chrome.com/blog/css-text-wrap-pretty)、[BudouX の文節分割](https://github.com/google/budoux/blob/main/README.md)、[Chromium の行分割実装](https://github.com/chromium/chromium/blob/main/third_party/blink/renderer/core/layout/inline/score_line_breaker.cc)。
 
-フォント・画像の読み込み失敗や実行エラーも非ゼロで終了します。Marp CLI 同梱の Puppeteer を使うため追加インストールは不要です。Marp 更新時や検査スクリプト変更時は `mise run test-layout` を実行してください。新しい見た目の不具合を検査に追加するときは、実際の不具合と正常例を回帰テストにし、修正前に PDF 生成が停止し、修正後に通ることを確認します。情報分類の検証や Marp 設定を変更した場合は `mise run test` も実行します。
+フォント・画像の読み込み失敗や実行エラーも非ゼロで終了します。Marp 更新時や検査スクリプト変更時は `mise run test-layout` を実行してください。新しい見た目の不具合を検査に追加するときは、実際の不具合と正常例を回帰テストにし、修正前に PDF 生成が停止し、修正後に通ることを確認します。情報分類の検証や Marp 設定を変更した場合は `mise run test` も実行します。

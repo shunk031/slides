@@ -11,8 +11,6 @@ mise trust
 mise install
 ```
 
-`ly` テーマの LINE Seed JP は同梱済みで、フォントのインストールや取得用のネット接続は不要です。
-
 ## プレビュー
 
 `mise run preview`
