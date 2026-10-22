@@ -195,8 +195,7 @@ Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S0.F1)]: Com
 >
 > - $\bbox[0px,#DBEAFE]{\mathcal{M}_{e_i}}$: 要素識別子 (ID)・種類・位置・\
 >   不透明度・重なり順などの属性
-> - 主タスクの質問 $\bbox[0px,#FFF2CC]{Q(e^q)}$:\
->   注目する要素 $e^q$ を指定
+> - 主タスクの質問 $\bbox[0px,#FFF2CC]{Q(e^q)}$: 質問対象 $e^q$ を指定
 
 > **主タスク: 関連要素の特定と意図説明**
 >
