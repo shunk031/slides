@@ -71,7 +71,7 @@ _Project page: [hukcc.github.io/Beyond-Atomic-Layouts/](https://hukcc.github.io/
 <!-- _class: selection-slide content-slide-gray classification-public -->
 <!-- 発表目安 0:45 -->
 
-## 本論文の選定理由 **|** _独立した要素から、組み合わさる要素の理解へ_
+## 本論文の選定理由 **|** _独立した要素から組み合わさる要素の理解へ_
 
 > ![Figure 1 (e): 関連レイヤーを理解する design assistant の例](assets/beyond-atomic-fig1e.png)
 >
@@ -99,7 +99,7 @@ _Project page: [hukcc.github.io/Beyond-Atomic-Layouts/](https://hukcc.github.io/
 <!-- _class: background-slide content-slide-gray classification-public -->
 <!-- 発表目安 0:50 -->
 
-## 背景 **|** _Atomic Layout と Compositional Layout の違い_
+## 背景 **|** _独立要素を扱う Atomic Layout からレイヤーを組み合わせる Compositional Layout へ_
 
 - **Atomic Layout:** 文書や画面を、文字・画像・ボタンなどの独立した要素として扱う
   - 既存の文書・画面理解: 要素の位置・種類・読み順から内容を認識
@@ -147,8 +147,8 @@ Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S0.F1)]: Com
 **③ 学習手法: MASON**
 
 - **M**ultimodal **A**lignment and **S**tructural percepti**ON**
-- Multimodal Alignment (MA): 完成画像と各レイヤーの対応付けを学習
-- Structural Perception (SP): レイヤー間の位置・重なり・前後関係を明示
+  - Multimodal Alignment (MA): 完成画像と各レイヤーの対応付けを学習
+  - Structural Perception (SP): レイヤー間の位置・重なり・前後関係を明示
 
 **主な結果: 公開モデル Qwen2.5-VL 7B を CoDeLayout で微調整**
 
@@ -159,7 +159,7 @@ Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S0.F1)]: Com
 <!-- _class: content-slide-gray classification-public -->
 <!-- 発表目安 0:55。代表研究のみ口頭説明、全研究名を読み上げない -->
 
-## 関連研究 **|** _個別要素の理解・レイヤー生成だけでは、合成関係を説明できない_
+## 関連研究 **|** _個別要素の理解・レイヤー生成だけでは合成関係を説明できない_
 
 - **レイアウトの理解: 個別要素の位置・意味を認識**
   - LayoutLMv3 _[[Huang+ MM’22](https://arxiv.org/abs/2204.08387)]_: 文書の文字・画像・位置を統合
@@ -308,7 +308,7 @@ GPT-4o のレイヤー間の位置関係を読み取る能力を測定
 <!-- _class: method-slide mason-overview-slide content-slide-gray classification-public -->
 <!-- 発表目安 0:45 -->
 
-## MASON 1/3 **|** _学習データと入力を拡張し、2 つの失敗要因に対処_
+## MASON 1/3 **|** _学習データと入力の拡張で 2 つの失敗要因に対処_
 
 > ![Figure 4: 左の MA Module は要素対応付け、中央の SP Module は空間関係、右は VLM の追加学習](assets/beyond-atomic-pipeline.png)
 >
@@ -407,7 +407,7 @@ $$
 <!-- 発表目安 0:50 -->
 <!-- 論文: https://arxiv.org/html/2608.26716v1 Sec. 4.3, Sec. 5.1–5.2, Eq. 4 -->
 
-## 実験設定 **|** _主タスクだけで微調整した DF と比べ、MA・SP の効果を評価_
+## 実験設定 **|** _主タスクだけで微調整した DF との比較で MA・SP の効果を評価_
 
 $$
 \underbrace{\vphantom{\hat A\mathcal L'\mathcal M'Q^g(e_i)}\bbox[0px,#FCE4D6]{\hat A}}_{\mathclap{\bbox[0px,#FCE4D6]{\text{回答}}}}
@@ -468,7 +468,7 @@ _[[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.T4)]: Table 4 の主
 <!-- _class: analysis-slide efficiency-slide content-slide-gray classification-public -->
 <!-- 発表目安 0:50 -->
 
-## 結果 2/2 **|** _MASON は主タスク 30% で、全データを使う DF より高精度_
+## 結果 2/2 **|** _MASON は主タスク 30% でも全データを使う DF より高精度_
 
 > ![Figure 5: 主タスクデータ割合に対するDFとMASONの重み付き精度と精度差](assets/beyond-atomic-datascale.svg)
 >
@@ -560,7 +560,7 @@ _[[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.T5)]: Table 5 の主
 <!-- _class: analysis-slide efficiency-slide qualitative-slide content-slide-gray classification-public -->
 <!-- 発表目安 2:00 -->
 
-## 定性結果・制限 **|** _Clipping の切り抜き先を特定・Morphing はなお難しい_
+## 定性結果 **|** _DF は見た目の似た要素・MASON は合成相手を選択_
 
 > ![Figure 6 (c): Clippingの完成画像・質問対象・DFとMASONの対応先](assets/beyond-atomic-case-clipping.png)
 >
@@ -570,21 +570,24 @@ _[[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.T5)]: Table 5 の主
 >
 > Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.F6.sf1)]: Morphing の比較
 
-> - **Clipping**
->   - 質問対象: 切り抜く前の人物画像
->   - DF: 元画像との関係を見落とし、幅の似た装飾へ誤対応
->   - MASON: 元画像と合成関係にある人物の切り抜き前景を特定
+> **Clipping**
+>
+> - Q: 切り抜く前の人物写真と合成関係にある要素は？
+> - GT: 人物だけの切り抜き
+>   - 写真との間にタイトル文字を挟む
+> - 予測
+>   - ❌️ DF: 写真と幅がそろう下端の装飾
+>   - ⭕️ MASON: 人物の切り抜き
 
-> - **Morphing**
->   - 質問対象:「FLORAL」の文字レイヤー
->   - DF: 色・配置が似た別要素へ誤対応
->   - MASON:「O」を置き換える花を特定
+> **Morphing**
+>
+> - Q:「FLORAL」の文字と合成関係にある要素は？
+> - GT:「O」に重ねた花の画像
+>   - O を花の形に見せる
+> - 予測
+>   - ❌️ DF: 文字の横に並ぶ同色の装飾
+>   - ⭕️ MASON: 花の画像
 
-- **残る課題・著者らの将来方向**
-  - Morphing: 全データで学習しても特定精度 **70.21%**
-    - 訓練データに占める割合は **2.63%** のみ
-    - 大きな変形と意味の置き換えを捉える必要がある
-  - レイヤー構造を考慮する視覚エンコーダと、視覚・言語の対応付けの強化
 
 ---
 
@@ -621,7 +624,7 @@ _[[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.T5)]: Table 5 の主
 
 ---
 
-<!-- _class: analysis-slide efficiency-slide summary-slide content-slide-gray classification-public -->
+<!-- _class: selection-slide content-slide-gray classification-public -->
 <!-- 発表目安 0:20 -->
 <!-- 主結果: https://arxiv.org/html/2608.26716v1#S5.T4 -->
 
@@ -631,12 +634,16 @@ _[[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S5.T5)]: Table 5 の主
 >
 > Figure from [[Huang+ ECCV’26](https://arxiv.org/html/2608.26716v1#S0.F1.sf5)]: 関連レイヤーの一括編集
 
-> - **課題**: 複数レイヤーが協調するデザインでは、独立要素の位置認識だけでは不十分
-> - **CoDeLayout**: 約 20K 件のデザインで関連要素ペアとデザイン意図を評価
-> - **MASON**: 見た目の対応付け (MA) とレイヤー間の関係 (SP) で追加学習
-> - **残る論点**: Morphing の難しさ・推論時に必要な正確なメタデータ
+> **MASON: 見た目の対応付け (MA)\
+> とレイヤー間の関係 (SP) で追加学習**
+>
+> - 制限: Morphing は全データで学習しても **70.21%**
+>   - 訓練データの **2.63%** のみ
+>   - 大きな変形と意味の置き換えが必要
+>   - 推論時に必要な正確なメタデータ
+> - 将来方向: レイヤー構造を考慮する視覚エンコーダ・視覚と言語の対応付けの強化
 
-**Qwen2.5-VL 7B を主タスクの全データで学習した場合の比較**\
-重み付き精度: DF **88.80%** → MASON **91.66%** (+2.86 pt)\
-MASON は主タスク QA に加え、補助 QA と構造情報を利用
-
+> **主な結果: 公開モデル Qwen2.5-VL 7B を CoDeLayout で微調整**
+>
+> - 重み付き精度: GPT-o3 (zero-shot) **79.68%** → MASON **91.66%** (+11.98 pt)
+> - 主タスクの全データで学習: DF **88.80%** → MASON **91.66%** (+2.86 pt)

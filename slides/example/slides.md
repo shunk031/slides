@@ -516,7 +516,7 @@ $$
 
 <!-- _class: selection-slide content-slide-gray classification-public -->
 
-## 導入の配置 **|** _問いと図を並べ、着目点を下段に置く_
+## 導入の配置 **|** _問いと図を並べて着目点を下段に置く_
 
 > ![Figure 2: 入力・処理・出力の模式図](assets/layout-pipeline.svg)
 >
