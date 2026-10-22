@@ -1,8 +1,27 @@
 # レイアウト検査の仕様
 
-`mise run check-layout` は Chrome で実際に描画し、フォントと画像の読み込み後に改行・配置・表記を検査します。実装は [scripts/check-layout.cjs](../scripts/check-layout.cjs) です。実行手順と出力先は [README](../README.md#検査結果と原寸画像を確認する) を参照してください。
+`mise run check-layout` は Chrome で実際に描画し、フォントと画像の読み込み後に改行・配置・表記を検査します。実装は [scripts/check-layout.cjs](../scripts/check-layout.cjs) です。実行手順と出力先は [実行方法](#実行方法) を参照してください。
 
 検査エラーはすべて終了コード 1 になり、`mise run pdf` の PDF 生成も止めます。人が判断する `Space review` の空白候補と `demonstrative` の表現候補は、この停止条件に含めません。
+
+## 実行方法
+
+```sh
+mise run check-layout
+```
+
+Chrome でフォントと画像の読み込みを待ち、全資料を描画して検査します。追加の Puppeteer インストールは不要です。結果は `dist/<発表名>/slides-review/` に出力します。
+
+| ファイル                     | 確認する内容                                                       |
+| ---------------------------- | ------------------------------------------------------------------ |
+| `review.md`                  | ページごとのエラーと、画像を見て判断する `Space review` の空白候補 |
+| `slide-N.png`                | 全ページの原寸画像。改行、図、背景、日本語フォントを確認           |
+| `slide-N-space.png`          | 空白候補を番号・寸法付きで着色した画像。通常画像と比較             |
+| `lines.json` / `spaces.json` | 描画行・配置の測定値 / 空白候補・列・要素間隔の測定値              |
+
+エラーは終了コード 1 になり、`mise run pdf` も停止します。表示された検査 ID を [仕様表](#検査一覧) で引き、対象ページを直してください。`Space review` の候補は人が判断するため、終了コードに影響しません。候補ゼロでも、全ページの原寸画像を確認します。保存時の自動検査は設定していません。
+
+`LAYOUT_OUT` で出力先のルート、`CHROME_PATH` で Chrome の位置を指定できます。検査画像では `debug-layout` の枠を一時的に消しますが、元の Markdown は変更しません。検査の範囲・閾値・限界、出力の読み方は本仕様書にまとめています。
 
 ## 検査一覧
 
@@ -55,7 +74,7 @@ ID はターミナルの `ERROR <ID>` に対応します。確認候補だけは
 | `missing-term-definition`      | 登録用語の定義の欠落                   | 正本どおりの定義が資料内に 1 回もない                          | 登録外の概念                                       |
 | `underbrace-mathclap`          | 数式の下括弧注釈の書式不備             | 注釈全体が `\mathclap{...}` に包まれていない                   | 注釈の重なり・下端の余白                           |
 
-情報分類の検証は Marp の変換段階で先に走ります。固定 ID はなく、未知の分類は `Unknown classification`、複数区分は `Multiple classifications`、ページ間の変更・漏れは `Classification differs from slide 1` と表示します。許可クラスと使い方は [README の情報分類](../README.md#情報分類を表示する) を参照してください。
+情報分類の検証は Marp の変換段階で先に走ります。固定 ID はなく、未知の分類は `Unknown classification`、複数区分は `Multiple classifications`、ページ間の変更・漏れは `Classification differs from slide 1` と表示します。許可クラスと使い方は [情報分類の指定方法](authoring.md#情報分類を表示する) を参照してください。
 
 ## 各検査の条件
 
