@@ -799,10 +799,11 @@ function inspectStructure() {
         // Grid/flex items can deliberately extend beyond an image-sized parent.
         const box = (hasItems ? container : block).getBoundingClientRect();
         // Range rectangles can extend slightly beyond a line box because of platform font metrics.
+        const verticalTolerance = (parseFloat(getComputedStyle(node.parentElement).fontSize) || 0) * 0.15;
         overflow ||= [...range.getClientRects()].some(r => r.width && r.height && (
           r.left < Math.max(bounds.left, box.left) - 1 || r.right > Math.min(bounds.right, box.right) + 1 ||
           r.top < bounds.top - 1 || r.bottom > bounds.bottom + 1 ||
-          r.top < box.top - 2 || r.bottom > box.bottom + 2));
+          r.top < box.top - verticalTolerance || r.bottom > box.bottom + verticalTolerance));
       }
       if (overflow) findings.push({ slide: index + 1, kind: 'text-overflow', text: block.textContent.trim() });
     }
@@ -1268,10 +1269,15 @@ async function main() {
       await page.setContent('<style>section::after{content:attr(data-marpit-pagination) " / " attr(data-marpit-pagination-total);position:absolute;top:0;right:0;font:10px/12px monospace}</style><section data-marpit-pagination="1" data-marpit-pagination-total="1" style="position:relative;width:500px;height:300px;font:20px/20px monospace"><p style="position:absolute;top:20px;left:0;margin:0">Body</p><footer style="position:absolute;bottom:10px;left:0;font:10px/12px monospace;white-space:nowrap">Copyright / dataset creation / provenance notes</footer></section>');
       assert.deepEqual((await page.evaluate(inspectStructure)).filter(f => ['footer-overflow', 'text-overflow', 'text-overlap'].includes(f.kind)), []);
       assert.deepEqual(await page.evaluate(inspectTypography), []);
-      await page.setContent('<section style="position:relative;width:500px;height:300px;font:20px/18px monospace"><p style="position:absolute;top:20px;left:0;margin:0">Body</p></section>');
-      assert.deepEqual((await page.evaluate(inspectStructure)).filter(f => f.kind === 'text-overflow'), []);
-      await page.setContent('<section style="position:relative;width:500px;height:300px;font:20px/18px monospace"><p style="position:absolute;top:20px;left:0;margin:0"><span style="position:relative;top:-3px">Body</span></p></section>');
-      assert.ok((await page.evaluate(inspectStructure)).some(f => f.kind === 'text-overflow' && f.text === 'Body'));
+      for (const [fontSize, lineHeight, offset] of [[20, 18, 3], [40, 36, 4]]) {
+        const fixture = `<section style="position:relative;width:500px;height:300px;font:${fontSize}px/${lineHeight}px monospace"><p style="position:absolute;top:20px;left:0;margin:0">Body</p></section>`;
+        await page.setContent(fixture);
+        assert.deepEqual((await page.evaluate(inspectStructure)).filter(f => f.kind === 'text-overflow'), []);
+        for (const shift of [-offset, offset]) {
+          await page.setContent(fixture.replace('>Body</p>', `><span style="position:relative;top:${shift}px">Body</span></p>`));
+          assert.ok((await page.evaluate(inspectStructure)).some(f => f.kind === 'text-overflow' && f.text === 'Body'));
+        }
+      }
       await page.setContent('<style>section::after{content:attr(data-marpit-pagination) " / " attr(data-marpit-pagination-total);position:absolute;top:0;right:0;font:10px/12px monospace}</style><section data-marpit-pagination="1" data-marpit-pagination-total="1" style="position:relative;width:500px;height:300px;font:20px/20px monospace"><p style="position:absolute;top:20px;left:0;margin:0">Body</p><footer style="position:absolute;bottom:10px;left:0;font:10px/12px monospace;white-space:nowrap">Copyright / dataset creation / provenance notes</footer></section>');
       await page.$eval('p', p => { p.style.left = '440px'; p.style.top = '0'; });
       assert.ok((await page.evaluate(inspectStructure)).some(f => f.kind === 'footer-overflow' && f.text.startsWith('Body')));
