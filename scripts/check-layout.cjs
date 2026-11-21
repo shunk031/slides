@@ -1365,7 +1365,7 @@ async function main() {
       assert.ok(explicitBottomFigure[0].difference > 2);
       assert.ok(explicitBottomFigure[0].bottomDifference <= 1);
       assert.deepEqual(columnFindings(explicitBottomFigure), []);
-      await page.evaluate(() => { document.querySelector('img').style.transform = 'translateY(5px)'; });
+      await page.evaluate(() => { document.querySelector('img').style.transform = 'translateY(6px)'; });
       assert.equal(columnFindings(await page.evaluate(inspectColumns)).length, 1, 'explicit end still requires painted bottom equality');
       await page.evaluate(() => { document.querySelector('img').style.transform = ''; document.querySelectorAll('blockquote')[1].style.height = '200px'; });
       assert.equal(columnFindings(await page.evaluate(inspectColumns)).length, 1, 'explicit end does not replace the final text line with an empty box bottom');
