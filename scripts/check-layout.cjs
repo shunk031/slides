@@ -1269,7 +1269,7 @@ async function main() {
       await page.setContent('<style>section::after{content:attr(data-marpit-pagination) " / " attr(data-marpit-pagination-total);position:absolute;top:0;right:0;font:10px/12px monospace}</style><section data-marpit-pagination="1" data-marpit-pagination-total="1" style="position:relative;width:500px;height:300px;font:20px/20px monospace"><p style="position:absolute;top:20px;left:0;margin:0">Body</p><footer style="position:absolute;bottom:10px;left:0;font:10px/12px monospace;white-space:nowrap">Copyright / dataset creation / provenance notes</footer></section>');
       assert.deepEqual((await page.evaluate(inspectStructure)).filter(f => ['footer-overflow', 'text-overflow', 'text-overlap'].includes(f.kind)), []);
       assert.deepEqual(await page.evaluate(inspectTypography), []);
-      for (const [fontSize, lineHeight, offset] of [[20, 18, 3], [40, 36, 4]]) {
+      for (const [fontSize, lineHeight, offset] of [[20, 18, 6], [40, 36, 9]]) {
         const fixture = `<section style="position:relative;width:500px;height:300px;font:${fontSize}px/${lineHeight}px monospace"><p style="position:absolute;top:20px;left:0;margin:0">Body</p></section>`;
         await page.setContent(fixture);
         assert.deepEqual((await page.evaluate(inspectStructure)).filter(f => f.kind === 'text-overflow'), []);
