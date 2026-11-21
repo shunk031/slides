@@ -1,0 +1,248 @@
+/* @theme uec-haralab */
+/* @layouts: title-page */
+/* @utility-classes: first-slide */
+
+@import "gaia";
+
+@font-face {
+  font-family: "LINE Seed JP";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../../themes/assets/ly/fonts/LINESeedJP-Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "LINE Seed JP";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("../../themes/assets/ly/fonts/LINESeedJP-Bold.ttf") format("truetype");
+}
+
+:root {
+  --uec-font-family: "LINE Seed JP", sans-serif;
+  --uec-color-navy: #17288b;
+  --uec-color-text: #595959;
+  --uec-color-emphasis: #16843b;
+  --uec-color-background: #fff;
+
+  --uec-header-height: 102px;
+  --uec-header-mark-left: 20px;
+  --uec-header-mark-size: 46px;
+  --uec-header-title-left: 85px;
+  --uec-header-title-right: 80px;
+  --uec-header-title-size: 46px;
+  --uec-page-number-size: 28px;
+
+  --uec-content-inline: 23px;
+  --uec-content-top: 121px;
+  --uec-body-font-size: 31px;
+  --uec-body-line-height: 1.22;
+  --uec-section-heading-size: 36px;
+  --uec-section-gap: 21px;
+  --uec-list-gap: 3px;
+  --uec-list-indent: 1.15em;
+
+  --uec-cover-content-left: 73px;
+  --uec-cover-content-top: 178px;
+  --uec-cover-title-size: 54px;
+  --uec-cover-meta-size: 23px;
+  --uec-cover-presenter-size: 34px;
+  --uec-logo-width: 58px;
+  --uec-logo-right: 14px;
+  --uec-logo-bottom: 13px;
+
+  font-family: var(--uec-font-family);
+  color: var(--uec-color-text);
+  background: var(--uec-color-background);
+}
+
+section {
+  position: relative;
+  display: block;
+  box-sizing: border-box;
+  overflow: hidden;
+  color: var(--uec-color-text);
+  font-family: var(--uec-font-family);
+  background-color: var(--uec-color-background);
+}
+
+section::before {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: auto;
+  content: "";
+  background-image:
+    url("../../themes/assets/uec-haralab/haralab-logo.png"),
+    url("../../themes/assets/uec-haralab/uec-logo.png"),
+    linear-gradient(
+      to bottom,
+      var(--uec-color-navy) 0 var(--uec-header-height),
+      transparent var(--uec-header-height) 100%
+    );
+  background-repeat: no-repeat, no-repeat, no-repeat;
+  background-position:
+    left var(--uec-header-mark-left) top calc((var(--uec-header-height) - var(--uec-header-mark-size)) / 2),
+    right var(--uec-logo-right) bottom var(--uec-logo-bottom),
+    left top;
+  background-size:
+    var(--uec-header-mark-size) var(--uec-header-mark-size),
+    var(--uec-logo-width) auto,
+    100% 100%;
+}
+
+section::after {
+  position: absolute;
+  z-index: 2;
+  top: 14px;
+  right: 24px;
+  bottom: auto;
+  left: auto;
+  width: auto;
+  height: auto;
+  padding: 0;
+  content: attr(data-marpit-pagination);
+  color: white;
+  font-size: var(--uec-page-number-size);
+  line-height: 1.2;
+}
+
+section h1,
+section h2,
+section h3,
+section p,
+section ul {
+  margin-top: 0;
+}
+
+section:not(.title-page) {
+  padding: var(--uec-content-top) var(--uec-content-inline) 44px;
+  font-size: var(--uec-body-font-size);
+  line-height: var(--uec-body-line-height);
+}
+
+section:not(.title-page) > h1 {
+  position: absolute;
+  z-index: 2;
+  top: 15px;
+  right: var(--uec-header-title-right);
+  left: var(--uec-header-title-left);
+  margin: 0;
+  color: white;
+  font-size: var(--uec-header-title-size);
+  font-weight: 700;
+  line-height: 1.16;
+  text-align: left;
+  text-wrap: nowrap;
+}
+
+section:not(.title-page) > h2 {
+  margin: var(--uec-section-gap) 0 3px;
+  color: var(--uec-color-text);
+  font-size: var(--uec-section-heading-size);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+section:not(.title-page) > h2:first-of-type {
+  margin-top: 0;
+}
+
+section:not(.title-page) p {
+  margin-bottom: 5px;
+}
+
+section:not(.title-page) ul {
+  margin: 0;
+  padding-left: var(--uec-list-indent);
+  list-style: disc;
+}
+
+section:not(.title-page) ul ul {
+  list-style: circle;
+}
+
+section:not(.title-page) li {
+  padding-left: 0.08em;
+}
+
+section:not(.title-page) li + li {
+  margin-top: var(--uec-list-gap);
+}
+
+section:not(.title-page) li > ul {
+  margin-top: var(--uec-list-gap);
+}
+
+section strong {
+  color: var(--uec-color-emphasis);
+  font-weight: 700;
+}
+
+section:not(.title-page) > h1 strong,
+section:not(.title-page) > h2 strong {
+  color: inherit;
+}
+
+section.title-page.first-slide {
+  padding: var(--uec-cover-content-top) 40px 42px var(--uec-cover-content-left);
+  font-size: var(--uec-cover-meta-size);
+  line-height: 1.28;
+}
+
+section.title-page.first-slide > header {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  right: 100px;
+  left: var(--uec-header-title-left);
+  display: flex;
+  align-items: center;
+  height: var(--uec-header-height);
+  color: white;
+  font-size: 28px;
+  line-height: 1.2;
+}
+
+section.title-page.first-slide > h1 {
+  margin: 0 0 18px;
+  color: var(--uec-color-text);
+  font-size: var(--uec-cover-title-size);
+  font-weight: 700;
+  line-height: 1.1;
+  text-align: left;
+}
+
+section.title-page.first-slide > p {
+  margin: 5px 0;
+  color: var(--uec-color-text);
+  font-size: var(--uec-cover-meta-size);
+  line-height: 1.25;
+}
+
+section.title-page.first-slide > h2 {
+  margin: 29px 0 5px;
+  color: var(--uec-color-text);
+  font-size: var(--uec-cover-presenter-size);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+section.title-page.first-slide code {
+  padding: 0;
+  color: inherit;
+  background: transparent;
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+section a {
+  color: #009bb2;
+  text-decoration: underline;
+}
