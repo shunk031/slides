@@ -42,7 +42,7 @@ ID はターミナルの `ERROR <ID>` に対応します。確認候補だけは
 | `heading-soft-wrap`            | 太字だけの段落の自動改行               | 同じ明示行が複数の描画行になる                                 | `<br>` だけによる改行、太字以外が混じる見出し      |
 | `table-header-wrap`            | 表見出しの複数行表示                   | `th` が明示改行も含め 2 行以上                                 | 画像内の表                                         |
 | `text-overlap`                 | 異なるテキスト要素の重なり             | 縦横とも 2px 超の交差                                          | 同一要素内、文字と画像、一般の疑似要素             |
-| `text-overflow`                | 文字のボックス・画面外へのはみ出し     | スライド各辺・テキスト要素左右 [1px 超](../scripts/check-layout.cjs#L804-L805)（既存維持）。上下は親 computed font-size × 0.15 超（許容値は 20px で 3px、40px で 6px。実測根拠: 20px/18px で上 2px・下 1px、40px/36px で上下とも 3px の張り出し） | 画像内の文字                                       |
+| `text-overflow`                | 文字のボックス・画面外へのはみ出し     | スライド各辺・テキスト要素左右 [1px 超](https://github.com/shunk031/slides/blob/6b3c6688edc953bd6c0c5f8578b98688ed18c94c/docs/check-layout.md#L45)（全辺 1px 超の旧仕様・[実装](../scripts/check-layout.cjs#L804-L805) を踏襲）。上下は親 computed font-size × 0.15 超（許容値は 20px で 3px、40px で 6px。実測根拠: 20px/18px で上 2px・下 1px、40px/36px で上下とも 3px の張り出し） | 画像内の文字                                       |
 | `box-overflow`                 | 図・比較枠の画面外へのはみ出し         | `img` / `blockquote` の各辺 1px 超                             | DOM にない背景画像                                 |
 | `footer-overflow`              | footer・ページ番号との衝突、下端逸脱   | 実文字と縦横 2px の余白内で交差、または下端安全線を 1px 超過   | 背景・一般の疑似要素、画像内部の余白               |
 | `math-label-gap`               | 同じ表示数式内の下括弧注釈の衝突       | 注釈の描画矩形の距離が 0.25em 未満                            | 画像・別数式間、テキストを使わない注釈             |
@@ -130,7 +130,7 @@ Chrome の CSS parser でテーマを読み、`section` / `:root` と同じ comp
 
 ### text-overflow
 
-字形の Range 矩形のはみ出しを調べます。スライド各辺と要素左右は既存条件です。閾値は実装どおり [1px 超](../scripts/check-layout.cjs#L804-L805) を維持します。実測で判明した課題は上下の張り出しのみです。上下は親の font-size と比較します。許容値は親の計算値の 0.15 倍です。境界値の一致は許容し、超過のみ検出します。
+字形の Range 矩形のはみ出しを調べます。スライド各辺と要素左右は既存条件です。[旧仕様](https://github.com/shunk031/slides/blob/6b3c6688edc953bd6c0c5f8578b98688ed18c94c/docs/check-layout.md#L45) の全辺 1px 超を踏襲します。閾値は [実装](../scripts/check-layout.cjs#L804-L805) どおり 1px 超を維持します。実測で判明した課題は上下の張り出しのみです。上下は親の font-size と比較します。許容値は親の計算値の 0.15 倍です。境界値の一致は許容し、超過のみ検出します。
 
 ローカル Chrome 157 で実測しました。20px/20px は上 1px、下 0px です。20px/18px は上 2px、下 1px です。40px/36px は上下とも 3px です。この実測が相対許容値を裏付けます。グリッドキャプションは自身のボックスで測ります。すべてのクリッピングの検出は保証しません。
 
