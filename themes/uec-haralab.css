@@ -280,6 +280,14 @@ section.title-page.first-slide > p:nth-of-type(3) {
   letter-spacing: -0.015em;
 }
 
+section.title-page.first-slide > p:nth-of-type(3) a {
+  font-size: 18.25px;
+}
+
+section.title-page.first-slide > p:nth-of-type(3) a:first-of-type {
+  margin-right: 8px;
+}
+
 section.title-page.first-slide > p:nth-of-type(4) {
   margin-top: 20px;
   margin-bottom: 16px;
@@ -291,6 +299,6 @@ section.title-page.first-slide > p:nth-of-type(5) {
 }
 
 section a {
-  color: #009bb2;
+  color: #0097a7;
   text-decoration: underline;
 }
