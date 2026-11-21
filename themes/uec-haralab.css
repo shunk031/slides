@@ -180,6 +180,11 @@ section:not(.title-page) li > ul {
 }
 
 section strong {
+  color: var(--uec-color-text);
+  font-weight: 700;
+}
+
+section:not(.title-page) li strong {
   color: var(--uec-color-emphasis);
   font-weight: 700;
 }
