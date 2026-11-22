@@ -28,7 +28,7 @@
   --uec-color-background: #fff;
 
   --uec-header-height: 101px;
-  --uec-header-mark-left: 20px;
+  --uec-header-mark-left: 21px;
   --uec-header-mark-size: 46px;
   --uec-header-title-left: 84px;
   --uec-header-title-right: 80px;
@@ -226,7 +226,7 @@ section.title-page.first-slide > header {
   font-size: 25px;
   line-height: 1.2;
   letter-spacing: -0.006em;
-  transform: translateY(-2px);
+  transform: translateY(-1px);
 }
 
 section.title-page.first-slide > h1 {
