@@ -23,6 +23,20 @@ mise install
 
 `slides/` 内の全資料を変換し、`dist/<発表名>/slides.pdf` に出力します。
 
+## テーマの見本
+
+### ly
+
+| 表紙                                          | 本文                                         |
+| --------------------------------------------- | -------------------------------------------- |
+| ![ly の表紙](docs/images/themes/ly/title.png) | ![ly の本文](docs/images/themes/ly/body.png) |
+
+### uec-haralab
+
+| 表紙                                                            | 本文                                                           |
+| --------------------------------------------------------------- | -------------------------------------------------------------- |
+| ![uec-haralab の表紙](docs/images/themes/uec-haralab/title.png) | ![uec-haralab の本文](docs/images/themes/uec-haralab/body.png) |
+
 ## ドキュメント
 
 - [執筆ガイド](docs/authoring.md): 資料の追加、見出し・引用・情報分類、表紙・自己紹介、VS Code のプレビュー

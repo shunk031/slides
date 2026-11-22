@@ -19,6 +19,15 @@ run = "node scripts/check-classification.test.cjs"
 description = "改行・引用・空白・文字のはみ出しを検査し、全ページの画像を出力"
 run = "node scripts/check-layout.cjs"
 
+[tasks.readme-images]
+description = "check-layout の画像を使って README のテーマ見本と入力ハッシュを更新"
+depends = ["check-layout"]
+run = "node scripts/readme-images.cjs --write"
+
+[tasks.check-readme-images]
+description = "README のテーマ見本画像と入力ハッシュが最新か確認"
+run = "node scripts/readme-images.cjs --check"
+
 [tasks.test-layout]
 description = "改行検査が短い途中・最終行、入れ子リスト、引用を扱えるか確認"
 run = "node scripts/check-layout.cjs --self-test"
