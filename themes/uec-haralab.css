@@ -200,11 +200,12 @@ section:not(.title-page) li code {
   background: transparent;
   border: 0;
   box-shadow: none;
+  margin: 0;
   padding: 0;
-  font-family: "MS Gothic", "LINE Seed JP", monospace;
+  font-family: inherit;
   font-size: inherit;
-  font-weight: 400;
-  letter-spacing: normal;
+  font-weight: inherit;
+  letter-spacing: inherit;
 }
 
 section:not(.title-page) > h1 strong,
