@@ -195,8 +195,7 @@ section strong {
   font-weight: 700;
 }
 
-section:not(.title-page) p code,
-section:not(.title-page) li code {
+section:not(.title-page) :not(pre) > code {
   color: var(--uec-color-emphasis);
   background: transparent;
   border: 0;
