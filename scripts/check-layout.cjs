@@ -798,9 +798,12 @@ function inspectStructure() {
         while (container !== block && container.parentElement !== block) container = container.parentElement;
         // Grid/flex items can deliberately extend beyond an image-sized parent.
         const box = (hasItems ? container : block).getBoundingClientRect();
+        // Range rectangles can extend slightly beyond a line box because of platform font metrics.
+        const verticalTolerance = (parseFloat(getComputedStyle(node.parentElement).fontSize) || 0) * 0.15;
         overflow ||= [...range.getClientRects()].some(r => r.width && r.height && (
           r.left < Math.max(bounds.left, box.left) - 1 || r.right > Math.min(bounds.right, box.right) + 1 ||
-          r.top < Math.max(bounds.top, box.top) - 1 || r.bottom > Math.min(bounds.bottom, box.bottom) + 1));
+          r.top < bounds.top - 1 || r.bottom > bounds.bottom + 1 ||
+          r.top < box.top - verticalTolerance || r.bottom > box.bottom + verticalTolerance));
       }
       if (overflow) findings.push({ slide: index + 1, kind: 'text-overflow', text: block.textContent.trim() });
     }
@@ -1266,6 +1269,16 @@ async function main() {
       await page.setContent('<style>section::after{content:attr(data-marpit-pagination) " / " attr(data-marpit-pagination-total);position:absolute;top:0;right:0;font:10px/12px monospace}</style><section data-marpit-pagination="1" data-marpit-pagination-total="1" style="position:relative;width:500px;height:300px;font:20px/20px monospace"><p style="position:absolute;top:20px;left:0;margin:0">Body</p><footer style="position:absolute;bottom:10px;left:0;font:10px/12px monospace;white-space:nowrap">Copyright / dataset creation / provenance notes</footer></section>');
       assert.deepEqual((await page.evaluate(inspectStructure)).filter(f => ['footer-overflow', 'text-overflow', 'text-overlap'].includes(f.kind)), []);
       assert.deepEqual(await page.evaluate(inspectTypography), []);
+      for (const [fontSize, lineHeight, offset] of [[20, 18, 6], [40, 36, 9]]) {
+        const fixture = `<section style="position:relative;width:500px;height:300px;font:${fontSize}px/${lineHeight}px monospace"><p style="position:absolute;top:20px;left:0;margin:0">Body</p></section>`;
+        await page.setContent(fixture);
+        assert.deepEqual((await page.evaluate(inspectStructure)).filter(f => f.kind === 'text-overflow'), []);
+        for (const shift of [-offset, offset]) {
+          await page.setContent(fixture.replace('>Body</p>', `><span style="position:relative;top:${shift}px">Body</span></p>`));
+          assert.ok((await page.evaluate(inspectStructure)).some(f => f.kind === 'text-overflow' && f.text === 'Body'));
+        }
+      }
+      await page.setContent('<style>section::after{content:attr(data-marpit-pagination) " / " attr(data-marpit-pagination-total);position:absolute;top:0;right:0;font:10px/12px monospace}</style><section data-marpit-pagination="1" data-marpit-pagination-total="1" style="position:relative;width:500px;height:300px;font:20px/20px monospace"><p style="position:absolute;top:20px;left:0;margin:0">Body</p><footer style="position:absolute;bottom:10px;left:0;font:10px/12px monospace;white-space:nowrap">Copyright / dataset creation / provenance notes</footer></section>');
       await page.$eval('p', p => { p.style.left = '440px'; p.style.top = '0'; });
       assert.ok((await page.evaluate(inspectStructure)).some(f => f.kind === 'footer-overflow' && f.text.startsWith('Body')));
       await page.$eval('p', p => { p.style.left = '0'; p.style.top = '20px'; });
@@ -1352,7 +1365,7 @@ async function main() {
       assert.ok(explicitBottomFigure[0].difference > 2);
       assert.ok(explicitBottomFigure[0].bottomDifference <= 1);
       assert.deepEqual(columnFindings(explicitBottomFigure), []);
-      await page.evaluate(() => { document.querySelector('img').style.transform = 'translateY(5px)'; });
+      await page.evaluate(() => { document.querySelector('img').style.transform = 'translateY(6px)'; });
       assert.equal(columnFindings(await page.evaluate(inspectColumns)).length, 1, 'explicit end still requires painted bottom equality');
       await page.evaluate(() => { document.querySelector('img').style.transform = ''; document.querySelectorAll('blockquote')[1].style.height = '200px'; });
       assert.equal(columnFindings(await page.evaluate(inspectColumns)).length, 1, 'explicit end does not replace the final text line with an empty box bottom');
