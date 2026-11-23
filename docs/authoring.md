@@ -59,7 +59,7 @@ PDF 生成前にレイアウト検査が走り、エラーがあると生成を�
 
 ## 論文表紙と自己紹介
 
-論文表紙は、`# 論文タイトル`、著者、著者所属、論文リンク、発表者情報の引用ブロック、注記の引用ブロック、ロゴ画像の順に書きます。発表者情報は所属・氏名・リンクの 3 段落です。`paper-title` が配置、`title-slide-big` が背景を指定するため、サンプルの段落順を保って内容を差し替えてください。CSS の領域名は順に `paper-title`・`authors`・`affiliations`・`links`・`presenter`・`note`・`logo` です。
+論文表紙は、`# 論文タイトル`、著者、著者所属、論文リンク、発表者情報の引用ブロック、注記の引用ブロック、ロゴ画像の順に書きます。発表者情報は所属・氏名・リンクの 3 段落です。`paper-title` が配置、`title-slide-big` が背景を指定するため、サンプルの段落順を保って内容を差し替えてください。
 
 表紙の `_テキスト_` は斜体の代わりに白いハイライトを付けます。背景は文字のある行だけ白くなり、ボックスの残りには装飾が残ります。タイトルの行高を縮めるときは、`g` などの下端が次行のハイライトに隠れないか確認します。ロゴは [Wikimedia Commons の SVG](https://upload.wikimedia.org/wikipedia/commons/6/68/LY_Corp_logo.svg) を `themes/assets/ly/logo.svg` に保存しています。
 
@@ -69,4 +69,4 @@ PDF 生成前にレイアウト検査が走り、エラーがあると生成を�
 
 ## VS Code のプレビュー
 
-編集には VS Code と推奨拡張の [Marp for VS Code](https://marketplace.visualstudio.com/items?itemName=marp-team.marp-vscode) も使えます。ローカルの `ly` テーマは `.vscode/settings.json` に登録済みです。ただし、VS Code の Marp プレビューはリポジトリの engine プラグイン（情報分類・数式の検証、括弧補足のサイズ調整）を実行しません。正確な表示は `mise run preview` のブラウザで確認してください。
+編集には VS Code と推奨拡張の [Marp for VS Code](https://marketplace.visualstudio.com/items?itemName=marp-team.marp-vscode) も使えます。ただし、VS Code の Marp プレビューはリポジトリの engine プラグイン（情報分類・数式の検証、括弧補足のサイズ調整）を実行しません。正確な表示は `mise run preview` のブラウザで確認してください。
