@@ -11,8 +11,6 @@
 
 ## uec-haralab
 
-実際の構成は [サンプル](../slides/example-uec-haralab/slides.md)、共通設定は [themes/uec-haralab.css](../themes/uec-haralab.css) を参照してください。
-
 | レイアウト | 指定するクラス・用途                                                   |
 | ---------- | ---------------------------------------------------------------------- |
 | 表紙       | `title-page first-slide`：イベント名、題目、発表者情報、連絡先を配置   |
