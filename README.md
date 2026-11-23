@@ -1,6 +1,6 @@
 # slides
 
-Marp で論文紹介や技術発表のスライドを書くリポジトリです。
+Marp で論文紹介や技術発表のスライドを書くリポジトリです。Markdown・テーマ CSS・画像を管理し、PDF は手元で生成します。執筆には Codex / Claude Code も使えます。
 
 ## セットアップ
 
@@ -25,6 +25,8 @@ mise install
 
 ## テーマの見本
 
+各テーマのサンプルスライドから、表紙と本文の例を掲載しています。テーマや対象のサンプルスライドを変更した場合は `mise run readme-images` で見本画像を更新してください。CI の `check-readme-images` で画像の更新漏れを検出します。
+
 ### ly
 
 | 表紙                                                        | 本文                                                       |
@@ -39,9 +41,9 @@ mise install
 
 ## ドキュメント
 
-- [執筆ガイド](docs/authoring.md)
+- [執筆ガイド](docs/authoring.md): 資料の追加、見出し・引用・情報分類、表紙・自己紹介、VS Code のプレビュー
 - [テーマガイド](docs/theme.md)
-- [レイアウト検査](docs/check-layout.md)
-- [CI](docs/ci.md)
+- [レイアウト検査](docs/check-layout.md): 実行方法、出力ファイル、検査条件・閾値・限界
+- [CI](docs/ci.md): ワークフロー、公開前検査、必須チェックの設定
 
-Codex / Claude Code の執筆ルールは [AGENTS.md](AGENTS.md) にあります。
+Codex / Claude Code の執筆ルールは [AGENTS.md](AGENTS.md) にあります。`CLAUDE.md` は同じファイルへのシンボリックリンクです。
