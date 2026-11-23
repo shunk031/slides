@@ -42,7 +42,7 @@ mise install
 ## ドキュメント
 
 - [執筆ガイド](docs/authoring.md): 資料の追加、見出し・引用・情報分類、表紙・自己紹介、VS Code のプレビュー
-- [テーマガイド](docs/theme.md): `ly` のレイアウト、共通変数・デバッグ枠、テーマの追加
+- [テーマガイド](docs/theme.md)
 - [レイアウト検査](docs/check-layout.md): 実行方法、出力ファイル、検査条件・閾値・限界
 - [CI](docs/ci.md): ワークフロー、公開前検査、必須チェックの設定
 
