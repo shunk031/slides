@@ -1,6 +1,6 @@
 # レイアウト検査の仕様
 
-`mise run check-layout` は Chrome で実際に描画し、フォントと画像の読み込み後に改行・配置・表記を検査します。実装は [scripts/check-layout.cjs](../scripts/check-layout.cjs) です。実行手順と出力先は [実行方法](#実行方法) を参照してください。
+`mise run check-layout` は Chrome で実際に描画し、フォントと画像の読み込み後に改行・配置・表記を検査します。実行手順と出力先は [実行方法](#実行方法) を参照してください。
 
 検査エラーはすべて終了コード 1 になり、`mise run pdf` の PDF 生成も止めます。人が判断する `Space review` の空白候補と `demonstrative` の表現候補は、この停止条件に含めません。
 
