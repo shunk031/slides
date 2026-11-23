@@ -20,6 +20,9 @@ jobs:
         run: node scripts/check-release.test.cjs
       - name: Check release classes
         run: mise run check-release
+      - name: Check README theme previews
+        if: ${{ !cancelled() }}
+        run: mise run check-readme-images
       - name: Test classification
         if: ${{ !cancelled() }}
         run: mise run test

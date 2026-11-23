@@ -1,0 +1,127 @@
+{
+  "version": 1,
+  "inputs": [
+    {
+      "path": ".marprc.cjs",
+      "sha256": "cc8fe8fa368ba91a26060c220254381b1f1a379401df2948730bc06de8b866dd"
+    },
+    {
+      "path": "mise.toml",
+      "sha256": "0844695d95d9578ceb1c5c7fd35872e8ce24c081a7eb513a95cd78320a11b530"
+    },
+    {
+      "path": "scripts/check-classification.cjs",
+      "sha256": "afbea5dcbfacade6cdbfcf4afe2347768bc644a0466097b3034d646699e9d968"
+    },
+    {
+      "path": "scripts/check-layout.cjs",
+      "sha256": "b0c47ba6d3aad4a40708db5df554e91276f16c7021a17309852854dfbb60ef85"
+    },
+    {
+      "path": "scripts/check-math.cjs",
+      "sha256": "08f983de7c1c747b10a842efc42b63c7d444e40031ce643c19cdc8d600f5c36d"
+    },
+    {
+      "path": "scripts/parenthesis-supplements.cjs",
+      "sha256": "d53a6bdbb469c9d361611c5a9c695ea24327d893025dbced77c6809af12ee6c1"
+    },
+    {
+      "path": "scripts/readme-images.cjs",
+      "sha256": "3375b814c2352d058df5ff4af2fad31a5b904a0b5b9c806c5a6183c1fc08fa94"
+    },
+    {
+      "path": "slides/example-uec-haralab/slides.md",
+      "sha256": "2ed209ccfc6e65289cff9ad3d4c897f2dd5042f118a2dfea9aca579feed4a64c"
+    },
+    {
+      "path": "slides/example/assets/kitada-kita.jpg",
+      "sha256": "347fd7017106956e27cf99479ae9c7022fc259f9e50e087735836c85151cda82"
+    },
+    {
+      "path": "slides/example/assets/kitada-ly.jpg",
+      "sha256": "65e20341d8286698f4e2cdd0143e444092e521ffcf3a2e84d73a870a91f1d754"
+    },
+    {
+      "path": "slides/example/assets/layout-chart.svg",
+      "sha256": "f7c1a0a59e572dd426f243ae8db8bcbfad5b901cdd7cdc24ac19c5baaae2319e"
+    },
+    {
+      "path": "slides/example/assets/layout-flow.svg",
+      "sha256": "e549345b171ba52bfc6a76cbe26b10ac19185f8564a1f5787e2a7ae0d34c7fb8"
+    },
+    {
+      "path": "slides/example/assets/layout-pipeline.svg",
+      "sha256": "62e7f1c655d4bcc37a2547478ecfa5408fb39d142e88e0dafe5051f74f25aa2f"
+    },
+    {
+      "path": "slides/example/slides.md",
+      "sha256": "81c012ca459677dfd044893dc33073e6b4c6014d1683763e6cbbaab31d899861"
+    },
+    {
+      "path": "themes/assets/ly/background.svg",
+      "sha256": "28b9d0c394e30b9243bae89c03fbc584902360558f6fb1e3e65a8d0cd08bb1e7"
+    },
+    {
+      "path": "themes/assets/ly/fonts/LINESeedJP-Bold.ttf",
+      "sha256": "67aec2dc10b3ad210d6f7d53b33bbfea42ea28e32fa3834624eee699a638d5ff"
+    },
+    {
+      "path": "themes/assets/ly/fonts/LINESeedJP-Regular.ttf",
+      "sha256": "04a6c0077ddb8ba5af3638bd76b4600708dde7b38df047b40fbe6f3af358d3c3"
+    },
+    {
+      "path": "themes/assets/ly/fonts/OFL.txt",
+      "sha256": "1cfc3752ddd076bc7d461b6680e42a345f2579f91319fa04192b754b3b993f65"
+    },
+    {
+      "path": "themes/assets/ly/fonts/README.md",
+      "sha256": "0317f82ed76c844628721f479433ec93bc03fd568db4e4174d389309936a830a"
+    },
+    {
+      "path": "themes/assets/ly/gray.svg",
+      "sha256": "34b5f6bcabc34a2bde805e629a4fceb1953c9b1078eb706c6930a79532c3e164"
+    },
+    {
+      "path": "themes/assets/ly/logo.svg",
+      "sha256": "a335b1974163b28a69d26abc1604feea596a25f26d8ed30b2947f98f3cdb1b1a"
+    },
+    {
+      "path": "themes/assets/ly/title.svg",
+      "sha256": "7bd1cc9106b9e0812fd5c3f905533dd2a6ee2d640202307eb7e125f2d7b92f5d"
+    },
+    {
+      "path": "themes/assets/uec-haralab/haralab-logo.png",
+      "sha256": "01e8a546d164986285bb68474825b01373df939cc90d8526d12cbb71c31aa764"
+    },
+    {
+      "path": "themes/assets/uec-haralab/uec-logo.png",
+      "sha256": "47bbdd5d74dc87409101ab4f4e51d9cf58d6b7b540d74e0c6bc2285e0f6ffbd7"
+    },
+    {
+      "path": "themes/ly.css",
+      "sha256": "dc243d05e14595d2767ad0d34c0be7cc3852918494edb869d23ad165abf9d034"
+    },
+    {
+      "path": "themes/uec-haralab.css",
+      "sha256": "3ab6ba3e5e264286302547204b2f69e6e357da8d3142efa40b5f97bcae97a715"
+    }
+  ],
+  "outputs": [
+    {
+      "path": "docs/images/themes/ly/body.png",
+      "sha256": "97fe7626172730ec342677db6d51d7d8910ce0ced8dc5f5217f0afd7a5d8add8"
+    },
+    {
+      "path": "docs/images/themes/ly/title.png",
+      "sha256": "a9d39d4d011c5e8b227185ebd9e43c9ad101189129ec18f57255ef3fec2fd597"
+    },
+    {
+      "path": "docs/images/themes/uec-haralab/body.png",
+      "sha256": "9fa6ec18f8e977feeaec531211fd4b44a4e2668e52a7fb03191cad346b8441fc"
+    },
+    {
+      "path": "docs/images/themes/uec-haralab/title.png",
+      "sha256": "b72c45a79f54b0b1019b4ae232706308cef7f03d0280d0a24f6f2914eb6d1ced"
+    }
+  ]
+}
