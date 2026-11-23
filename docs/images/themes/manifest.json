@@ -55,7 +55,7 @@
     },
     {
       "path": "slides/example/slides.md",
-      "sha256": "81c012ca459677dfd044893dc33073e6b4c6014d1683763e6cbbaab31d899861"
+      "sha256": "7e756ad7ff52a2849bea651b8d8e83c7382c7f76937be68fafe7762bacccd82a"
     },
     {
       "path": "themes/assets/ly/background.svg",
@@ -99,7 +99,7 @@
     },
     {
       "path": "themes/ly.css",
-      "sha256": "dc243d05e14595d2767ad0d34c0be7cc3852918494edb869d23ad165abf9d034"
+      "sha256": "4028939d9bcfa0ca135db76850341d95e7acddf6883148d91f4b084a18f9ba03"
     },
     {
       "path": "themes/uec-haralab.css",
@@ -113,7 +113,7 @@
     },
     {
       "path": "docs/images/themes/ly/title.png",
-      "sha256": "a9d39d4d011c5e8b227185ebd9e43c9ad101189129ec18f57255ef3fec2fd597"
+      "sha256": "c7fdd2ff61e8343dc2bf8fbc91a15d22d3fdb67cc53ed3f623e0a6bcdd25b865"
     },
     {
       "path": "docs/images/themes/uec-haralab/body.png",

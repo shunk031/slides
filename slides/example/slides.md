@@ -6,6 +6,7 @@ size: 16:9
 lang: ja
 footer: © LY Corporation
 _class: paper-title title-slide-big first-slide classification-public
+_header: イベント・発表会名
 paginate: true
 _paginate: false
 ---

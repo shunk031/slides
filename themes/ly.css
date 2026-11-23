@@ -298,6 +298,7 @@ section.paper-title {
   --paper-column-gap: 24px;
   --paper-title-width: 1080px;
   --paper-title-font-size: 50px;
+  --paper-event-font-size: 14px;
   /* Keep the next line's highlight clear of LINE Seed JP descenders. */
   --paper-title-line-height: 1.25;
   --paper-authors-width: 940px;
@@ -332,6 +333,21 @@ section.paper-title {
   font-size: var(--paper-info-font-size);
   line-height: var(--paper-line-height);
   letter-spacing: var(--paper-letter-spacing);
+}
+
+section.paper-title > header {
+  position: absolute;
+  top: var(--slide-top);
+  left: var(--slide-padding);
+  right: auto;
+  bottom: auto;
+  width: max-content;
+  height: auto;
+  padding: 0;
+  overflow: visible;
+  font-size: var(--paper-event-font-size);
+  line-height: var(--top-row-height);
+  color: var(--color-muted);
 }
 
 section.paper-title > :is(h1, p, blockquote) {
