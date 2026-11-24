@@ -222,7 +222,7 @@ section:not(.title-page) > h2 strong {
 }
 
 section.title-page.first-slide {
-  --uec-color-text: #5a5a5a;
+  --uec-color-text: #595959;
   --uec-logo-bottom: 12px;
 
   padding: var(--uec-cover-content-top) 40px 42px var(--uec-cover-content-left);
