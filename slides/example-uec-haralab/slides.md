@@ -8,19 +8,35 @@ _paginate: false
 ---
 
 <!-- _class: title-page first-slide -->
-<!-- _header: イベント・発表会名 -->
+<!-- _header: Example seminar title -->
 
-# 大規模データ処理の最適化と<br>効率的な性能評価手法の確立
+# Example Paper Title<br>with the Second Title Line<br>and the Third Title Line
 
-著者 氏名
+Author One, Author Two, and colleagues
 
-電気通信大学 大学院情報理工学研究科
+Example University, Department of Computing<br>Author contribution and ordering note
 
-[https://example.com](https://example.com)
+[Paper](https://example.com) | [Project](https://example.com)
 
-## 発表者 氏名
+Figures and equations in this talk are attributed to their original sources.
 
-電気通信大学 大学院情報理工学研究科 原研究室
+## Presenter Name
+
+Example University, Research Laboratory
+
+`presenter@example.com`
+
+---
+
+<!-- _class: title-page first-slide centered -->
+<!-- _paginate: false -->
+<!-- _header: Example research talk -->
+
+# Example Talk Title<br>with a Second Title Line
+
+## Presenter Name
+
+Example University, Research Laboratory
 
 `presenter@example.com`
 

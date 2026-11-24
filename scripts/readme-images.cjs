@@ -4,7 +4,7 @@ const path = require('node:path');
 
 const previews = [
   { theme: 'ly', input: 'slides/example/slides.md', titlePage: 1, bodyPage: 3 },
-  { theme: 'uec-haralab', input: 'slides/example-uec-haralab/slides.md', titlePage: 1, bodyPage: 2 },
+  { theme: 'uec-haralab', input: 'slides/example-uec-haralab/slides.md', titlePage: 1, bodyPage: 3 },
 ];
 const outputRoot = 'docs/images/themes';
 const manifestPath = path.join(outputRoot, 'manifest.json');

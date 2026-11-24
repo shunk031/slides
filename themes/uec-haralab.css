@@ -1,5 +1,5 @@
 /* @theme uec-haralab */
-/* @layouts: title-page */
+/* @layouts: title-page centered */
 /* @utility-classes: first-slide */
 
 @import "gaia";
@@ -54,10 +54,16 @@
   --uec-cover-content-top: 171px;
   --uec-cover-title-size: 50px;
   --uec-cover-title-tracking: -0.003em;
-  --uec-cover-meta-size: 18.5px;
+  --uec-cover-meta-size: 17.6px;
   --uec-cover-meta-tracking: -0.05em;
   --uec-cover-presenter-size: 32px;
   --uec-cover-presenter-tracking: -0.003em;
+  --uec-cover-centered-content-top: 190px;
+  --uec-cover-centered-title-size: 64px;
+  --uec-cover-centered-title-color: #434343;
+  --uec-cover-centered-presenter-size: 50px;
+  --uec-cover-centered-meta-size: 36px;
+  --uec-cover-centered-email-size: 32px;
   --uec-logo-width: 66px;
   --uec-logo-right: 11px;
   --uec-logo-bottom: 11px;
@@ -216,6 +222,9 @@ section:not(.title-page) > h2 strong {
 }
 
 section.title-page.first-slide {
+  --uec-color-text: #5a5a5a;
+  --uec-logo-bottom: 12px;
+
   padding: var(--uec-cover-content-top) 40px 42px var(--uec-cover-content-left);
   font-size: var(--uec-cover-meta-size);
   line-height: 1.28;
@@ -257,7 +266,7 @@ section.title-page.first-slide > p {
 }
 
 section.title-page.first-slide > h2 {
-  margin: 0 0 18px;
+  margin: 0 0 17.5px;
   color: var(--uec-color-text);
   font-size: var(--uec-cover-presenter-size);
   letter-spacing: var(--uec-cover-presenter-tracking);
@@ -273,7 +282,7 @@ section.title-page.first-slide code {
   color: inherit;
   background: transparent;
   font-family: "Courier New", Courier, monospace;
-  font-size: 17px;
+  font-size: 18px;
   font-weight: 700;
   letter-spacing: 0.025em;
 }
@@ -284,14 +293,17 @@ section.title-page.first-slide > p:nth-of-type(1) {
 
 section.title-page.first-slide > p:nth-of-type(2) {
   letter-spacing: -0.02em;
+  margin-top: 18px;
+  line-height: 1.2;
 }
 
 section.title-page.first-slide > p:nth-of-type(3) {
+  margin-top: 17.5px;
   letter-spacing: -0.015em;
 }
 
 section.title-page.first-slide > p:nth-of-type(3) a {
-  font-size: 18.25px;
+  font-size: 17.6px;
 }
 
 section.title-page.first-slide > p:nth-of-type(3) a:first-of-type {
@@ -299,13 +311,72 @@ section.title-page.first-slide > p:nth-of-type(3) a:first-of-type {
 }
 
 section.title-page.first-slide > p:nth-of-type(4) {
-  margin-top: 20px;
-  margin-bottom: 16px;
-  letter-spacing: -0.039em;
+  margin-top: 21px;
+  margin-bottom: 17px;
+  color: #000;
 }
 
 section.title-page.first-slide > p:nth-of-type(5) {
+  margin-top: 17.5px;
+  margin-bottom: 5px;
+  letter-spacing: -0.02em;
+}
+
+section.title-page.first-slide > p:nth-of-type(6) {
+  margin-top: 7.5px;
   letter-spacing: -0.045em;
+}
+
+section.title-page.centered {
+  padding: var(--uec-cover-centered-content-top) 40px 42px;
+  text-align: center;
+}
+
+section.title-page.centered > h1 {
+  margin-bottom: 24px;
+  color: var(--uec-cover-centered-title-color);
+  font-size: var(--uec-cover-centered-title-size);
+  letter-spacing: var(--uec-cover-title-tracking);
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+}
+
+section.title-page.centered > h2 {
+  margin: 0 0 18px;
+  color: var(--uec-color-text);
+  font-size: var(--uec-cover-centered-presenter-size);
+  letter-spacing: var(--uec-cover-presenter-tracking);
+  font-weight: 400;
+  line-height: 1.2;
+  text-align: center;
+}
+
+section.title-page.centered > p {
+  margin: 15px 0;
+  color: var(--uec-color-text);
+  font-size: var(--uec-cover-centered-meta-size);
+  line-height: 1.25;
+  text-align: center;
+}
+
+section.title-page.centered > p:nth-of-type(1) {
+  margin-bottom: 1px;
+}
+
+section.title-page.centered > p:nth-of-type(2) {
+  margin-top: 1px;
+}
+
+section.title-page.centered code {
+  position: static;
+  padding: 0;
+  color: inherit;
+  background: transparent;
+  font-family: "Courier New", Courier, monospace;
+  font-size: var(--uec-cover-centered-email-size);
+  font-weight: 700;
+  letter-spacing: 0.025em;
 }
 
 section a {
