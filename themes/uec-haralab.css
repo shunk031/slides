@@ -45,6 +45,8 @@
   --uec-body-tracking: -0.001em;
   --uec-section-heading-tracking: -0.001em;
   --uec-section-gap: 25px;
+  --citation-font-size: 20px;
+  --figure-caption-font-size: 20px;
   --uec-list-gap: 7px;
   --uec-list-indent: 1.5em;
 
@@ -309,4 +311,19 @@ section.title-page.first-slide > p:nth-of-type(5) {
 section a {
   color: #0097a7;
   text-decoration: underline;
+}
+
+/* Parenthetical supplements and citations share the ly theme's size and style. */
+section .paren { font-size: var(--citation-font-size); }
+
+section:not(.title-page) :is(p, li) > em,
+section :is(p, li) > em:has(> a) {
+  font-size: var(--citation-font-size);
+  font-style: normal;
+}
+
+/* Tables sit centered in the content area. */
+section table {
+  margin-left: auto;
+  margin-right: auto;
 }

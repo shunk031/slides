@@ -103,25 +103,25 @@
     },
     {
       "path": "themes/uec-haralab.css",
-      "sha256": "3ab6ba3e5e264286302547204b2f69e6e357da8d3142efa40b5f97bcae97a715"
+      "sha256": "7eb728c8d28ea2ee26de1f3d5bf54f497cf0d1b7bf414d69c3d15eaa2beb1d77"
     }
   ],
   "outputs": [
     {
       "path": "docs/images/themes/ly/body.png",
-      "sha256": "97fe7626172730ec342677db6d51d7d8910ce0ced8dc5f5217f0afd7a5d8add8"
+      "sha256": "dca2dcccf7f347c149ee887ef5945b97f0db4b91d92405d7130aa5cb3bc8b926"
     },
     {
       "path": "docs/images/themes/ly/title.png",
-      "sha256": "c7fdd2ff61e8343dc2bf8fbc91a15d22d3fdb67cc53ed3f623e0a6bcdd25b865"
+      "sha256": "62d652701d0429d4bfa2bc1aa17ec669978b8372f062927d2a0beb141e12e365"
     },
     {
       "path": "docs/images/themes/uec-haralab/body.png",
-      "sha256": "9fa6ec18f8e977feeaec531211fd4b44a4e2668e52a7fb03191cad346b8441fc"
+      "sha256": "31b8c488e9495e4be7dcb30043f14237c1a2c0aafd99806ac841e50dcb5dae14"
     },
     {
       "path": "docs/images/themes/uec-haralab/title.png",
-      "sha256": "b72c45a79f54b0b1019b4ae232706308cef7f03d0280d0a24f6f2914eb6d1ced"
+      "sha256": "2d6f36742b8eb9e331ca18b90ef084c3fcd52716bb9a8c571419f071e46638d8"
     }
   ]
 }
