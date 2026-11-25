@@ -27,11 +27,11 @@
     },
     {
       "path": "scripts/readme-images.cjs",
-      "sha256": "3375b814c2352d058df5ff4af2fad31a5b904a0b5b9c806c5a6183c1fc08fa94"
+      "sha256": "87ca8862ca508b8dac61cc34878bcebe2e0d49fd91ffc28e3d6d9d8a333d6c20"
     },
     {
       "path": "slides/example-uec-haralab/slides.md",
-      "sha256": "2ed209ccfc6e65289cff9ad3d4c897f2dd5042f118a2dfea9aca579feed4a64c"
+      "sha256": "ba30f1caf57ebac9385fe66e047eedacf2d5bef04aa7caf6eb69f16dba1716d3"
     },
     {
       "path": "slides/example/assets/kitada-kita.jpg",
@@ -103,25 +103,29 @@
     },
     {
       "path": "themes/uec-haralab.css",
-      "sha256": "7eb728c8d28ea2ee26de1f3d5bf54f497cf0d1b7bf414d69c3d15eaa2beb1d77"
+      "sha256": "cb830f25f86bfe1c34fedf34df5c748f22a3865258a8e90a3728923c5ba5a9ec"
     }
   ],
   "outputs": [
     {
       "path": "docs/images/themes/ly/body.png",
-      "sha256": "dca2dcccf7f347c149ee887ef5945b97f0db4b91d92405d7130aa5cb3bc8b926"
+      "sha256": "97fe7626172730ec342677db6d51d7d8910ce0ced8dc5f5217f0afd7a5d8add8"
     },
     {
       "path": "docs/images/themes/ly/title.png",
-      "sha256": "62d652701d0429d4bfa2bc1aa17ec669978b8372f062927d2a0beb141e12e365"
+      "sha256": "c7fdd2ff61e8343dc2bf8fbc91a15d22d3fdb67cc53ed3f623e0a6bcdd25b865"
     },
     {
       "path": "docs/images/themes/uec-haralab/body.png",
-      "sha256": "31b8c488e9495e4be7dcb30043f14237c1a2c0aafd99806ac841e50dcb5dae14"
+      "sha256": "3d8e03b01daa10eb128aaad986aa18e65e382327347753a861da5d719db15ec9"
+    },
+    {
+      "path": "docs/images/themes/uec-haralab/title-centered.png",
+      "sha256": "16318d949f89fc54eeef7ff5ca1b0c401d69da22f8fc34d327e5fde193d516ae"
     },
     {
       "path": "docs/images/themes/uec-haralab/title.png",
-      "sha256": "2d6f36742b8eb9e331ca18b90ef084c3fcd52716bb9a8c571419f071e46638d8"
+      "sha256": "945a4a8cede36f1d539e1f4575452571ab9ed082c1ae302fa06d6b98aceec909"
     }
   ]
 }

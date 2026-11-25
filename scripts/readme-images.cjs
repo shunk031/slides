@@ -4,7 +4,7 @@ const path = require('node:path');
 
 const previews = [
   { theme: 'ly', input: 'slides/example/slides.md', titlePage: 1, bodyPage: 3 },
-  { theme: 'uec-haralab', input: 'slides/example-uec-haralab/slides.md', titlePage: 1, bodyPage: 2 },
+  { theme: 'uec-haralab', input: 'slides/example-uec-haralab/slides.md', titlePage: 1, centeredPage: 2, bodyPage: 3 },
 ];
 const outputRoot = 'docs/images/themes';
 const manifestPath = path.join(outputRoot, 'manifest.json');
@@ -49,6 +49,7 @@ function hashFile(file) {
 function outputFiles() {
   return previews.flatMap(preview => [
     { path: `${outputRoot}/${preview.theme}/title.png`, source: reviewImage(preview, preview.titlePage) },
+    ...(preview.centeredPage ? [{ path: `${outputRoot}/${preview.theme}/title-centered.png`, source: reviewImage(preview, preview.centeredPage) }] : []),
     { path: `${outputRoot}/${preview.theme}/body.png`, source: reviewImage(preview, preview.bodyPage) },
   ]).sort((a, b) => a.path.localeCompare(b.path));
 }
