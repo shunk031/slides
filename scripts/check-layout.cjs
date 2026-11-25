@@ -1190,7 +1190,10 @@ async function main() {
         const affiliation = slide.querySelector(':scope > p:nth-of-type(1)');
         const contact = slide.querySelector(':scope > p:nth-of-type(2)');
         return {
+          titleOutline: getComputedStyle(title).outlineStyle,
           presenterOutline: getComputedStyle(presenter).outlineStyle,
+          affiliationOutline: getComputedStyle(affiliation).outlineStyle,
+          contactOutline: getComputedStyle(contact).outlineStyle,
           titleLabel: getComputedStyle(title, '::after').content,
           presenterLabel: getComputedStyle(presenter, '::after').content,
           affiliationLabel: getComputedStyle(affiliation, '::after').content,
@@ -1198,7 +1201,10 @@ async function main() {
         };
       });
       assert.deepEqual(debugTitlePageStyles, {
+        titleOutline: 'solid',
         presenterOutline: 'solid',
+        affiliationOutline: 'solid',
+        contactOutline: 'solid',
         titleLabel: '"論文タイトル用"',
         presenterLabel: '"発表者名用"',
         affiliationLabel: '"所属用"',

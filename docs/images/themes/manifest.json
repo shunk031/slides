@@ -15,7 +15,7 @@
     },
     {
       "path": "scripts/check-layout.cjs",
-      "sha256": "9c8eac038656712e0561b137be9362cc387f198aa304eff038d9a333a3142633"
+      "sha256": "4b34b326b5888ed5e2aff5c6864c979c854a3560102c74cdc8d2ed938fce6856"
     },
     {
       "path": "scripts/check-math.cjs",
