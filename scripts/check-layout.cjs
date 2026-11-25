@@ -1152,6 +1152,64 @@ async function main() {
       assert.ok(phraseLines.find(block => block.slide === 2 && block.element === 'h1')?.lines.length > 1, 'the long content-slide heading must wrap');
       const phraseWraps = await page.evaluate(inspectMidwordWraps);
       assert.deepEqual(phraseWraps, [], `Japanese titles, headings, and body text must not break inside words: ${JSON.stringify(phraseWraps)}`);
+      const debugFixture = path.resolve('scripts/fixtures/uec-debug-layout.md');
+      const debugHTML = execFileSync('marp', ['--template', 'bare', debugFixture, '-o', '-'], { encoding: 'utf8', maxBuffer: 20 * 1024 * 1024 });
+      const debugBase = pathToFileURL(path.dirname(debugFixture) + path.sep).href;
+      await page.setContent(debugHTML.replace('<head>', `<head><base href="${debugBase}">`));
+      await page.evaluate(() => document.fonts.ready);
+      const debugStyles = await page.evaluate(() => {
+        const slide = document.querySelector('section.debug-layout');
+        const heading = slide.querySelector('h1');
+        const paragraph = slide.querySelector('p');
+        const code = slide.querySelector('code');
+        return {
+          elementOutline: getComputedStyle(heading).outlineStyle,
+          paragraphOutline: getComputedStyle(paragraph).outlineStyle,
+          codeOutline: getComputedStyle(code).outlineStyle,
+          beforeOutline: getComputedStyle(slide, '::before').outlineStyle,
+          afterOutline: getComputedStyle(slide, '::after').outlineStyle,
+          headingLabel: getComputedStyle(heading, '::after').content,
+          paragraphLabel: getComputedStyle(paragraph, '::after').content,
+          codeLabel: getComputedStyle(code, '::after').content,
+        };
+      });
+      assert.deepEqual(debugStyles, {
+        elementOutline: 'solid',
+        paragraphOutline: 'solid',
+        codeOutline: 'solid',
+        beforeOutline: 'dashed',
+        afterOutline: 'dashed',
+        headingLabel: '"タイトル用"',
+        paragraphLabel: '"本文用"',
+        codeLabel: '"コード用"',
+      });
+      const debugTitlePageStyles = await page.evaluate(() => {
+        const slide = document.querySelector('section.debug-layout.title-page');
+        const title = slide.querySelector(':scope > h1');
+        const presenter = slide.querySelector(':scope > h2');
+        const affiliation = slide.querySelector(':scope > p:nth-of-type(1)');
+        const contact = slide.querySelector(':scope > p:nth-of-type(2)');
+        return {
+          titleOutline: getComputedStyle(title).outlineStyle,
+          presenterOutline: getComputedStyle(presenter).outlineStyle,
+          affiliationOutline: getComputedStyle(affiliation).outlineStyle,
+          contactOutline: getComputedStyle(contact).outlineStyle,
+          titleLabel: getComputedStyle(title, '::after').content,
+          presenterLabel: getComputedStyle(presenter, '::after').content,
+          affiliationLabel: getComputedStyle(affiliation, '::after').content,
+          contactLabel: getComputedStyle(contact, '::after').content,
+        };
+      });
+      assert.deepEqual(debugTitlePageStyles, {
+        titleOutline: 'solid',
+        presenterOutline: 'solid',
+        affiliationOutline: 'solid',
+        contactOutline: 'solid',
+        titleLabel: '"論文タイトル用"',
+        presenterLabel: '"発表者名用"',
+        affiliationLabel: '"所属用"',
+        contactLabel: '"連絡先用"',
+      });
       await page.setContent('<section lang="ja" style="font:20px/30px sans-serif;word-break:auto-phrase;text-wrap:pretty"><p style="width:70px;margin:0">意図 どおり</p></section>');
       assert.deepEqual(await page.evaluate(inspectMidwordWraps), []);
       await page.setContent('<section style="font:20px monospace"><p style="width:80px;margin:0;word-break:break-all">ABCDEFGHIJKL</p></section>');
