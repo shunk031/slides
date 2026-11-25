@@ -31,7 +31,7 @@
     },
     {
       "path": "slides/example-uec-haralab/slides.md",
-      "sha256": "ba30f1caf57ebac9385fe66e047eedacf2d5bef04aa7caf6eb69f16dba1716d3"
+      "sha256": "8e0a7b10bd6bc5655e56299785bce1bc1d3dafc072fa8b3c7bdac6def0692baa"
     },
     {
       "path": "slides/example/assets/kitada-kita.jpg",
@@ -121,11 +121,11 @@
     },
     {
       "path": "docs/images/themes/uec-haralab/title-centered.png",
-      "sha256": "1292f195693941eb80bcb6e6d08a044a7d57941c2e0ec3cd48b9f21dbf5486de"
+      "sha256": "819b86497b93f1695e0c679144f6673d59cf69a300b4f231dc7a43c486865e89"
     },
     {
       "path": "docs/images/themes/uec-haralab/title.png",
-      "sha256": "c9a20ff3a3cae0f995e41f2d2aca1305a31cda498c9b56d9f5b8386289055861"
+      "sha256": "197aef31fb055360389818d8e2bb2d7af7f10138bcbbcd1104c1d8d2969025f6"
     }
   ]
 }
