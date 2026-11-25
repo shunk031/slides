@@ -58,7 +58,6 @@
   --uec-cover-meta-tracking: -0.05em;
   --uec-cover-presenter-size: 32px;
   --uec-cover-presenter-tracking: -0.003em;
-  --uec-cover-centered-content-top: 190px;
   --uec-cover-centered-title-size: 64px;
   --uec-cover-centered-title-color: #434343;
   --uec-cover-centered-presenter-size: 50px;
@@ -328,12 +327,16 @@ section.title-page.first-slide > p:nth-of-type(6) {
 }
 
 section.title-page.centered {
-  padding: var(--uec-cover-centered-content-top) 40px 42px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--uec-header-height) 40px 0;
   text-align: center;
 }
 
 section.title-page.centered > h1 {
-  margin-bottom: 24px;
+  margin: 0 0 24px;
   color: var(--uec-cover-centered-title-color);
   font-size: var(--uec-cover-centered-title-size);
   letter-spacing: var(--uec-cover-title-tracking);
@@ -353,7 +356,7 @@ section.title-page.centered > h2 {
 }
 
 section.title-page.centered > p {
-  margin: 15px 0;
+  margin: 0;
   color: var(--uec-color-text);
   font-size: var(--uec-cover-centered-meta-size);
   line-height: 1.25;
@@ -365,7 +368,13 @@ section.title-page.centered > p:nth-of-type(1) {
 }
 
 section.title-page.centered > p:nth-of-type(2) {
-  margin-top: 1px;
+  margin-top: 0;
+}
+
+section.title-page.centered > h1,
+section.title-page.centered > h2,
+section.title-page.centered > p {
+  transform: translateY(-4px);
 }
 
 section.title-page.centered code {
@@ -385,10 +394,10 @@ section a {
 }
 
 /* Parenthetical supplements and citations share the ly theme's size and style. */
-section .paren { font-size: var(--citation-font-size); }
+section:not(.title-page) .paren { font-size: var(--citation-font-size); }
 
 section:not(.title-page) :is(p, li) > em,
-section :is(p, li) > em:has(> a) {
+section:not(.title-page) :is(p, li) > em:has(> a) {
   font-size: var(--citation-font-size);
   font-style: normal;
 }
