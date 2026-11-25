@@ -15,7 +15,7 @@
     },
     {
       "path": "scripts/check-layout.cjs",
-      "sha256": "b0c47ba6d3aad4a40708db5df554e91276f16c7021a17309852854dfbb60ef85"
+      "sha256": "14be622e992a31a48e828876aaa3f71ade64a84a84af58b6f9a37ff4e3fe1452"
     },
     {
       "path": "scripts/check-math.cjs",
@@ -31,7 +31,7 @@
     },
     {
       "path": "slides/example-uec-haralab/slides.md",
-      "sha256": "ba30f1caf57ebac9385fe66e047eedacf2d5bef04aa7caf6eb69f16dba1716d3"
+      "sha256": "8e0a7b10bd6bc5655e56299785bce1bc1d3dafc072fa8b3c7bdac6def0692baa"
     },
     {
       "path": "slides/example/assets/kitada-kita.jpg",
@@ -103,7 +103,7 @@
     },
     {
       "path": "themes/uec-haralab.css",
-      "sha256": "cb830f25f86bfe1c34fedf34df5c748f22a3865258a8e90a3728923c5ba5a9ec"
+      "sha256": "82fe6ddf8eb69ee50f9b0017e7ae26548ada839fcaea75f4d318f158cc668e29"
     }
   ],
   "outputs": [
@@ -117,15 +117,15 @@
     },
     {
       "path": "docs/images/themes/uec-haralab/body.png",
-      "sha256": "3d8e03b01daa10eb128aaad986aa18e65e382327347753a861da5d719db15ec9"
+      "sha256": "cac4cd4f4875cc160af55de5cfb822bbb27514a565317baa4467cecb0db391bb"
     },
     {
       "path": "docs/images/themes/uec-haralab/title-centered.png",
-      "sha256": "16318d949f89fc54eeef7ff5ca1b0c401d69da22f8fc34d327e5fde193d516ae"
+      "sha256": "819b86497b93f1695e0c679144f6673d59cf69a300b4f231dc7a43c486865e89"
     },
     {
       "path": "docs/images/themes/uec-haralab/title.png",
-      "sha256": "945a4a8cede36f1d539e1f4575452571ab9ed082c1ae302fa06d6b98aceec909"
+      "sha256": "197aef31fb055360389818d8e2bb2d7af7f10138bcbbcd1104c1d8d2969025f6"
     }
   ]
 }

@@ -1141,6 +1141,17 @@ async function main() {
       assert.equal(p3Legacy.some(r => r.suspect), false);
       assert.ok(p3Wraps.some(r => r.word === 'どおり'));
       assert.deepEqual([...new Intl.Segmenter('ja', { granularity: 'word' }).segment('意図どおり')].filter(s => s.isWordLike).map(s => s.segment), ['意図', 'どおり']);
+      const phraseFixture = path.resolve('scripts/fixtures/uec-phrase-wrap.md');
+      const phraseHTML = execFileSync('marp', ['--template', 'bare', phraseFixture, '-o', '-'], { encoding: 'utf8', maxBuffer: 20 * 1024 * 1024 });
+      const phraseBase = pathToFileURL(path.dirname(phraseFixture) + path.sep).href;
+      await page.setContent(phraseHTML.replace('<head>', `<head><base href="${phraseBase}">`));
+      await page.evaluate(() => document.fonts.ready);
+      const phraseLines = await page.evaluate(inspectLines);
+      assert.ok(phraseLines.find(block => block.element === 'h1')?.lines.length > 1, 'the long cover title must wrap');
+      assert.ok(phraseLines.find(block => block.element === 'p')?.lines.length > 1, 'the cover subtitle must wrap');
+      assert.ok(phraseLines.find(block => block.slide === 2 && block.element === 'h1')?.lines.length > 1, 'the long content-slide heading must wrap');
+      const phraseWraps = await page.evaluate(inspectMidwordWraps);
+      assert.deepEqual(phraseWraps, [], `Japanese titles, headings, and body text must not break inside words: ${JSON.stringify(phraseWraps)}`);
       await page.setContent('<section lang="ja" style="font:20px/30px sans-serif;word-break:auto-phrase;text-wrap:pretty"><p style="width:70px;margin:0">意図 どおり</p></section>');
       assert.deepEqual(await page.evaluate(inspectMidwordWraps), []);
       await page.setContent('<section style="font:20px monospace"><p style="width:80px;margin:0;word-break:break-all">ABCDEFGHIJKL</p></section>');
