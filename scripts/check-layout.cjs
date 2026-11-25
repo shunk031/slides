@@ -1183,6 +1183,27 @@ async function main() {
         paragraphLabel: '"本文用"',
         codeLabel: '"コード用"',
       });
+      const debugTitlePageStyles = await page.evaluate(() => {
+        const slide = document.querySelector('section.debug-layout.title-page');
+        const title = slide.querySelector(':scope > h1');
+        const presenter = slide.querySelector(':scope > h2');
+        const affiliation = slide.querySelector(':scope > p:nth-of-type(1)');
+        const contact = slide.querySelector(':scope > p:nth-of-type(2)');
+        return {
+          presenterOutline: getComputedStyle(presenter).outlineStyle,
+          titleLabel: getComputedStyle(title, '::after').content,
+          presenterLabel: getComputedStyle(presenter, '::after').content,
+          affiliationLabel: getComputedStyle(affiliation, '::after').content,
+          contactLabel: getComputedStyle(contact, '::after').content,
+        };
+      });
+      assert.deepEqual(debugTitlePageStyles, {
+        presenterOutline: 'solid',
+        titleLabel: '"論文タイトル用"',
+        presenterLabel: '"発表者名用"',
+        affiliationLabel: '"所属用"',
+        contactLabel: '"連絡先用"',
+      });
       await page.setContent('<section lang="ja" style="font:20px/30px sans-serif;word-break:auto-phrase;text-wrap:pretty"><p style="width:70px;margin:0">意図 どおり</p></section>');
       assert.deepEqual(await page.evaluate(inspectMidwordWraps), []);
       await page.setContent('<section style="font:20px monospace"><p style="width:80px;margin:0;word-break:break-all">ABCDEFGHIJKL</p></section>');
