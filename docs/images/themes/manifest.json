@@ -15,7 +15,7 @@
     },
     {
       "path": "scripts/check-layout.cjs",
-      "sha256": "14be622e992a31a48e828876aaa3f71ade64a84a84af58b6f9a37ff4e3fe1452"
+      "sha256": "139c94b4de3245bf7cadcdee915a2677e9fd9732000c425bbb961c3a2d4408cf"
     },
     {
       "path": "scripts/check-math.cjs",
@@ -103,7 +103,7 @@
     },
     {
       "path": "themes/uec-haralab.css",
-      "sha256": "82fe6ddf8eb69ee50f9b0017e7ae26548ada839fcaea75f4d318f158cc668e29"
+      "sha256": "c7b495fd40c89cd8090d8641fbf838f9774bb019b4c97abbbbb79aed402d29c7"
     }
   ],
   "outputs": [
