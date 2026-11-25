@@ -134,6 +134,11 @@ section ul {
   margin-top: 0;
 }
 
+section[lang="ja"] {
+  word-break: auto-phrase;
+  text-wrap: pretty;
+}
+
 section:not(.title-page) {
   padding: var(--uec-content-top) var(--uec-content-inline) 44px;
   font-size: var(--uec-body-font-size);
