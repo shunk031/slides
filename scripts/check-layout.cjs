@@ -4,6 +4,8 @@ const path = require('node:path');
 const { createRequire } = require('node:module');
 const { execFileSync } = require('node:child_process');
 const { pathToFileURL } = require('node:url');
+const os = require('node:os');
+const coverSpec = JSON.parse(fs.readFileSync(path.join(__dirname, 'uec-haralab-cover-spec.json'), 'utf8'));
 
 function inspectLayoutCoverage(css) {
   const sheet = new CSSStyleSheet();
@@ -1024,6 +1026,87 @@ function inspectMathLabels() {
   return formulas;
 }
 
+async function inspectCoverRendering(spec) {
+  const findings = [];
+  const slides = [...document.querySelectorAll('section')];
+  const selectors = {
+    title: ':scope > h1',
+    presenter: ':scope > h2',
+    affiliation: ':scope > h2 + p',
+    email: ':scope > h2 + p + p code',
+  };
+  const normalizeFamily = family => family.trim().replace(/^['"]|['"]$/g, '');
+  const expectedColor = color => {
+    const probe = document.createElement('span');
+    probe.style.color = color;
+    document.body.append(probe);
+    const normalized = getComputedStyle(probe).color;
+    probe.remove();
+    return normalized;
+  };
+
+  for (const variant of spec.variants) {
+    const slide = slides.find(section => section.classList.contains('title-page') && section.classList.contains(variant.className));
+    if (!slide) {
+      findings.push({ slide: variant.page, kind: 'cover-render', text: `${variant.role}: required cover variant is missing` });
+      continue;
+    }
+    const slideNumber = slides.indexOf(slide) + 1;
+    if (slideNumber !== variant.page) findings.push({ slide: slideNumber, kind: 'cover-render', text: `${variant.role}: expected page ${variant.page}, got page ${slideNumber}` });
+
+    for (const [role, expected] of Object.entries(variant.roles)) {
+      const element = slide.querySelector(selectors[role]);
+      if (!element) {
+        findings.push({ slide: slideNumber, kind: 'cover-render', text: `${variant.role} ${role}: element is missing` });
+        continue;
+      }
+      const style = getComputedStyle(element);
+      const actualFamily = normalizeFamily(style.fontFamily.split(',')[0]);
+      if (actualFamily !== expected.fontFamily) findings.push({ slide: slideNumber, kind: 'cover-render', text: `${variant.role} ${role} font-family expected ${expected.fontFamily}, got ${actualFamily}` });
+      const actualWeight = Number(style.fontWeight);
+      if (actualWeight !== expected.fontWeight) findings.push({ slide: slideNumber, kind: 'cover-render', text: `${variant.role} ${role} font-weight expected ${expected.fontWeight}, got ${style.fontWeight}` });
+      const actualSize = Number.parseFloat(style.fontSize);
+      if (actualSize !== expected.fontSize) findings.push({ slide: slideNumber, kind: 'cover-render', text: `${variant.role} ${role} font-size expected ${expected.fontSize}px, got ${style.fontSize}` });
+      const actualColor = style.color;
+      if (actualColor !== expectedColor(expected.color)) findings.push({ slide: slideNumber, kind: 'cover-render', text: `${variant.role} ${role} color expected ${expected.color}, got ${actualColor}` });
+    }
+
+    const backgroundImage = getComputedStyle(slide, '::before').backgroundImage;
+    const imageURLs = [...backgroundImage.matchAll(/url\((?:"([^"]+)"|'([^']+)'|([^)]*))\)/g)].map(match => match[1] || match[2] || match[3].trim());
+    for (const logo of spec.logos) {
+      const source = imageURLs[logo.layer];
+      if (!source) {
+        findings.push({ slide: slideNumber, kind: 'cover-render', text: `${variant.role} ${logo.role}: background image layer ${logo.layer + 1} is missing` });
+        continue;
+      }
+      const image = new Image();
+      image.src = new URL(source, document.baseURI).href;
+      try {
+        await image.decode();
+        if (!image.naturalWidth || !image.naturalHeight) findings.push({ slide: slideNumber, kind: 'cover-render', text: `${variant.role} ${logo.role}: image has zero natural size` });
+      } catch {
+        findings.push({ slide: slideNumber, kind: 'cover-render', text: `${variant.role} ${logo.role}: failed to load image ${image.src}` });
+      }
+    }
+  }
+
+  for (const faceSpec of spec.fontFaces) {
+    const cssFamily = `"${faceSpec.family}"`;
+    const query = `${faceSpec.weight} 16px ${cssFamily}`;
+    let loadFailed = false;
+    try {
+      await document.fonts.load(query);
+    } catch {
+      loadFailed = true;
+    }
+    const faces = [...document.fonts].filter(face => normalizeFamily(face.family) === faceSpec.family && face.weight.split(/\s+/).includes(String(faceSpec.weight)));
+    if (loadFailed || !faces.some(face => face.status === 'loaded') || !document.fonts.check(query)) {
+      findings.push({ slide: spec.variants[0].page, kind: 'cover-render', text: `bundled font ${faceSpec.family} weight ${faceSpec.weight} is not loaded` });
+    }
+  }
+  return findings;
+}
+
 
 function mathSpacingFindings(formulas, sources) {
   const findings = [];
@@ -1828,6 +1911,62 @@ async function main() {
       for (const content of ['<ul><li>Ordinary parent<ul><li>Child</li></ul></li></ul>','<ul><li><strong>First</strong><ul><li>Child</li></ul></li><li><strong>Second</strong><ul><li>Child</li></ul></li></ul>','<ul><li>Parent<ul><li><strong>Nested</strong><ul><li>Child</li></ul></li></ul></li></ul>']) {
         await page.setContent(`<section>${content}</section>`); assert.deepEqual(await page.evaluate(inspectPseudoLists),[]);
       }
+      const coverDir = fs.mkdtempSync(path.join(os.tmpdir(), 'slide-cover-render-'));
+      try {
+        const coverInput = path.resolve('slides/example-uec-haralab/slides.md');
+        const coverHTML = execFileSync('marp', ['--template', 'bare', coverInput, '-o', '-'], { encoding: 'utf8', maxBuffer: 20 * 1024 * 1024 });
+        const coverHTMLPath = path.join(coverDir, 'slides.html');
+        const coverBase = `<head><base href="${pathToFileURL(path.dirname(coverInput) + path.sep).href}">`;
+        fs.writeFileSync(coverHTMLPath, coverHTML.replace('<head>', coverBase));
+        const loadCover = async () => {
+          await page.goto(pathToFileURL(coverHTMLPath).href, { waitUntil: 'networkidle0' });
+          await page.evaluate(async () => { await document.fonts.ready; });
+        };
+        await loadCover();
+        assert.deepEqual(await page.evaluate(inspectCoverRendering, coverSpec), [], 'cover render specification must pass for both variants');
+
+        await page.evaluate(() => { document.querySelector('section.centered > h2').style.fontWeight = '700'; });
+        let coverFindings = await page.evaluate(inspectCoverRendering, coverSpec);
+        let probe = coverFindings.find(f => f.text.includes('centered presenter font-weight expected 400, got 700'));
+        assert.ok(probe, `presenter weight regression was not detected: ${JSON.stringify(coverFindings)}`);
+        console.log(`Expected cover guard failure: ${probe.text}`);
+
+        await loadCover();
+        await page.evaluate(() => { document.querySelector('section.first-slide > h2').style.fontWeight = '700.5'; });
+        coverFindings = await page.evaluate(inspectCoverRendering, coverSpec);
+        probe = coverFindings.find(f => f.text.includes('paper-introduction presenter font-weight expected 700, got 700.5'));
+        assert.ok(probe, `fractional presenter weight regression was not detected: ${JSON.stringify(coverFindings)}`);
+        console.log(`Expected cover guard failure: ${probe.text}`);
+
+        await loadCover();
+        await page.evaluate(() => { document.querySelector('section.centered > p:nth-of-type(2) code').style.fontFamily = 'Arial'; });
+        coverFindings = await page.evaluate(inspectCoverRendering, coverSpec);
+        probe = coverFindings.find(f => f.text.includes('centered email font-family expected Courier New, got Arial'));
+        assert.ok(probe, `email family regression was not detected: ${JSON.stringify(coverFindings)}`);
+        console.log(`Expected cover guard failure: ${probe.text}`);
+
+        await loadCover();
+        const missingLogoURL = pathToFileURL(path.join(coverDir, 'missing-haralab-logo.png')).href;
+        const uecLogoURL = pathToFileURL(path.resolve('themes/assets/uec-haralab/uec-logo.png')).href;
+        await page.addStyleTag({ content: `section.centered::before { background-image: url("${missingLogoURL}"), url("${uecLogoURL}"), linear-gradient(to bottom, #17288b 0 101px, transparent 101px 100%) !important; }` });
+        coverFindings = await page.evaluate(inspectCoverRendering, coverSpec);
+        probe = coverFindings.find(f => f.text.includes('centered haralab-logo: failed to load image'));
+        assert.ok(probe, `logo path regression was not detected: ${JSON.stringify(coverFindings)}`);
+        console.log(`Expected cover guard failure: ${probe.text}`);
+
+        const brokenFontHTML = coverHTML.replace('LINESeedJP-Regular.ttf', 'missing-LINESeedJP-Regular.ttf');
+        assert.notEqual(brokenFontHTML, coverHTML, 'cover HTML must include the bundled regular font path');
+        const brokenFontPath = path.join(coverDir, 'font-path-broken.html');
+        fs.writeFileSync(brokenFontPath, brokenFontHTML.replace('<head>', coverBase));
+        await page.goto(pathToFileURL(brokenFontPath).href, { waitUntil: 'networkidle0' });
+        await page.evaluate(async () => { await document.fonts.ready; });
+        coverFindings = await page.evaluate(inspectCoverRendering, coverSpec);
+        probe = coverFindings.find(f => f.text.includes('bundled font LINE Seed JP weight 400 is not loaded'));
+        assert.ok(probe, `font file path regression was not detected: ${JSON.stringify(coverFindings)}`);
+        console.log(`Expected cover guard failure: ${probe.text}`);
+      } finally {
+        fs.rmSync(coverDir, { recursive: true, force: true });
+      }
       console.log('Layout inspection self-test passed');
       return;
     }
@@ -1877,8 +2016,9 @@ async function main() {
       const math = await page.evaluate(inspectMathLabels);
       const mathSources = new (marpRequire('@marp-team/marp-core').Marp)().markdown.parse(fs.readFileSync(input, 'utf8'), {}).filter(t => t.type === 'marp_math_block').map(t => t.content);
       const mathReview = mathSpacingFindings(math, mathSources);
+      const coverFindings = path.resolve(input) === path.resolve('slides/example-uec-haralab/slides.md') ? await page.evaluate(inspectCoverRendering, coverSpec) : [];
       fs.writeFileSync(path.join(output, 'spaces.json'), JSON.stringify({ input, browser: await browser.version(), slides: spaces }, null, 2));
-      const structure = [...(input === files[0] ? layoutCoverage.findings : []), ...await page.evaluate(inspectStructure), ...math.flatMap(f => f.findings), ...textConventions.filter(f => !f.review), ...pseudoLists.filter(f => !f.review), ...parentheses.filter(f => !f.review), ...await page.evaluate(inspectTypography), ...await page.evaluate(inspectTerms, terms), ...await page.evaluate(inspectMidwordWraps), ...await page.evaluate(inspectItemGaps), ...titleFindings, ...headingFindings, ...columnFindings(columns), ...groupGapFindings(groupGaps), ...bodyFillFindings(bodyFill)];
+      const structure = [...(input === files[0] ? layoutCoverage.findings : []), ...await page.evaluate(inspectStructure), ...coverFindings, ...math.flatMap(f => f.findings), ...textConventions.filter(f => !f.review), ...pseudoLists.filter(f => !f.review), ...parentheses.filter(f => !f.review), ...await page.evaluate(inspectTypography), ...await page.evaluate(inspectTerms, terms), ...await page.evaluate(inspectMidwordWraps), ...await page.evaluate(inspectItemGaps), ...titleFindings, ...headingFindings, ...columnFindings(columns), ...groupGapFindings(groupGaps), ...bodyFillFindings(bodyFill)];
       structuralErrors += structure.length + candidates.length;
       candidateCount += candidates.length + structure.length;
       fs.writeFileSync(path.join(output, 'lines.json'), JSON.stringify({ input, browser: await browser.version(), blocks, columnPairs: columns, groupGaps, bodyFill, structure, languageReview, pseudoReview, parenthesisReview, mathReview, math }, null, 2));
