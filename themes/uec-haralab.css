@@ -162,6 +162,10 @@ section:not(.title-page) > h1 {
   text-wrap: nowrap;
 }
 
+section[lang="ja"]:not(.title-page) > h1 {
+  text-wrap: pretty;
+}
+
 section:not(.title-page) > h2 {
   margin: var(--uec-section-gap) 0 3px;
   color: var(--uec-color-text);

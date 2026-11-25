@@ -1149,8 +1149,9 @@ async function main() {
       const phraseLines = await page.evaluate(inspectLines);
       assert.ok(phraseLines.find(block => block.element === 'h1')?.lines.length > 1, 'the long cover title must wrap');
       assert.ok(phraseLines.find(block => block.element === 'p')?.lines.length > 1, 'the cover subtitle must wrap');
+      assert.ok(phraseLines.find(block => block.slide === 2 && block.element === 'h1')?.lines.length > 1, 'the long content-slide heading must wrap');
       const phraseWraps = await page.evaluate(inspectMidwordWraps);
-      assert.deepEqual(phraseWraps, [], `the Japanese cover title and subtitle must not break inside words: ${JSON.stringify(phraseWraps)}`);
+      assert.deepEqual(phraseWraps, [], `Japanese titles, headings, and body text must not break inside words: ${JSON.stringify(phraseWraps)}`);
       await page.setContent('<section lang="ja" style="font:20px/30px sans-serif;word-break:auto-phrase;text-wrap:pretty"><p style="width:70px;margin:0">意図 どおり</p></section>');
       assert.deepEqual(await page.evaluate(inspectMidwordWraps), []);
       await page.setContent('<section style="font:20px monospace"><p style="width:80px;margin:0;word-break:break-all">ABCDEFGHIJKL</p></section>');
