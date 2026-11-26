@@ -105,7 +105,7 @@ Chrome の CSS parser でテーマを読み、`section` / `:root` と同じ comp
 
 ### cover-render
 
-`slides/example-uec-haralab/slides.md` の 1、2 ページを検査します。1 ページは `paper-introduction`、2 ページは `centered` です。各ページの title、presenter、affiliation、email が対象です。期待する font-family、font-weight、font-size、color は `scripts/uec-haralab-cover-spec.json` に一元化します。1 ページの値は `themes/uec-haralab.css` の表紙セレクターに合わせます。2 ページの値は承認済み仕様です。
+`slides/example-uec-haralab/slides.md` の 1、2 ページを検査します。1 ページは `paper-introduction`、2 ページは `centered` です。各ページの title、presenter、affiliation、email が対象です。期待する font-family、font-weight、font-size、color は `scripts/uec-haralab-cover-spec.json` に一元化します。両表紙の各役割の family、weight、size、color は `themes/uec-haralab.css` のセレクターと変数に合わせます。1 ページの値は同スタイルシートが定義する `first-slide` の各役割セレクターに基づきます。2 ページの値は、`:root` で定義された `--uec-font-family`・`--uec-color-text` および `--uec-cover-centered-title-size`・`--uec-cover-centered-title-color`・`--uec-cover-centered-presenter-size`・`--uec-cover-centered-meta-size`・`--uec-cover-centered-email-size` に基づきます。`section.title-page.centered > h1`、`> h2`、`> p`、`code` セレクターがこれらの値と font-weight・font-family を適用します。
 
 計算済み font-family は先頭の family と照合します。font-weight、font-size、color は仕様ファイルの値と完全一致させます。
 

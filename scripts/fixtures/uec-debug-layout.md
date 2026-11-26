@@ -22,4 +22,4 @@ paginate: true
 
 Example University, Research Laboratory
 
-presenter@example.com
+`presenter@example.com`
