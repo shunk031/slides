@@ -24,7 +24,7 @@ Figures and equations in this talk are attributed to their original sources.
 
 Example University, Research Laboratory
 
-you@example.com
+`you@example.com`
 
 ---
 
@@ -38,7 +38,7 @@ you@example.com
 
 Example University, Research Laboratory
 
-you@example.com
+`you@example.com`
 
 ---
 
