@@ -45,6 +45,11 @@
   --uec-body-tracking: -0.001em;
   --uec-section-heading-tracking: -0.001em;
   --uec-section-gap: 25px;
+  --uec-heading-description-ratio: calc(15 / 28);
+  --uec-heading-description-gap: 0.35em;
+  --uec-heading-description-line-height: 1.4;
+  --uec-heading-separator-width: 3px;
+  --uec-heading-separator-height: calc(var(--uec-section-heading-size) * 0.9);
   --citation-font-size: 20px;
   --figure-caption-font-size: 20px;
   --uec-list-gap: 7px;
@@ -179,8 +184,56 @@ section:not(.title-page) > h2:first-of-type {
   margin-top: 0;
 }
 
+section:not(.title-page) h2:has(> em:last-child) {
+  display: flex;
+  align-items: center;
+  gap: var(--uec-heading-description-gap);
+  white-space: nowrap;
+}
+
+section:not(.title-page) h2 > strong:has(+ em:last-child) {
+  flex-shrink: 0;
+  height: var(--uec-heading-separator-height);
+  border-left: var(--uec-heading-separator-width) solid var(--uec-color-navy);
+  font-size: 0;
+}
+
+section:not(.title-page) h2 > em:last-child {
+  min-width: 0;
+  font-size: calc(1em * var(--uec-heading-description-ratio));
+  font-style: normal;
+  line-height: var(--uec-heading-description-line-height);
+  white-space: normal;
+  text-wrap: balance;
+}
+
 section:not(.title-page) p {
   margin-bottom: 5px;
+}
+
+section:not(.title-page) > blockquote:has(> p > img) {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+section:not(.title-page) > blockquote:has(> p > img)::before,
+section:not(.title-page) > blockquote:has(> p > img)::after {
+  content: none;
+}
+
+section:not(.title-page) > blockquote:has(> p > img) > p {
+  margin: 0;
+  text-align: center;
+}
+
+section:not(.title-page) > blockquote:has(> p > img) > p:first-child {
+  margin-bottom: 8px;
+}
+
+section:not(.title-page) > blockquote:has(> p > img) > p:last-child {
+  font-size: var(--figure-caption-font-size);
 }
 
 section:not(.title-page) ul {
